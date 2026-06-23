@@ -1,0 +1,41 @@
+# Gradle
+.gradle/
+build/
+*/build/
+.kotlin/
+
+# Local SDK and machine-specific config
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Android generated files
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+*.aab
+*.aar
+
+# Signing and secrets
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# Kotlin / Java
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.nar
+hs_err_pid*
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
