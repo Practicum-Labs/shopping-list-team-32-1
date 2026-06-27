@@ -53,6 +53,7 @@ fun MainRoute(
             onNewListNameChange = viewModel::onNewListNameChange,
             onCreateListClick = viewModel::createShoppingList,
             onIconPickerDismiss = viewModel::onIconPickerDismiss,
+            onShoppingListIconClick = viewModel::onShoppingListIconClick,
             onIconSelected = viewModel::onShoppingListIconSelected,
             onShoppingListScrollHandled = viewModel::onShoppingListScrollHandled,
             onRetryClick = viewModel::retryShoppingListsLoading,
@@ -135,12 +136,15 @@ fun MainScreen(
         )
     }
 
-    if (uiState.isIconPickerVisible) {
-        ShoppingListIconPickerBottomSheet(
-            isUpdatingIcon = uiState.isUpdatingIcon,
-            isErrorVisible = uiState.isIconPickerErrorVisible,
-            actions = actions,
-        )
+    when (val iconPickerState = uiState.iconPickerState) {
+        IconPickerState.Hidden -> Unit
+        is IconPickerState.Visible -> {
+            ShoppingListIconPickerBottomSheet(
+                isUpdatingIcon = iconPickerState.isUpdating,
+                isErrorVisible = iconPickerState.isErrorVisible,
+                actions = actions,
+            )
+        }
     }
 }
 
@@ -176,6 +180,7 @@ private fun BoxScope.MainContent(
             ShoppingListsContent(
                 shoppingLists = contentState.shoppingLists,
                 scrollToShoppingListId = scrollToShoppingListId,
+                onShoppingListIconClick = actions.onShoppingListIconClick,
                 onShoppingListScrollHandled = actions.onShoppingListScrollHandled,
                 modifier = Modifier
                     .align(Alignment.TopCenter)

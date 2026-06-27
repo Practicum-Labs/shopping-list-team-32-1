@@ -7,10 +7,7 @@ data class MainUiState(
     val isAddListDialogVisible: Boolean = false,
     val newListName: String = "",
     val isCreatingList: Boolean = false,
-    val isIconPickerVisible: Boolean = false,
-    val isUpdatingIcon: Boolean = false,
-    val isIconPickerErrorVisible: Boolean = false,
-    val iconPickerShoppingListId: Long? = null,
+    val iconPickerState: IconPickerState = IconPickerState.Hidden,
     val scrollToShoppingListId: Long? = null,
 )
 
@@ -24,4 +21,14 @@ sealed interface MainContentState {
     data class Content(
         val shoppingLists: List<ShoppingList>,
     ) : MainContentState
+}
+
+sealed interface IconPickerState {
+    data object Hidden : IconPickerState
+
+    data class Visible(
+        val shoppingListId: Long,
+        val isUpdating: Boolean = false,
+        val isErrorVisible: Boolean = false,
+    ) : IconPickerState
 }

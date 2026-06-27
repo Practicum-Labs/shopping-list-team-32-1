@@ -57,7 +57,7 @@ class MainViewModel(
                 isAddListDialogVisible = true,
                 newListName = "",
                 isCreatingList = false,
-                isIconPickerErrorVisible = false,
+                iconPickerState = currentState.iconPickerState.hideError(),
             )
         }
     }
@@ -109,8 +109,7 @@ class MainViewModel(
                         isAddListDialogVisible = false,
                         newListName = "",
                         isCreatingList = false,
-                        isIconPickerVisible = true,
-                        iconPickerShoppingListId = createdListId,
+                        scrollToShoppingListId = createdListId,
                     )
                 }
             }.onFailure {
@@ -123,33 +122,46 @@ class MainViewModel(
         }
     }
 
-    fun onIconPickerDismiss() {
-        if (screenState.value.isUpdatingIcon) {
+    fun onShoppingListIconClick(shoppingListId: Long) {
+        if (screenState.value.iconPickerState.isUpdating) {
             return
         }
 
         screenState.update { currentState ->
             currentState.copy(
-                isIconPickerVisible = false,
-                isUpdatingIcon = false,
-                isIconPickerErrorVisible = false,
-                iconPickerShoppingListId = null,
-                scrollToShoppingListId = currentState.iconPickerShoppingListId,
+                iconPickerState = IconPickerState.Visible(
+                    shoppingListId = shoppingListId,
+                ),
+            )
+        }
+    }
+
+    fun onIconPickerDismiss() {
+        if (screenState.value.iconPickerState.isUpdating) {
+            return
+        }
+
+        screenState.update { currentState ->
+            currentState.copy(
+                iconPickerState = IconPickerState.Hidden,
             )
         }
     }
 
     fun onShoppingListIconSelected(iconName: String) {
         val currentState = screenState.value
-        val shoppingListId = currentState.iconPickerShoppingListId ?: return
-        if (currentState.isUpdatingIcon) {
+        val iconPickerState = currentState.iconPickerState as? IconPickerState.Visible ?: return
+        if (iconPickerState.isUpdating) {
             return
         }
 
+        val shoppingListId = iconPickerState.shoppingListId
         screenState.update { state ->
             state.copy(
-                isUpdatingIcon = true,
-                isIconPickerErrorVisible = false,
+                iconPickerState = iconPickerState.copy(
+                    isUpdating = true,
+                    isErrorVisible = false,
+                ),
             )
         }
         viewModelScope.launch {
@@ -161,18 +173,16 @@ class MainViewModel(
             }.onSuccess {
                 screenState.update { state ->
                     state.copy(
-                        isIconPickerVisible = false,
-                        isUpdatingIcon = false,
-                        isIconPickerErrorVisible = false,
-                        iconPickerShoppingListId = null,
-                        scrollToShoppingListId = shoppingListId,
+                        iconPickerState = IconPickerState.Hidden,
                     )
                 }
             }.onFailure {
                 screenState.update { state ->
                     state.copy(
-                        isUpdatingIcon = false,
-                        isIconPickerErrorVisible = true,
+                        iconPickerState = iconPickerState.copy(
+                            isUpdating = false,
+                            isErrorVisible = true,
+                        ),
                     )
                 }
             }
@@ -190,3 +200,13 @@ class MainViewModel(
         const val DEFAULT_LIST_ICON_NAME = "list_alt"
     }
 }
+
+private val IconPickerState.isUpdating: Boolean
+    get() = this is IconPickerState.Visible && isUpdating
+
+private fun IconPickerState.hideError(): IconPickerState =
+    if (this is IconPickerState.Visible) {
+        copy(isErrorVisible = false)
+    } else {
+        this
+    }

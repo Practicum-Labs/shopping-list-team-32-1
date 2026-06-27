@@ -1,8 +1,6 @@
 package com.practicum.shoppinglist.presentation.ui.main.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +36,7 @@ import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 fun ShoppingListsContent(
     shoppingLists: List<ShoppingList>,
     scrollToShoppingListId: Long?,
+    onShoppingListIconClick: (Long) -> Unit,
     onShoppingListScrollHandled: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -68,7 +68,10 @@ fun ShoppingListsContent(
             items = shoppingLists,
             key = { shoppingList -> shoppingList.id },
         ) { shoppingList ->
-            ShoppingListItem(shoppingList = shoppingList)
+            ShoppingListItem(
+                shoppingList = shoppingList,
+                onIconClick = onShoppingListIconClick,
+            )
         }
     }
 }
@@ -76,6 +79,7 @@ fun ShoppingListsContent(
 @Composable
 private fun ShoppingListItem(
     shoppingList: ShoppingList,
+    onIconClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(Dimens.Main.listItemCornerRadius)
@@ -106,23 +110,27 @@ private fun ShoppingListItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.Main.listItemContentSpacing),
         ) {
-            Box(
+            Surface(
+                onClick = { onIconClick(shoppingList.id) },
                 modifier = Modifier
-                    .size(Dimens.Main.listItemIconContainerSize)
-                    .background(
-                        color = MaterialTheme.colors.iconPickerItemContainer,
-                        shape = CircleShape,
-                    ),
-                contentAlignment = Alignment.Center,
+                    .size(Dimens.Main.listItemIconContainerSize),
+                shape = CircleShape,
+                color = MaterialTheme.colors.iconPickerItemContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
-                Icon(
-                    imageVector = shoppingListIconByName(shoppingList.iconName),
-                    contentDescription = stringResource(
-                        id = R.string.main_shopping_list_icon_content_description,
-                    ),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(Dimens.Main.listItemIconSize),
-                )
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Icon(
+                        imageVector = shoppingListIconByName(shoppingList.iconName),
+                        contentDescription = stringResource(
+                            id = R.string.main_shopping_list_icon_content_description,
+                        ),
+                        modifier = Modifier.size(Dimens.Main.listItemIconSize),
+                    )
+                }
             }
             Text(
                 text = shoppingList.name,

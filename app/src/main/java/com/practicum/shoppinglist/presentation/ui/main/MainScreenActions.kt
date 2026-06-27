@@ -9,6 +9,7 @@ data class MainScreenActions(
     val onNewListNameChange: (String) -> Unit = {},
     val onCreateListClick: () -> Unit = {},
     val onIconPickerDismiss: () -> Unit = {},
+    val onShoppingListIconClick: (Long) -> Unit = {},
     val onIconSelected: (String) -> Unit = {},
     val onShoppingListScrollHandled: () -> Unit = {},
     val onRetryClick: () -> Unit = {},

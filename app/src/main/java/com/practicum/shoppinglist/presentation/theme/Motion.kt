@@ -2,7 +2,7 @@ package com.practicum.shoppinglist.presentation.theme
 
 object Motion {
     object Navigation {
-        const val loadingScreenDelayMillis = 1_000L
+        const val loadingScreenDelayMillis = 2_000L
         const val mainEnterDurationMillis = 500
         const val onboardingExitDurationMillis = 350
         const val mainEnterInitialScale = 0.98f

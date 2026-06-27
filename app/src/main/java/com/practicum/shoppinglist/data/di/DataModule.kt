@@ -2,11 +2,11 @@ package com.practicum.shoppinglist.data.di
 
 import androidx.room.Room
 import com.practicum.shoppinglist.data.local.database.AppDatabase
+import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
 import com.practicum.shoppinglist.data.repository.ShoppingListRepositoryImpl
-import com.practicum.shoppinglist.data.theme.ThemePreferencesDataSource
-import com.practicum.shoppinglist.data.theme.ThemeRepositoryImpl
+import com.practicum.shoppinglist.data.repository.ThemeRepositoryImpl
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
-import com.practicum.shoppinglist.domain.theme.ThemeRepository
+import com.practicum.shoppinglist.domain.repository.ThemeRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

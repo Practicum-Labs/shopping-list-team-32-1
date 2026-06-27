@@ -1,4 +1,4 @@
-package com.practicum.shoppinglist.domain.theme
+package com.practicum.shoppinglist.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 

@@ -1,6 +1,7 @@
-package com.practicum.shoppinglist.data.theme
+package com.practicum.shoppinglist.data.repository
 
-import com.practicum.shoppinglist.domain.theme.ThemeRepository
+import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
+import com.practicum.shoppinglist.domain.repository.ThemeRepository
 
 class ThemeRepositoryImpl(
     private val themePreferencesDataSource: ThemePreferencesDataSource,

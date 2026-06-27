@@ -1,9 +1,9 @@
 package com.practicum.shoppinglist.domain.di
 
-import com.practicum.shoppinglist.domain.theme.ObserveDarkThemeUseCase
-import com.practicum.shoppinglist.domain.theme.SetDarkThemeUseCase
 import com.practicum.shoppinglist.domain.usecase.CreateShoppingListUseCase
+import com.practicum.shoppinglist.domain.usecase.ObserveDarkThemeUseCase
 import com.practicum.shoppinglist.domain.usecase.ObserveShoppingListsUseCase
+import com.practicum.shoppinglist.domain.usecase.SetDarkThemeUseCase
 import com.practicum.shoppinglist.domain.usecase.UpdateShoppingListIconUseCase
 import org.koin.dsl.module
 

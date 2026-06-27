@@ -1,4 +1,4 @@
-package com.practicum.shoppinglist.data.theme
+package com.practicum.shoppinglist.data.local.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore

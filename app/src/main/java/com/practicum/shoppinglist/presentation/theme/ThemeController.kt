@@ -1,7 +1,7 @@
 package com.practicum.shoppinglist.presentation.theme
 
-import com.practicum.shoppinglist.domain.theme.ObserveDarkThemeUseCase
-import com.practicum.shoppinglist.domain.theme.SetDarkThemeUseCase
+import com.practicum.shoppinglist.domain.usecase.ObserveDarkThemeUseCase
+import com.practicum.shoppinglist.domain.usecase.SetDarkThemeUseCase
 import kotlinx.coroutines.flow.Flow
 
 class ThemeController(
