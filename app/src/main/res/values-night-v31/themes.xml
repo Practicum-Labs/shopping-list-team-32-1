@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Dark">
+        <item name="android:windowSplashScreenBackground">@color/shopping_dark_primary_container</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/shopping_dark_primary_container</item>
+    </style>
+</resources>

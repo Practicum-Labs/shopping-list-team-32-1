@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">shopping-list</string>
+    <string name="app_name">Shopping List</string>
+    <string name="onboarding_logo_content_description">Логотип Список покупок</string>
+    <string name="onboarding_illustration_content_description">Иллюстрация покупок</string>
+    <string name="onboarding_welcome_title">Добро пожаловать в Список покупок!</string>
+    <string name="onboarding_welcome_subtitle">Создавайте списки, добавляйте товары, отмечайте, что уже куплено</string>
+    <string name="main_title">Мои списки</string>
+    <string name="main_empty_state_illustration_content_description">Иллюстрация пустого списка покупок</string>
+    <string name="main_empty_state_title">У вас пока нет списков</string>
+    <string name="main_empty_state_subtitle">Нажмите на кнопку + ниже, чтобы создать свой первый список</string>
+    <string name="main_search_content_description">Поиск</string>
+    <string name="main_delete_content_description">Удалить</string>
+    <string name="main_theme_content_description">Сменить тему</string>
+    <string name="main_add_list_content_description">Создать список</string>
+    <string name="main_shopping_list_icon_content_description">Иконка списка покупок</string>
+    <string name="main_error_message">Не удалось загрузить списки, попробуйте еще раз</string>
+    <string name="main_retry_button">Обновить</string>
+    <string name="main_add_list_dialog_icon_content_description">Добавление списка</string>
+    <string name="main_add_list_dialog_title">Добавление списка</string>
+    <string name="main_add_list_name_label">Название списка</string>
+    <string name="main_add_list_name_placeholder">Новый список</string>
+    <string name="main_add_list_cancel">Отмена</string>
+    <string name="main_add_list_create">Создать</string>
+    <string name="main_icon_picker_error">Не удалось обновить иконку, попробуйте еще раз</string>
 </resources>

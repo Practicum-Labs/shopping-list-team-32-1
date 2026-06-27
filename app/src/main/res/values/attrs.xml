@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="shoppingColorPrimary" format="color" />
+    <attr name="shoppingColorOnPrimary" format="color" />
+    <attr name="shoppingColorPrimaryContainer" format="color" />
+    <attr name="shoppingColorOnPrimaryContainer" format="color" />
+    <attr name="shoppingColorSecondary" format="color" />
+    <attr name="shoppingColorOnSecondary" format="color" />
+    <attr name="shoppingColorBackground" format="color" />
+    <attr name="shoppingColorOnBackground" format="color" />
+    <attr name="shoppingColorSurface" format="color" />
+    <attr name="shoppingColorOnSurface" format="color" />
+    <attr name="shoppingColorSurfaceVariant" format="color" />
+    <attr name="shoppingColorOnSurfaceVariant" format="color" />
+    <attr name="shoppingColorOutline" format="color" />
+    <attr name="shoppingColorError" format="color" />
+    <attr name="shoppingColorOnError" format="color" />
+    <attr name="shoppingColorAddListDialogSurface" format="color" />
+    <attr name="shoppingColorAddListDialogLabelContainer" format="color" />
+    <attr name="shoppingColorAddListDialogAccent" format="color" />
+    <attr name="shoppingColorAddListDialogIcon" format="color" />
+    <attr name="shoppingColorAddListDialogTitle" format="color" />
+    <attr name="shoppingColorAddListDialogPlaceholder" format="color" />
+    <attr name="shoppingColorIconPickerSheetSurface" format="color" />
+    <attr name="shoppingColorIconPickerItemContainer" format="color" />
+    <attr name="shoppingColorListItemSurface" format="color" />
+    <attr name="shoppingColorListItemTitle" format="color" />
+</resources>
