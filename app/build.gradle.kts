@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -5,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.practicum.shopping_list"
+    namespace = "com.practicum.shoppinglist"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.practicum.shopping_list"
+        applicationId = "com.practicum.shoppinglist"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -45,11 +47,13 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
