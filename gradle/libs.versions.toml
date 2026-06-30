@@ -17,7 +17,7 @@ room = "2.8.4"
 
 # SDK & Java Versions
 compileSdk = "37"
-minSdk = "28"
+minSdk = "24"
 targetSdk = "36"
 jvmTarget = "11"
 

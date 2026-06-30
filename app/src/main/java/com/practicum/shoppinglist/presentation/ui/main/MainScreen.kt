@@ -150,7 +150,7 @@ fun MainScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(id = R.string.main_search_back),
                             tint = MaterialTheme.colors.addListDialogIcon
                         )
                     }
@@ -182,7 +182,7 @@ fun MainScreen(
                         IconButton(onClick = { actions.onSearchQueryChange("") }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Очистить",
+                                contentDescription = stringResource(id = R.string.main_search_clear),
                                 tint = MaterialTheme.colors.addListDialogIcon
                             )
                         }

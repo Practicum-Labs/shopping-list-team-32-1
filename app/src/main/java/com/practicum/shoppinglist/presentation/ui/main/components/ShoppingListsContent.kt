@@ -109,7 +109,7 @@ fun ShoppingListsContent(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(MaterialTheme.colorScheme.background)
-                                .padding(start = 16.dp, end = 0.dp),
+                                .padding(start = Dimens.Main.swipeActionContainerStartPadding, end = 0.dp),
                             contentAlignment = Alignment.CenterEnd
                         ) {
                             if (isLongSwipe) {
@@ -118,7 +118,7 @@ fun ShoppingListsContent(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Surface(
-                                        modifier = Modifier.size(48.dp),
+                                        modifier = Modifier.size(Dimens.Main.swipeActionButtonSize),
                                         shape = CircleShape,
                                         color = MaterialTheme.colorScheme.primary,
                                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -129,8 +129,10 @@ fun ShoppingListsContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Outlined.Delete,
-                                                contentDescription = "Удалить",
-                                                modifier = Modifier.size(24.dp)
+                                                contentDescription = stringResource(
+                                                    id = R.string.main_delete_content_description
+                                                ),
+                                                modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
                                             )
                                         }
                                     }
@@ -146,48 +148,52 @@ fun ShoppingListsContent(
                                             onRenameListClick(shoppingList.id)
                                         },
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(Dimens.Main.swipeActionButtonSize)
                                             .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Edit,
-                                            contentDescription = "Редактировать",
+                                            contentDescription = stringResource(id = R.string.main_rename_dialog_title),
                                             tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(24.dp)
+                                            modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
                                         )
                                     }
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(Dimens.Main.swipeActionSpacing))
                                     IconButton(
                                         onClick = {
                                             closeItem()
                                             onCopyListClick(shoppingList.id)
                                         },
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(Dimens.Main.swipeActionButtonSize)
                                             .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.ContentCopy,
-                                            contentDescription = "Копировать",
+                                            contentDescription = stringResource(
+                                                id = R.string.main_copy_content_description
+                                            ),
                                             tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(24.dp)
+                                            modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
                                         )
                                     }
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(Dimens.Main.swipeActionSpacing))
                                     IconButton(
                                         onClick = {
                                             closeItem()
                                             onDeleteListClick(shoppingList.id)
                                         },
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(Dimens.Main.swipeActionButtonSize)
                                             .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Delete,
-                                            contentDescription = "Удалить",
+                                            contentDescription = stringResource(
+                                                id = R.string.main_delete_content_description
+                                            ),
                                             tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(24.dp)
+                                            modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
                                         )
                                     }
                                 }
@@ -215,7 +221,7 @@ fun SwipeableListItem(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val actionsWidth = 168.dp
+    val actionsWidth = Dimens.Main.swipeActionsWidth
     val actionsWidthPx = with(density) { -actionsWidth.toPx() }
 
     var offsetX by remember { mutableStateOf(0f) }
