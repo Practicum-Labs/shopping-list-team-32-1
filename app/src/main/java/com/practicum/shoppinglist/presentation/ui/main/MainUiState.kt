@@ -9,6 +9,13 @@ data class MainUiState(
     val isCreatingList: Boolean = false,
     val iconPickerState: IconPickerState = IconPickerState.Hidden,
     val scrollToShoppingListId: Long? = null,
+    val isSearching: Boolean = false,
+    val searchQuery: String = "",
+    val isDeleteAllDialogVisible: Boolean = false,
+    val deleteListConfirmDialogTarget: ShoppingList? = null,
+    val renameListTarget: ShoppingList? = null,
+    val renameListName: String = "",
+    val isRenamingList: Boolean = false,
 )
 
 sealed interface MainContentState {

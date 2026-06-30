@@ -22,4 +22,16 @@
     <string name="main_add_list_cancel">Отмена</string>
     <string name="main_add_list_create">Создать</string>
     <string name="main_icon_picker_error">Не удалось обновить иконку, попробуйте еще раз</string>
+    <string name="main_search_placeholder">Поиск списков</string>
+    <string name="main_search_empty_title">Мы не смогли найти то,\nчто вы искали</string>
+    <string name="main_search_empty_subtitle">Попробуйте изменить запрос\nили проверить написание</string>
+    <string name="main_delete_all_confirm_title">Удалить все списки?</string>
+    <string name="main_delete_list_confirm_title">Удалить список «%1$s»?</string>
+    <string name="main_delete_confirm_yes">Удалить</string>
+    <string name="main_delete_confirm_no">Отмена</string>
+    <string name="main_rename_dialog_title">Редактирование списка</string>
+    <string name="main_rename_dialog_save">Сохранить</string>
+    <string name="main_rename_dialog_cancel">Отмена</string>
+    <string name="main_rename_dialog_name_label">Название списка</string>
+    <string name="main_copy_prefix">Копия %1$s</string>
 </resources>

@@ -15,4 +15,13 @@ interface ShoppingListRepository {
         shoppingListId: Long,
         iconName: String,
     )
+
+    suspend fun deleteAllShoppingLists()
+
+    suspend fun deleteShoppingList(shoppingListId: Long)
+
+    suspend fun updateShoppingListName(
+        shoppingListId: Long,
+        name: String,
+    )
 }

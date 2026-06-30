@@ -15,6 +15,12 @@ material = "1.14.0"
 navigation = "2.9.8"
 room = "2.8.4"
 
+# SDK & Java Versions
+compileSdk = "37"
+minSdk = "28"
+targetSdk = "36"
+jvmTarget = "11"
+
 # Static analysis
 detekt = "1.23.8"
 

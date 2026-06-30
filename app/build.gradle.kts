@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.practicum.shoppinglist"
-    compileSdk = 37
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.practicum.shoppinglist"
-        minSdk = 28
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -34,8 +34,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        val javaVersion = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 
