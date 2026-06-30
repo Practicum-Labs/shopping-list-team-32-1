@@ -79,7 +79,7 @@ fun RenameShoppingListDialog(
 }
 
 @Composable
-private fun RenameShoppingListDialogContent(
+fun RenameShoppingListDialogContent(
     listName: String,
     isRenamingList: Boolean,
     onListNameChange: (String) -> Unit,

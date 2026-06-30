@@ -10,6 +10,7 @@
     <string name="main_empty_state_subtitle">Нажмите на кнопку + ниже, чтобы создать свой первый список</string>
     <string name="main_search_content_description">Поиск</string>
     <string name="main_delete_content_description">Удалить</string>
+    <string name="main_copy_content_description">Копировать</string>
     <string name="main_theme_content_description">Сменить тему</string>
     <string name="main_add_list_content_description">Создать список</string>
     <string name="main_shopping_list_icon_content_description">Иконка списка покупок</string>
@@ -29,9 +30,11 @@
     <string name="main_delete_list_confirm_title">Удалить список «%1$s»?</string>
     <string name="main_delete_confirm_yes">Удалить</string>
     <string name="main_delete_confirm_no">Отмена</string>
-    <string name="main_rename_dialog_title">Редактирование списка</string>
+    <string name="main_rename_dialog_title">Переименование списка</string>
     <string name="main_rename_dialog_save">Сохранить</string>
     <string name="main_rename_dialog_cancel">Отмена</string>
     <string name="main_rename_dialog_name_label">Название списка</string>
-    <string name="main_copy_prefix">Копия %1$s</string>
+    <string name="main_copy_suffix">%1$s (копия)</string>
+    <string name="main_search_back">Назад</string>
+    <string name="main_search_clear">Очистить</string>
 </resources>

@@ -23,6 +23,8 @@ import com.practicum.shoppinglist.presentation.ui.main.MainScreen
 import com.practicum.shoppinglist.presentation.ui.main.MainScreenActions
 import com.practicum.shoppinglist.presentation.ui.main.MainUiState
 import com.practicum.shoppinglist.presentation.ui.main.components.AddShoppingListDialogContent
+import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialogContent
+import com.practicum.shoppinglist.presentation.ui.main.components.RenameShoppingListDialogContent
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListIconPickerContent
 
 @Preview(
@@ -260,6 +262,118 @@ private fun ShoppingListIconPickerDarkPreview() {
                 isErrorVisible = false,
                 onIconSelected = {},
                 modifier = Modifier.height(460.dp),
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Rename List Dialog",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+)
+@Composable
+private fun RenameShoppingListDialogPreview() {
+    Theme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center,
+        ) {
+            RenameShoppingListDialogContent(
+                listName = "Покупки на выходные",
+                isRenamingList = false,
+                onListNameChange = {},
+                onDismiss = {},
+                onSaveClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimens.Main.addDialogHorizontalPadding),
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Rename List Dialog Dark",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun RenameShoppingListDialogDarkPreview() {
+    Theme(darkTheme = true) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center,
+        ) {
+            RenameShoppingListDialogContent(
+                listName = "Покупки на выходные",
+                isRenamingList = false,
+                onListNameChange = {},
+                onDismiss = {},
+                onSaveClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimens.Main.addDialogHorizontalPadding),
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Confirmation Dialog Light",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+)
+@Composable
+private fun ConfirmationDialogLightPreview() {
+    Theme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center,
+        ) {
+            ConfirmationDialogContent(
+                title = "Удалить все списки?",
+                confirmText = "Удалить",
+                cancelText = "Отмена",
+                onConfirm = {},
+                onDismiss = {},
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Confirmation Dialog Dark",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun ConfirmationDialogDarkPreview() {
+    Theme(darkTheme = true) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center,
+        ) {
+            ConfirmationDialogContent(
+                title = "Удалить все списки?",
+                confirmText = "Удалить",
+                cancelText = "Отмена",
+                onConfirm = {},
+                onDismiss = {},
             )
         }
     }
