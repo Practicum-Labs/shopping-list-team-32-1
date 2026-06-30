@@ -25,4 +25,9 @@
     <attr name="shoppingColorIconPickerItemContainer" format="color" />
     <attr name="shoppingColorListItemSurface" format="color" />
     <attr name="shoppingColorListItemTitle" format="color" />
+    <attr name="shoppingColorSwipeActionBackground" format="color" />
+    <attr name="shoppingColorConfirmDialogCancelBackground" format="color" />
+    <attr name="shoppingColorConfirmDialogDeleteBackground" format="color" />
+    <attr name="shoppingColorConfirmDialogCancelText" format="color" />
+    <attr name="shoppingColorConfirmDialogDeleteText" format="color" />
 </resources>
