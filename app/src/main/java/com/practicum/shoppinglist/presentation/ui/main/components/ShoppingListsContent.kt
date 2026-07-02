@@ -63,7 +63,7 @@ fun ShoppingListsContent(
     onShoppingListIconClick: (Long) -> Unit,
     onShoppingListScrollHandled: () -> Unit,
     onDeleteListClick: (Long) -> Unit,
-    onCopyListClick: (Long) -> Unit,
+    onCopyListClick: (Long, String) -> Unit,
     onRenameListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isSearching: Boolean = false,
@@ -138,6 +138,7 @@ fun ShoppingListsContent(
                                     }
                                 }
                             } else {
+                                val copiedName = stringResource(id = R.string.main_copy_suffix, shoppingList.name)
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.End
@@ -162,7 +163,7 @@ fun ShoppingListsContent(
                                     IconButton(
                                         onClick = {
                                             closeItem()
-                                            onCopyListClick(shoppingList.id)
+                                            onCopyListClick(shoppingList.id, copiedName)
                                         },
                                         modifier = Modifier
                                             .size(Dimens.Main.swipeActionButtonSize)

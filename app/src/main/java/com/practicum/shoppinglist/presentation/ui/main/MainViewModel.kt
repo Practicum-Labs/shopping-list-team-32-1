@@ -1,9 +1,7 @@
 package com.practicum.shoppinglist.presentation.ui.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.domain.usecase.CopyShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.CreateShoppingListUseCase
@@ -28,7 +26,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("LongParameterList")
 class MainViewModel(
-    private val context: Context,
     observeShoppingListsUseCase: ObserveShoppingListsUseCase,
     private val createShoppingListUseCase: CreateShoppingListUseCase,
     private val updateShoppingListIconUseCase: UpdateShoppingListIconUseCase,
@@ -286,12 +283,11 @@ class MainViewModel(
         }
     }
 
-    fun onCopyListClick(shoppingListId: Long) {
+    fun onCopyListClick(shoppingListId: Long, copiedName: String) {
         val lists = (uiState.value.contentState as? MainContentState.Content)?.shoppingLists ?: return
         val targetList = lists.find { it.id == shoppingListId } ?: return
         viewModelScope.launch {
             runCatching {
-                val copiedName = context.getString(R.string.main_copy_suffix, targetList.name)
                 copyShoppingListUseCase(copiedName, targetList.iconName)
             }.onSuccess { createdId ->
                 screenState.update { currentState ->
