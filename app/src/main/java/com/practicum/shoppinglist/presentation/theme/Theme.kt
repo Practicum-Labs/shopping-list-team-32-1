@@ -55,6 +55,11 @@ data class Colors(
     val iconPickerItemContainer: Color,
     val listItemSurface: Color,
     val listItemTitle: Color,
+    val swipeActionBackground: Color,
+    val confirmDialogCancelBackground: Color,
+    val confirmDialogDeleteBackground: Color,
+    val confirmDialogCancelText: Color,
+    val confirmDialogDeleteText: Color,
 )
 
 val MaterialTheme.colors: Colors
@@ -80,6 +85,11 @@ private fun colors(): Colors {
         iconPickerItemContainer = colorAttr(R.attr.shoppingColorIconPickerItemContainer),
         listItemSurface = colorAttr(R.attr.shoppingColorListItemSurface),
         listItemTitle = colorAttr(R.attr.shoppingColorListItemTitle),
+        swipeActionBackground = colorAttr(R.attr.shoppingColorSwipeActionBackground),
+        confirmDialogCancelBackground = colorAttr(R.attr.shoppingColorConfirmDialogCancelBackground),
+        confirmDialogDeleteBackground = colorAttr(R.attr.shoppingColorConfirmDialogDeleteBackground),
+        confirmDialogCancelText = colorAttr(R.attr.shoppingColorConfirmDialogCancelText),
+        confirmDialogDeleteText = colorAttr(R.attr.shoppingColorConfirmDialogDeleteText),
     )
 }
 

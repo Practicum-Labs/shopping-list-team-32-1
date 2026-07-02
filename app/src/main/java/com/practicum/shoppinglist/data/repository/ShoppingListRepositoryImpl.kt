@@ -39,4 +39,16 @@ class ShoppingListRepositoryImpl(
             iconName = iconName,
         )
     }
+
+    override suspend fun deleteAllShoppingLists() {
+        shoppingListDao.deleteAllShoppingLists()
+    }
+
+    override suspend fun deleteShoppingList(shoppingListId: Long) {
+        shoppingListDao.deleteShoppingList(shoppingListId)
+    }
+
+    override suspend fun updateShoppingListName(shoppingListId: Long, name: String) {
+        shoppingListDao.updateShoppingListName(shoppingListId, name)
+    }
 }

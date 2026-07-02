@@ -10,6 +10,10 @@ val viewModelModule = module {
             observeShoppingListsUseCase = get(),
             createShoppingListUseCase = get(),
             updateShoppingListIconUseCase = get(),
+            deleteAllShoppingListsUseCase = get(),
+            deleteShoppingListUseCase = get(),
+            copyShoppingListUseCase = get(),
+            renameShoppingListUseCase = get(),
         )
     }
 }

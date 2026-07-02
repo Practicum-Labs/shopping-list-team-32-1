@@ -33,6 +33,11 @@
         <item name="shoppingColorIconPickerItemContainer">@color/shopping_light_icon_picker_item_container</item>
         <item name="shoppingColorListItemSurface">@color/shopping_light_list_item_surface</item>
         <item name="shoppingColorListItemTitle">@color/shopping_light_list_item_title</item>
+        <item name="shoppingColorSwipeActionBackground">@color/shopping_light_swipe_action_background</item>
+        <item name="shoppingColorConfirmDialogCancelBackground">@color/shopping_light_primary_container</item>
+        <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_light_primary</item>
+        <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
+        <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
     </style>
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
@@ -64,6 +69,11 @@
         <item name="shoppingColorIconPickerItemContainer">@color/shopping_dark_icon_picker_item_container</item>
         <item name="shoppingColorListItemSurface">@color/shopping_dark_list_item_surface</item>
         <item name="shoppingColorListItemTitle">@color/shopping_dark_list_item_title</item>
+        <item name="shoppingColorSwipeActionBackground">@color/shopping_dark_swipe_action_background</item>
+        <item name="shoppingColorConfirmDialogCancelBackground">@color/shopping_dark_confirm_dialog_cancel</item>
+        <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_dark_confirm_dialog_delete</item>
+        <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
     </style>
 
     <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />
