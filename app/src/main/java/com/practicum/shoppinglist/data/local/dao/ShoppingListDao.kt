@@ -19,4 +19,16 @@ interface ShoppingListDao {
         shoppingListId: Long,
         iconName: String,
     )
+
+    @Query("DELETE FROM shopping_lists")
+    suspend fun deleteAllShoppingLists()
+
+    @Query("DELETE FROM shopping_lists WHERE id = :shoppingListId")
+    suspend fun deleteShoppingList(shoppingListId: Long)
+
+    @Query("UPDATE shopping_lists SET name = :name WHERE id = :shoppingListId")
+    suspend fun updateShoppingListName(
+        shoppingListId: Long,
+        name: String,
+    )
 }

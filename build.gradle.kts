@@ -14,7 +14,7 @@ fun Detekt.setupCommonDetektSettings() {
     autoCorrect = false
     disableDefaultRuleSets = false
     buildUponDefaultConfig = false
-    jvmTarget = JavaVersion.VERSION_11.toString()
+    jvmTarget = libs.versions.jvmTarget.get()
 
     setSource(files(rootDir))
     include("**/*.kt")
@@ -57,7 +57,7 @@ val detektProjectBaseline by tasks.register<DetektCreateBaselineTask>("detektPro
     buildUponDefaultConfig.set(true)
     ignoreFailures.set(true)
     parallel.set(true)
-    jvmTarget = JavaVersion.VERSION_11.toString()
+    jvmTarget = libs.versions.jvmTarget.get()
     config.setFrom(files(rootDir.resolve("conf/detekt.yml")))
 }
 
