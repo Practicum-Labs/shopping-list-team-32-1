@@ -7,7 +7,6 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModel {
         MainViewModel(
-            context = get(),
             observeShoppingListsUseCase = get(),
             createShoppingListUseCase = get(),
             updateShoppingListIconUseCase = get(),

@@ -20,7 +20,7 @@ data class MainScreenActions(
     val onDeleteListClick: (Long) -> Unit = {},
     val onDeleteListConfirm: () -> Unit = {},
     val onDeleteListDismiss: () -> Unit = {},
-    val onCopyListClick: (Long) -> Unit = {},
+    val onCopyListClick: (Long, String) -> Unit = { _, _ -> },
     val onRenameListClick: (Long) -> Unit = {},
     val onRenameListNameChange: (String) -> Unit = {},
     val onRenameListConfirm: () -> Unit = {},

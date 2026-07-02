@@ -110,7 +110,7 @@ fun ConfirmationDialogContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 77.dp, end = 24.dp, bottom = 24.dp),
+                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
