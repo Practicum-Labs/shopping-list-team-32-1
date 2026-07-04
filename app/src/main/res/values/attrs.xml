@@ -30,4 +30,8 @@
     <attr name="shoppingColorConfirmDialogDeleteBackground" format="color" />
     <attr name="shoppingColorConfirmDialogCancelText" format="color" />
     <attr name="shoppingColorConfirmDialogDeleteText" format="color" />
+    <attr name="shoppingColorMenuSheetSortLabel" format="color" />
+    <attr name="shoppingColorSortSubmenuBackground" format="color" />
+    <attr name="shoppingColorMenuSheetSurface" format="color" />
+    <attr name="shoppingColorMenuSheetSortActive" format="color" />
 </resources>

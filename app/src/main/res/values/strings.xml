@@ -37,4 +37,11 @@
     <string name="main_copy_suffix">%1$s (копия)</string>
     <string name="main_search_back">Назад</string>
     <string name="main_search_clear">Очистить</string>
+    <string name="main_menu_sheet_sort">Сортировка</string>
+    <string name="main_menu_sheet_sort_alphabetical">По алфавиту</string>
+    <string name="main_menu_sheet_sort_custom">Пользовательская</string>
+    <string name="main_menu_sheet_delete_all">Удалить все</string>
+    <string name="main_menu_sheet_clear_purchased">Очистить купленные</string>
+    <string name="shopping_list_delete_all_confirm_title">Удалить все товары?</string>
+    <string name="shopping_list_clear_purchased_confirm_title">Удалить все купленные товары?</string>
 </resources>
