@@ -84,5 +84,15 @@ object Dimens {
         val swipeActionButtonSize = 48.dp
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp
+        val menuSheetCornerRadius = 28.dp
+        val menuSheetContentTopPadding = 8.dp
+        val menuSheetItemHeight = 56.dp
+        val menuSheetItemHorizontalPadding = 16.dp
+        val menuSheetItemIconSize = 24.dp
+        val menuSheetItemIconEndPadding = 16.dp
+        val menuSheetSortLabelIconSpacing = 4.dp
+        val menuSheetSortItemVerticalPadding = 12.dp
+        val menuSheetSortSubmenuWidth = 280.dp
+        val menuSheetBottomPadding = 16.dp
     }
 }
