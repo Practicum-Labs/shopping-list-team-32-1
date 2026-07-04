@@ -60,6 +60,10 @@ data class Colors(
     val confirmDialogDeleteBackground: Color,
     val confirmDialogCancelText: Color,
     val confirmDialogDeleteText: Color,
+    val menuSheetSortLabel: Color,
+    val sortSubmenuBackground: Color,
+    val menuSheetSurface: Color,
+    val menuSheetSortActive: Color,
 )
 
 val MaterialTheme.colors: Colors
@@ -90,6 +94,10 @@ private fun colors(): Colors {
         confirmDialogDeleteBackground = colorAttr(R.attr.shoppingColorConfirmDialogDeleteBackground),
         confirmDialogCancelText = colorAttr(R.attr.shoppingColorConfirmDialogCancelText),
         confirmDialogDeleteText = colorAttr(R.attr.shoppingColorConfirmDialogDeleteText),
+        menuSheetSortLabel = colorAttr(R.attr.shoppingColorMenuSheetSortLabel),
+        sortSubmenuBackground = colorAttr(R.attr.shoppingColorSortSubmenuBackground),
+        menuSheetSurface = colorAttr(R.attr.shoppingColorMenuSheetSurface),
+        menuSheetSortActive = colorAttr(R.attr.shoppingColorMenuSheetSortActive),
     )
 }
 
