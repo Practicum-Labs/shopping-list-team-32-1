@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -68,17 +66,7 @@ fun ShoppingListIconPickerContent(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = Dimens.Main.iconPickerDragHandleTopPadding)
-                .width(Dimens.Main.iconPickerDragHandleWidth)
-                .height(Dimens.Main.iconPickerDragHandleHeight)
-                .background(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = RoundedCornerShape(Dimens.Main.iconPickerDragHandleHeight),
-                ),
-        )
+        BottomSheetDragHandle()
         if (isErrorVisible) {
             Text(
                 text = stringResource(id = R.string.main_icon_picker_error),

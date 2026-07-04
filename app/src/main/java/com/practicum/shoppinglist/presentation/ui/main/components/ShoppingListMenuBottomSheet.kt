@@ -1,6 +1,5 @@
 package com.practicum.shoppinglist.presentation.ui.main.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,7 +76,7 @@ fun ShoppingListMenuBottomSheet(
 }
 
 @Composable
-fun ShoppingListMenuContent(
+internal fun ShoppingListMenuContent(
     currentSortType: SortType,
     onSortTypeSelected: (SortType) -> Unit,
     onDeleteAllClick: () -> Unit,
@@ -92,7 +91,7 @@ fun ShoppingListMenuContent(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        MenuDragHandle()
+        BottomSheetDragHandle()
 
         Spacer(modifier = Modifier.height(Dimens.Main.menuSheetContentTopPadding))
 
@@ -159,26 +158,6 @@ fun ShoppingListMenuContent(
 }
 
 @Composable
-private fun MenuDragHandle() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = Dimens.Main.iconPickerDragHandleTopPadding),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .width(Dimens.Main.iconPickerDragHandleWidth)
-                .height(Dimens.Main.iconPickerDragHandleHeight)
-                .background(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = RoundedCornerShape(Dimens.Main.iconPickerDragHandleHeight),
-                ),
-        )
-    }
-}
-
-@Composable
 private fun SortSubmenu(
     expanded: Boolean,
     currentSortType: SortType,
@@ -188,11 +167,11 @@ private fun SortSubmenu(
 
     Card(
         modifier = Modifier.width(Dimens.Main.menuSheetSortSubmenuWidth),
-        shape = RoundedCornerShape(4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(Dimens.Main.sortSubmenuCornerRadius),
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimens.Main.sortSubmenuElevation),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colors.sortSubmenuBackground),
     ) {
-        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(vertical = Dimens.Main.sortSubmenuVerticalPadding)) {
             SortType.entries.forEach { sortType ->
                 SortSubmenuItem(
                     sortType = sortType,
@@ -227,8 +206,8 @@ private fun SortSubmenuItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 12.dp),
+                .height(Dimens.Main.sortSubmenuItemHeight)
+                .padding(horizontal = Dimens.Main.sortSubmenuItemHorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -327,8 +306,7 @@ private fun ShoppingListMenuSheetBasePreview() {
     }
 }
 
-
-@Preview(name = "Menu Sheet - Base", showBackground = true, widthDp = 428)
+@Preview(name = "Menu Sheet - Base (Dark)", showBackground = true, widthDp = 428)
 @Composable
 private fun ShoppingListMenuSheetBaseDarkPreview() {
     Theme(darkTheme = true) {
@@ -345,7 +323,6 @@ private fun ShoppingListMenuSheetBaseDarkPreview() {
         }
     }
 }
-
 
 @Preview(name = "Menu Sheet - Sort Open (Alphabetical)", showBackground = true, widthDp = 428)
 @Composable
@@ -366,8 +343,7 @@ private fun ShoppingListMenuSheetSortAlphabeticalPreview() {
     }
 }
 
-
-@Preview(name = "Menu Sheet - Sort Open (Alphabetical)", showBackground = true, widthDp = 428)
+@Preview(name = "Menu Sheet - Sort Open (Alphabetical) (Dark)", showBackground = true, widthDp = 428)
 @Composable
 private fun ShoppingListMenuSheetSortAlphabeticalDarkPreview() {
     Theme(darkTheme = true) {
@@ -385,7 +361,6 @@ private fun ShoppingListMenuSheetSortAlphabeticalDarkPreview() {
         }
     }
 }
-
 
 @Preview(name = "Menu Sheet - Sort Open (Custom)", showBackground = true, widthDp = 428)
 @Composable
@@ -406,8 +381,7 @@ private fun ShoppingListMenuSheetSortCustomPreview() {
     }
 }
 
-
-@Preview(name = "Menu Sheet - Sort Open (Custom)", showBackground = true, widthDp = 428)
+@Preview(name = "Menu Sheet - Sort Open (Custom) (Dark)", showBackground = true, widthDp = 428)
 @Composable
 private fun ShoppingListMenuSheetSortCustomDarkPreview() {
     Theme(darkTheme = true) {
@@ -425,4 +399,3 @@ private fun ShoppingListMenuSheetSortCustomDarkPreview() {
         }
     }
 }
-

@@ -90,9 +90,13 @@ object Dimens {
         val menuSheetItemHorizontalPadding = 16.dp
         val menuSheetItemIconSize = 24.dp
         val menuSheetItemIconEndPadding = 16.dp
-        val menuSheetSortLabelIconSpacing = 4.dp
         val menuSheetSortItemVerticalPadding = 12.dp
         val menuSheetSortSubmenuWidth = 280.dp
         val menuSheetBottomPadding = 16.dp
+        val sortSubmenuCornerRadius = 4.dp
+        val sortSubmenuElevation = 2.dp
+        val sortSubmenuVerticalPadding = 8.dp
+        val sortSubmenuItemHeight = 48.dp
+        val sortSubmenuItemHorizontalPadding = 12.dp
     }
 }
