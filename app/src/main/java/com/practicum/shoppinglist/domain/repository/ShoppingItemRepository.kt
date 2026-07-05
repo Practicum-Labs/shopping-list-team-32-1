@@ -12,6 +12,7 @@ interface ShoppingItemRepository {
     suspend fun updateItem(item: ShoppingItemEntity)
     suspend fun deleteItem(item: ShoppingItemEntity)
     suspend fun clearBoughtItems(listId: Long)
+    suspend fun clearAllItems(listId: Long)
     suspend fun updateItems(items: List<ShoppingItemEntity>)
 
     fun getSuggestionsFlow(query: String): Flow<List<ProductSuggestionEntity>>

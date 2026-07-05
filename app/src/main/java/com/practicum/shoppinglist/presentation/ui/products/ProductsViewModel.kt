@@ -6,6 +6,7 @@ import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
+import com.practicum.shoppinglist.presentation.ui.main.SortType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,7 @@ data class ProductsUiState(
     val items: List<ShoppingItemEntity> = emptyList(),
     val suggestions: List<String> = emptyList(),
     val isLoading: Boolean = true,
-    val listDeleted: Boolean = false
+    val sortType: SortType = SortType.Custom
 )
 
 class ProductsViewModel(
@@ -104,24 +105,15 @@ class ProductsViewModel(
         }
     }
 
-    fun renameList(newName: String) {
-        viewModelScope.launch {
-            val currentList = _uiState.value.list ?: return@launch
-            listRepository.updateShoppingListName(listId, newName.trim())
-            _uiState.value = _uiState.value.copy(list = currentList.copy(name = newName.trim()))
-        }
-    }
-
-    fun deleteList() {
-        viewModelScope.launch {
-            listRepository.deleteShoppingList(listId)
-            _uiState.value = _uiState.value.copy(listDeleted = true)
-        }
-    }
-
     fun clearBought() {
         viewModelScope.launch {
             itemRepository.clearBoughtItems(listId)
+        }
+    }
+
+    fun clearAllItems() {
+        viewModelScope.launch {
+            itemRepository.clearAllItems(listId)
         }
     }
 
@@ -129,7 +121,7 @@ class ProductsViewModel(
         viewModelScope.launch {
             val sorted = _uiState.value.items.sortedBy { it.name.lowercase() }
             val updated = sorted.mapIndexed { index, item -> item.copy(sortOrder = index) }
-            _uiState.value = _uiState.value.copy(items = updated)
+            _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Alphabetical)
             itemRepository.updateItems(updated)
         }
     }
@@ -140,7 +132,7 @@ class ProductsViewModel(
             val item = currentItems.removeAt(fromIndex)
             currentItems.add(toIndex, item)
             val updated = currentItems.mapIndexed { index, it -> it.copy(sortOrder = index) }
-            _uiState.value = _uiState.value.copy(items = updated)
+            _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Custom)
         }
     }
 

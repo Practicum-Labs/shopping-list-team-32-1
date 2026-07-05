@@ -1,5 +1,6 @@
 package com.practicum.shoppinglist.presentation.ui.products
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,7 +42,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Checkbox
@@ -60,9 +60,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,6 +70,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.FocusRequester
@@ -87,6 +88,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.text.input.ImeAction
@@ -99,9 +101,14 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
+import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Dimens
+import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
+import kotlinx.coroutines.launch
 
 val CreamBackground = Color(0xFFFFFBF7)
 val SandAccent = Color(0xFFFFD8BE)
@@ -110,22 +117,60 @@ val TextSecondary = Color(0xFF635B55)
 val CircleBackdrop = Color(0xFFDECBBF)
 val CartPeach = Color(0xFFF3C08D)
 
-data class TopBarActions(
-    val onRename: () -> Unit,
-    val onDelete: () -> Unit,
-    val onClearBought: () -> Unit,
-    val onSortAlphabetically: () -> Unit
+data class ProductsScreenActions(
+    val onToggleBought: (ShoppingItemEntity) -> Unit = {},
+    val onDeleteProduct: (ShoppingItemEntity) -> Unit = {},
+    val onReorder: (Int, Int) -> Unit = { _, _ -> },
+    val onCommitOrder: () -> Unit = {},
+    val onClearBought: () -> Unit = {},
+    val onClearAllItems: () -> Unit = {},
+    val onSortAlphabetically: () -> Unit = {},
+    val onUpdateSuggestionQuery: (String) -> Unit = {},
+    val onAddProduct: (name: String, quantity: Double, unit: String) -> Unit = { _, _, _ -> },
+    val onUpdateProduct: (item: ShoppingItemEntity, name: String, quantity: Double, unit: String) -> Unit = { _, _, _, _ -> }
 )
 
 @Composable
 fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    
+
+    ProductsScreenContent(
+        state = state,
+        suggestions = suggestions,
+        onBack = onBack,
+        actions = ProductsScreenActions(
+            onToggleBought = { viewModel.toggleProductBought(it) },
+            onDeleteProduct = { viewModel.deleteProduct(it) },
+            onReorder = { from, to -> viewModel.reorderItems(from, to) },
+            onCommitOrder = { viewModel.commitItemOrder() },
+            onClearBought = { viewModel.clearBought() },
+            onClearAllItems = { viewModel.clearAllItems() },
+            onSortAlphabetically = { viewModel.sortAlphabetically() },
+            onUpdateSuggestionQuery = { viewModel.updateSuggestionQuery(it) },
+            onAddProduct = { name, quantity, unit -> viewModel.addProduct(name, quantity, unit) },
+            onUpdateProduct = { item, name, quantity, unit -> viewModel.updateProduct(item, name, quantity, unit) }
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductsScreenContent(
+    state: ProductsUiState,
+    suggestions: List<String>,
+    onBack: () -> Unit,
+    actions: ProductsScreenActions = ProductsScreenActions()
+) {
     var showAddDialog by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<ShoppingItemEntity?>(null) }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var showMenuSheet by remember { mutableStateOf(false) }
+    val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
+    fun closeMenuSheet() {
+        coroutineScope.launch { menuSheetState.hide() }.invokeOnCompletion { showMenuSheet = false }
+    }
 
     // Input States
     var nameInput by remember { mutableStateOf("") }
@@ -152,10 +197,6 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
         }
     }
 
-    LaunchedEffect(state.listDeleted) {
-        if (state.listDeleted) onBack()
-    }
-
     val isSheetOpen = showAddDialog || editingItem != null
 
     Scaffold(
@@ -163,12 +204,7 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
             ProductsTopBar(
                 title = state.list?.name ?: "Продукты",
                 onBack = onBack,
-                actions = TopBarActions(
-                    onRename = { showRenameDialog = true },
-                    onDelete = { showDeleteConfirmDialog = true },
-                    onClearBought = { viewModel.clearBought() },
-                    onSortAlphabetically = { viewModel.sortAlphabetically() }
-                )
+                onMenuClick = { showMenuSheet = true }
             )
         },
         floatingActionButton = {
@@ -187,7 +223,15 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            ProductsContent(innerPadding, state, viewModel) { editingItem = it }
+            ProductsContent(
+                innerPadding = innerPadding,
+                state = state,
+                onToggleBought = actions.onToggleBought,
+                onDeleteProduct = actions.onDeleteProduct,
+                onReorder = actions.onReorder,
+                onCommitOrder = actions.onCommitOrder,
+                onEdit = { editingItem = it }
+            )
 
             // Dimmed overlay when sheet is open
             AnimatedVisibility(
@@ -230,14 +274,14 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                     unit = unitInput,
                     onUnitChange = { unitInput = it },
                     suggestions = suggestions,
-                    onQueryChange = { viewModel.updateSuggestionQuery(it) },
+                    onQueryChange = actions.onUpdateSuggestionQuery,
                     onSaveClick = {
                         if (nameInput.isNotBlank()) {
                             val quantityDouble = qtyInput.toDoubleOrNull() ?: 1.0
                             if (editingItem != null) {
-                                viewModel.updateProduct(editingItem!!, nameInput, quantityDouble, unitInput)
+                                actions.onUpdateProduct(editingItem!!, nameInput, quantityDouble, unitInput)
                             } else {
-                                viewModel.addProduct(nameInput, quantityDouble, unitInput)
+                                actions.onAddProduct(nameInput, quantityDouble, unitInput)
                             }
                             showAddDialog = false
                             editingItem = null
@@ -248,15 +292,37 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
         }
     }
 
-    RenameDialogWrapper(showRenameDialog, state.list?.name ?: "Продукты", viewModel) { showRenameDialog = false }
-    DeleteConfirmDialogWrapper(showDeleteConfirmDialog, viewModel) { showDeleteConfirmDialog = false }
+    if (showMenuSheet) {
+        ShoppingListMenuBottomSheet(
+            sheetState = menuSheetState,
+            currentSortType = state.sortType,
+            onDismissRequest = { showMenuSheet = false },
+            onSortTypeSelected = { sortType ->
+                if (sortType == SortType.Alphabetical) {
+                    actions.onSortAlphabetically()
+                }
+                closeMenuSheet()
+            },
+            onDeleteAllClick = {
+                actions.onClearAllItems()
+                closeMenuSheet()
+            },
+            onClearPurchasedClick = {
+                actions.onClearBought()
+                closeMenuSheet()
+            }
+        )
+    }
 }
 
 @Composable
 fun ProductsContent(
     innerPadding: PaddingValues,
     state: ProductsUiState,
-    viewModel: ProductsViewModel,
+    onToggleBought: (ShoppingItemEntity) -> Unit,
+    onDeleteProduct: (ShoppingItemEntity) -> Unit,
+    onReorder: (Int, Int) -> Unit,
+    onCommitOrder: () -> Unit,
     onEdit: (ShoppingItemEntity) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
@@ -265,49 +331,13 @@ fun ProductsContent(
         } else {
             ProductList(
                 items = state.items,
-                onToggleBought = { viewModel.toggleProductBought(it) },
-                onDelete = { viewModel.deleteProduct(it) },
+                onToggleBought = onToggleBought,
+                onDelete = onDeleteProduct,
                 onEdit = onEdit,
-                onMove = { from, to -> viewModel.reorderItems(from, to) },
-                onDragEnd = { viewModel.commitItemOrder() }
+                onMove = onReorder,
+                onDragEnd = onCommitOrder
             )
         }
-    }
-}
-
-@Composable
-fun RenameDialogWrapper(
-    visible: Boolean,
-    currentName: String,
-    viewModel: ProductsViewModel,
-    onDismiss: () -> Unit
-) {
-    if (visible) {
-        RenameListDialog(
-            currentName = currentName,
-            onDismiss = onDismiss,
-            onSave = {
-                viewModel.renameList(it)
-                onDismiss()
-            }
-        )
-    }
-}
-
-@Composable
-fun DeleteConfirmDialogWrapper(
-    visible: Boolean,
-    viewModel: ProductsViewModel,
-    onDismiss: () -> Unit
-) {
-    if (visible) {
-        DeleteConfirmDialog(
-            onDismiss = onDismiss,
-            onConfirm = {
-                viewModel.deleteList()
-                onDismiss()
-            }
-        )
     }
 }
 
@@ -316,9 +346,8 @@ fun DeleteConfirmDialogWrapper(
 fun ProductsTopBar(
     title: String,
     onBack: () -> Unit,
-    actions: TopBarActions
+    onMenuClick: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
     TopAppBar(
         title = { Text(title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
@@ -327,19 +356,8 @@ fun ProductsTopBar(
             }
         },
         actions = {
-            IconButton(onClick = { expanded = true }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = MaterialTheme.colorScheme.onBackground)
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colors.addListDialogSurface)
-            ) {
-                DropdownMenuItem(text = { Text("Переименовать список", color = MaterialTheme.colorScheme.onSurface) }, onClick = { actions.onRename(); expanded = false })
-                DropdownMenuItem(text = { Text("Сортировать по алфавиту", color = MaterialTheme.colorScheme.onSurface) }, onClick = { actions.onSortAlphabetically(); expanded = false })
-                DropdownMenuItem(text = { Text("Очистить список (удалить купленные)", color = MaterialTheme.colorScheme.onSurface) }, onClick = { actions.onClearBought(); expanded = false })
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                DropdownMenuItem(text = { Text("Удалить список", color = MaterialTheme.colorScheme.error) }, onClick = { actions.onDelete(); expanded = false })
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -382,13 +400,14 @@ fun ProductList(
     onDelete: (ShoppingItemEntity) -> Unit,
     onEdit: (ShoppingItemEntity) -> Unit,
     onMove: (Int, Int) -> Unit,
-    onDragEnd: () -> Unit = {}
+    onDragEnd: () -> Unit = {},
+    modifier: Modifier = Modifier.fillMaxSize()
 ) {
     val state = rememberLazyListState()
     val dragDropState = remember { DragDropState(state, onMove, onDragEnd) }
     val draggedIndex = dragDropState.draggedIndex
 
-    Box(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Box(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         LazyColumn(
             state = state,
             modifier = Modifier.fillMaxSize().dragDropGesture(dragDropState)
@@ -847,59 +866,111 @@ fun BottomSheetContent(
     }
 }
 
+private val productListPreviewItems = listOf(
+    ShoppingItemEntity(id = 1, listId = 1, name = "Молоко", quantity = 1.0, unit = "л.", isBought = false, sortOrder = 0),
+    ShoppingItemEntity(id = 2, listId = 1, name = "Хлеб", quantity = 2.0, unit = "шт.", isBought = false, sortOrder = 1),
+    ShoppingItemEntity(id = 3, listId = 1, name = "Яблоки", quantity = 1.5, unit = "кг.", isBought = true, sortOrder = 2),
+    ShoppingItemEntity(id = 4, listId = 1, name = "Сыр", quantity = 300.0, unit = "г.", isBought = false, sortOrder = 3),
+    ShoppingItemEntity(id = 5, listId = 1, name = "Кофе", quantity = 1.0, unit = "шт.", isBought = false, sortOrder = 4),
+)
+
+@Preview(
+    name = "Light",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+)
 @Composable
-fun RenameListDialog(currentName: String, onDismiss: () -> Unit, onSave: (String) -> Unit) {
-    var name by remember { mutableStateOf(currentName) }
-    val colors = MaterialTheme.colors
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Переименовать список", color = colors.addListDialogTitle) },
-        text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Название списка") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colors.addListDialogAccent,
-                    focusedLabelColor = colors.addListDialogTitle,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                )
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onSave(name) }, enabled = name.isNotBlank()) {
-                Text("Сохранить", color = colors.addListDialogAccent)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Отмена", color = colors.addListDialogPlaceholder)
-            }
-        },
-        containerColor = colors.addListDialogSurface
-    )
+private fun ProductListLightPreview() {
+    Theme {
+        ProductList(
+            items = productListPreviewItems,
+            onToggleBought = {},
+            onDelete = {},
+            onEdit = {},
+            onMove = { _, _ -> }
+        )
+    }
 }
 
+@Preview(
+    name = "Dark",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
-fun DeleteConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    val colors = MaterialTheme.colors
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Удалить список?", color = colors.addListDialogTitle) },
-        text = { Text("Вы уверены, что хотите безвозвратно удалить этот список покупок?", color = colors.addListDialogPlaceholder) },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text("Удалить", color = MaterialTheme.colors.confirmDialogDeleteText)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Отмена", color = colors.addListDialogPlaceholder)
-            }
-        },
-        containerColor = colors.addListDialogSurface
-    )
+private fun ProductListDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductList(
+            items = productListPreviewItems,
+            onToggleBought = {},
+            onDelete = {},
+            onEdit = {},
+            onMove = { _, _ -> }
+        )
+    }
+}
+
+private val productsScreenPreviewState = ProductsUiState(
+    list = ShoppingList(id = 1, name = "Выходные", iconName = "shopping_bag"),
+    items = productListPreviewItems,
+    isLoading = false
+)
+
+@Preview(
+    name = "Screen Light",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+)
+@Composable
+private fun ProductsScreenLightPreview() {
+    Theme {
+        ProductsScreenContent(
+            state = productsScreenPreviewState,
+            suggestions = emptyList(),
+            onBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Screen Dark",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun ProductsScreenDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductsScreenContent(
+            state = productsScreenPreviewState,
+            suggestions = emptyList(),
+            onBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Screen Empty",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+)
+@Composable
+private fun ProductsScreenEmptyPreview() {
+    Theme {
+        ProductsScreenContent(
+            state = ProductsUiState(
+                list = ShoppingList(id = 1, name = "Выходные", iconName = "shopping_bag"),
+                items = emptyList(),
+                isLoading = false
+            ),
+            suggestions = emptyList(),
+            onBack = {}
+        )
+    }
 }

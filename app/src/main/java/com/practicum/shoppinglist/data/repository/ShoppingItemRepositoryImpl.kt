@@ -38,6 +38,10 @@ class ShoppingItemRepositoryImpl(
         shoppingItemDao.deleteBoughtItemsForList(listId)
     }
 
+    override suspend fun clearAllItems(listId: Long) {
+        shoppingItemDao.deleteItemsForList(listId)
+    }
+
     override suspend fun updateItems(items: List<ShoppingItemEntity>) {
         shoppingItemDao.updateItems(items)
     }
