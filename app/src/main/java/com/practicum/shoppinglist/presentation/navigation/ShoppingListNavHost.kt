@@ -8,10 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,9 +20,7 @@ import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryRoute
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterRoute
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingDestination
-import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingScreen
-import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingViewModel
-import org.koin.androidx.compose.koinViewModel
+import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingRoute
 
 @Composable
 fun ShoppingListNavHost(
@@ -55,39 +50,57 @@ private fun NavGraphBuilder.onboardingRoute(
     composable(
         route = ONBOARDING_ROUTE,
         exitTransition = {
-            if (targetState.destination.route == MAIN_ROUTE) {
+            if (
+                targetState.destination.route == MAIN_ROUTE ||
+                targetState.destination.route == LOGIN_ROUTE
+            ) {
                 onboardingExitTransition()
             } else {
                 ExitTransition.None
             }
         },
     ) {
-        val viewModel: OnboardingViewModel = koinViewModel()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-        LaunchedEffect(uiState.destination) {
-            uiState.destination?.let { destination ->
+        OnboardingRoute(
+            isDarkTheme = isDarkTheme,
+            onNavigate = { destination ->
                 navController.navigate(destination.toRoute()) {
                     popUpTo(ONBOARDING_ROUTE) {
                         inclusive = true
                     }
                     launchSingleTop = true
                 }
-            }
-        }
-
-        OnboardingScreen(isDarkTheme = isDarkTheme)
+            },
+        )
     }
 }
 
 private fun NavGraphBuilder.loginRoute(navController: NavHostController) {
     composable(
         route = LOGIN_ROUTE,
+        enterTransition = {
+            if (
+                initialState.destination.route == ONBOARDING_ROUTE ||
+                initialState.destination.route.isAuthRoute()
+            ) {
+                authEnterTransition()
+            } else {
+                EnterTransition.None
+            }
+        },
         exitTransition = {
             if (targetState.destination.route == MAIN_ROUTE) {
                 mainExitTransition()
+            } else if (targetState.destination.route.isAuthRoute()) {
+                authExitTransition()
             } else {
                 ExitTransition.None
+            }
+        },
+        popEnterTransition = {
+            if (initialState.destination.route.isAuthRoute()) {
+                authEnterTransition()
+            } else {
+                EnterTransition.None
             }
         },
     ) {
@@ -102,9 +115,25 @@ private fun NavGraphBuilder.loginRoute(navController: NavHostController) {
 private fun NavGraphBuilder.registerRoute(navController: NavHostController) {
     composable(
         route = REGISTER_ROUTE,
+        enterTransition = {
+            if (initialState.destination.route.isAuthRoute()) {
+                authEnterTransition()
+            } else {
+                EnterTransition.None
+            }
+        },
         exitTransition = {
             if (targetState.destination.route == MAIN_ROUTE) {
                 mainExitTransition()
+            } else if (targetState.destination.route.isAuthRoute()) {
+                authExitTransition()
+            } else {
+                ExitTransition.None
+            }
+        },
+        popExitTransition = {
+            if (targetState.destination.route.isAuthRoute()) {
+                authExitTransition()
             } else {
                 ExitTransition.None
             }
@@ -118,7 +147,23 @@ private fun NavGraphBuilder.registerRoute(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.recoveryRoute(navController: NavHostController) {
-    composable(route = RECOVERY_ROUTE) {
+    composable(
+        route = RECOVERY_ROUTE,
+        enterTransition = {
+            if (initialState.destination.route.isAuthRoute()) {
+                authEnterTransition()
+            } else {
+                EnterTransition.None
+            }
+        },
+        popExitTransition = {
+            if (targetState.destination.route.isAuthRoute()) {
+                authExitTransition()
+            } else {
+                ExitTransition.None
+            }
+        },
+    ) {
         RecoveryRoute(
             onBackClick = { navController.navigateBackToLogin() },
         )
@@ -203,6 +248,23 @@ private fun mainEnterTransition(): EnterTransition {
 }
 
 private fun mainExitTransition(): ExitTransition {
+    return authExitTransition()
+}
+
+private fun authEnterTransition(): EnterTransition {
+    return fadeIn(
+        animationSpec = tween(
+            durationMillis = Motion.Navigation.authExitDurationMillis,
+        ),
+    ) + scaleIn(
+        animationSpec = tween(
+            durationMillis = Motion.Navigation.authExitDurationMillis,
+        ),
+        initialScale = Motion.Navigation.mainEnterInitialScale,
+    )
+}
+
+private fun authExitTransition(): ExitTransition {
     return fadeOut(
         animationSpec = tween(
             durationMillis = Motion.Navigation.authExitDurationMillis,
@@ -216,7 +278,7 @@ private fun mainExitTransition(): ExitTransition {
 }
 
 private fun String?.isAuthRoute(): Boolean {
-    return this == LOGIN_ROUTE || this == REGISTER_ROUTE
+    return this == LOGIN_ROUTE || this == REGISTER_ROUTE || this == RECOVERY_ROUTE
 }
 
 private fun OnboardingDestination.toRoute(): String {
