@@ -11,6 +11,9 @@ interface ShoppingListDao {
     @Query("SELECT * FROM shopping_lists ORDER BY id DESC")
     fun observeShoppingLists(): Flow<List<ShoppingListEntity>>
 
+    @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId LIMIT 1")
+    suspend fun getShoppingListById(shoppingListId: Long): ShoppingListEntity?
+
     @Insert
     suspend fun insertShoppingList(shoppingList: ShoppingListEntity): Long
 

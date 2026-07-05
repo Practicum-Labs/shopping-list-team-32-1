@@ -13,6 +13,7 @@
     <color name="shopping_light_surface_variant">#EEE0D4</color>
     <color name="shopping_light_on_surface_variant">#50453A</color>
     <color name="shopping_light_outline">#837469</color>
+    <color name="shopping_light_outline_variant">#D4C4B5</color>
     <color name="shopping_light_error">#BA1A1A</color>
     <color name="shopping_light_on_error">#FFFFFFFF</color>
     <color name="shopping_light_add_list_dialog_surface">#F4E6DA</color>
@@ -41,6 +42,7 @@
     <color name="shopping_dark_surface_variant">#51443A</color>
     <color name="shopping_dark_on_surface_variant">#D9C8B9</color>
     <color name="shopping_dark_outline">#A08D80</color>
+    <color name="shopping_dark_outline_variant">#8F8174</color>
     <color name="shopping_dark_error">#FFB4AB</color>
     <color name="shopping_dark_on_error">#690005</color>
     <color name="shopping_dark_add_list_dialog_surface">#302921</color>

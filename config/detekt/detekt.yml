@@ -1,0 +1,23 @@
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 50
+    ignoreAnnotated: []
+  LargeClass:
+    active: true
+    threshold: 350
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 10
+  TooManyFunctions:
+    active: false
+  LabeledExpression:
+    active: false
+
+naming:
+  active: false
+
+style:
+  active: false
