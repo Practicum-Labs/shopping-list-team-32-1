@@ -11,6 +11,9 @@ object Dimens {
         val titleTopPadding = 48.dp
         val bodyTopPadding = 8.dp
         val textHorizontalPadding = 44.dp
+        val loaderBottomPadding = 96.dp
+        val loaderSize = 36.dp
+        val loaderStrokeWidth = 3.dp
         const val logoAspectRatio = 338f / 74f
         const val illustrationAspectRatio = 324f / 300f
     }
@@ -84,5 +87,26 @@ object Dimens {
         val swipeActionButtonSize = 48.dp
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp
+    }
+
+    object Auth {
+        val screenHorizontalPadding = 24.dp
+        val logoTopPadding = 56.dp
+        val logoHorizontalPadding = 32.dp
+        val titleTopPadding = 48.dp
+        val subtitleTopPadding = 8.dp
+        val fieldTopPadding = 24.dp
+        val fieldSpacing = 14.dp
+        val buttonTopPadding = 28.dp
+        val secondaryActionTopPadding = 2.dp
+        val messageTopPadding = 16.dp
+        val toolbarHeight = 56.dp
+        val toolbarTopPadding = 8.dp
+        val backButtonStartOffset = 16.dp
+        val passwordClearButtonEndOffset = 8.dp
+        val buttonLoaderSize = 20.dp
+        val buttonLoaderStrokeWidth = 2.dp
+        val contentMaxWidth = 420.dp
+        const val logoAspectRatio = 338f / 74f
     }
 }
