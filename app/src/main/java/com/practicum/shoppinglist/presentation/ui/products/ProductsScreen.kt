@@ -39,9 +39,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Checkbox
@@ -57,13 +57,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -85,6 +83,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -107,6 +106,7 @@ import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.ui.main.SortType
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
+import com.practicum.shoppinglist.presentation.ui.main.components.SwipeableListItem
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 import kotlinx.coroutines.launch
 
@@ -199,6 +199,16 @@ fun ProductsScreenContent(
 
     val isSheetOpen = showAddDialog || editingItem != null
 
+    fun closeSheet() {
+        val currentEditingItem = editingItem
+        if (currentEditingItem != null && nameInput.isNotBlank()) {
+            val quantityDouble = qtyInput.toDoubleOrNull() ?: 1.0
+            actions.onUpdateProduct(currentEditingItem, nameInput, quantityDouble, unitInput)
+        }
+        showAddDialog = false
+        editingItem = null
+    }
+
     Scaffold(
         topBar = {
             ProductsTopBar(
@@ -247,8 +257,7 @@ fun ProductsScreenContent(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            showAddDialog = false
-                            editingItem = null
+                            closeSheet()
                         }
                 )
             }
@@ -443,7 +452,6 @@ fun ProductList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeableProductItem(
     item: ShoppingItemEntity,
@@ -452,34 +460,85 @@ fun SwipeableProductItem(
     onEdit: (ShoppingItemEntity) -> Unit,
     isDragging: Boolean = false
 ) {
-    val state = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            when (value) {
-                SwipeToDismissBoxValue.EndToStart -> { onDelete(item); true }
-                SwipeToDismissBoxValue.StartToEnd -> { onEdit(item); false }
-                else -> false
-            }
-        }
-    )
-    SwipeToDismissBox(
-        state = state,
-        backgroundContent = { SwipeBackground(state.targetValue) },
+    SwipeableListItem(
+        onDelete = { onDelete(item) },
+        actionsWidth = Dimens.Main.swipeActionsWidthTwoButtons,
+        backgroundShape = RectangleShape,
+        backgroundContent = { isLongSwipe, closeItem ->
+            ProductSwipeBackground(
+                isLongSwipe = isLongSwipe,
+                onEditClick = { closeItem(); onEdit(item) },
+                onDeleteClick = { closeItem(); onDelete(item) }
+            )
+        },
         content = { ProductItemRow(item = item, onToggleBought = onToggleBought, isDragging = isDragging) }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SwipeBackground(target: SwipeToDismissBoxValue) {
-    val color = when (target) {
-        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colors.swipeActionBackground
-        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-        else -> Color.Transparent
-    }
-    val alignment = if (target == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
-    val icon = if (target == SwipeToDismissBoxValue.StartToEnd) Icons.Default.Edit else Icons.Default.Delete
-    Box(modifier = Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp), contentAlignment = alignment) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground)
+fun ProductSwipeBackground(
+    isLongSwipe: Boolean,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(start = Dimens.Main.swipeActionContainerStartPadding, end = 0.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        if (isLongSwipe) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Surface(
+                    modifier = Modifier.size(Dimens.Main.swipeActionButtonSize),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Удалить",
+                            modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                        )
+                    }
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = onEditClick,
+                    modifier = Modifier
+                        .size(Dimens.Main.swipeActionButtonSize)
+                        .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Редактировать",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                    )
+                }
+                Spacer(modifier = Modifier.width(Dimens.Main.swipeActionSpacing))
+                IconButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier
+                        .size(Dimens.Main.swipeActionButtonSize)
+                        .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "Удалить",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                    )
+                }
+            }
+        }
     }
 }
 
