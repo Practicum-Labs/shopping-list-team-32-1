@@ -4,6 +4,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    toolVersion = "1.23.6"
+    config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
 }
 
 android {
@@ -48,6 +56,7 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive)

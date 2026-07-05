@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface ShoppingListRepository {
     fun observeShoppingLists(): Flow<List<ShoppingList>>
 
+    suspend fun getShoppingListById(shoppingListId: Long): ShoppingList?
+
     suspend fun createShoppingList(
         name: String,
         iconName: String,

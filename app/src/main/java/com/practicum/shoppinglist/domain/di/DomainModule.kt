@@ -34,7 +34,10 @@ val domainModule = module {
         DeleteShoppingListUseCase(shoppingListRepository = get())
     }
     factory {
-        CopyShoppingListUseCase(shoppingListRepository = get())
+        CopyShoppingListUseCase(
+            shoppingListRepository = get(),
+            shoppingItemRepository = get(),
+        )
     }
     factory {
         RenameShoppingListUseCase(shoppingListRepository = get())

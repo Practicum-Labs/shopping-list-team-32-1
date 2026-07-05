@@ -18,6 +18,10 @@ class ShoppingListRepositoryImpl(
             }
     }
 
+    override suspend fun getShoppingListById(shoppingListId: Long): ShoppingList? {
+        return shoppingListDao.getShoppingListById(shoppingListId)?.toDomain()
+    }
+
     override suspend fun createShoppingList(
         name: String,
         iconName: String,

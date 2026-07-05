@@ -10,13 +10,19 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.practicum.shoppinglist.presentation.theme.Motion
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingScreen
+import com.practicum.shoppinglist.presentation.ui.products.ProductsScreen
+import com.practicum.shoppinglist.presentation.ui.products.ProductsViewModel
 import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ShoppingListNavHost(
@@ -85,6 +91,23 @@ fun ShoppingListNavHost(
             MainRoute(
                 isDarkTheme = isDarkTheme,
                 onThemeClick = onThemeClick,
+                onListClick = { listId ->
+                    navController.navigate("products/$listId")
+                }
+            )
+        }
+
+        composable(
+            route = "products/{listId}",
+            arguments = listOf(
+                navArgument("listId") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getLong("listId") ?: return@composable
+            val viewModel: ProductsViewModel = koinViewModel(parameters = { parametersOf(listId) })
+            ProductsScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }

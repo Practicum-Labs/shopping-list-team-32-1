@@ -3,6 +3,7 @@ package com.practicum.shoppinglist.presentation.ui.main.components
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,7 @@ fun ShoppingListsContent(
     onDeleteListClick: (Long) -> Unit,
     onCopyListClick: (Long, String) -> Unit,
     onRenameListClick: (Long) -> Unit,
+    onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isSearching: Boolean = false,
 ) {
@@ -100,6 +102,7 @@ fun ShoppingListsContent(
                 SearchShoppingListItem(
                     shoppingList = shoppingList,
                     onIconClick = onShoppingListIconClick,
+                    onListClick = onListClick,
                 )
             } else {
                 SwipeableListItem(
@@ -205,6 +208,7 @@ fun ShoppingListsContent(
                         ShoppingListItem(
                             shoppingList = shoppingList,
                             onIconClick = onShoppingListIconClick,
+                            onListClick = onListClick,
                         )
                     }
                 )
@@ -296,11 +300,13 @@ fun SwipeableListItem(
 private fun ShoppingListItem(
     shoppingList: ShoppingList,
     onIconClick: (Long) -> Unit,
+    onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(Dimens.Main.listItemCornerRadius)
 
     Card(
+        onClick = { onListClick(shoppingList.id) },
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = Dimens.Main.listItemMinHeight)
@@ -361,12 +367,14 @@ private fun ShoppingListItem(
 private fun SearchShoppingListItem(
     shoppingList: ShoppingList,
     onIconClick: (Long) -> Unit,
+    onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
+            .clickable { onListClick(shoppingList.id) }
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.Main.listItemContentSpacing),
