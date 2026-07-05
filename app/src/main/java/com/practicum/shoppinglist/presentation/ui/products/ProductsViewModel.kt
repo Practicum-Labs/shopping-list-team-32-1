@@ -134,16 +134,19 @@ class ProductsViewModel(
         }
     }
 
-    fun moveItem(fromIndex: Int, toIndex: Int) {
+    fun reorderItems(fromIndex: Int, toIndex: Int) {
         val currentItems = _uiState.value.items.toMutableList()
         if (fromIndex in currentItems.indices && toIndex in currentItems.indices) {
             val item = currentItems.removeAt(fromIndex)
             currentItems.add(toIndex, item)
             val updated = currentItems.mapIndexed { index, it -> it.copy(sortOrder = index) }
             _uiState.value = _uiState.value.copy(items = updated)
-            viewModelScope.launch {
-                itemRepository.updateItems(updated)
-            }
+        }
+    }
+
+    fun commitItemOrder() {
+        viewModelScope.launch {
+            itemRepository.updateItems(_uiState.value.items)
         }
     }
 

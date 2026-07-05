@@ -1,7 +1,6 @@
 package com.practicum.shoppinglist.presentation.ui.products
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -78,6 +77,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -85,7 +85,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -97,6 +96,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
 import com.practicum.shoppinglist.presentation.theme.Dimens
@@ -268,7 +268,8 @@ fun ProductsContent(
                 onToggleBought = { viewModel.toggleProductBought(it) },
                 onDelete = { viewModel.deleteProduct(it) },
                 onEdit = onEdit,
-                onMove = { from, to -> viewModel.moveItem(from, to) }
+                onMove = { from, to -> viewModel.reorderItems(from, to) },
+                onDragEnd = { viewModel.commitItemOrder() }
             )
         }
     }
@@ -380,18 +381,44 @@ fun ProductList(
     onToggleBought: (ShoppingItemEntity) -> Unit,
     onDelete: (ShoppingItemEntity) -> Unit,
     onEdit: (ShoppingItemEntity) -> Unit,
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit = {}
 ) {
     val state = rememberLazyListState()
-    val dragDropState = remember { DragDropState(state, onMove) }
-    LazyColumn(
-        state = state,
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp).dragDropGesture(dragDropState)
-    ) {
-        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-            val offset by animateDpAsState(targetValue = dragDropState.getItemOffset(index).y.dp, label = "offset")
-            Box(modifier = Modifier.fillMaxWidth().graphicsLayer { translationY = offset.toPx() }) {
-                SwipeableProductItem(item = item, onToggleBought = onToggleBought, onDelete = onDelete, onEdit = onEdit)
+    val dragDropState = remember { DragDropState(state, onMove, onDragEnd) }
+    val draggedIndex = dragDropState.draggedIndex
+
+    Box(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        LazyColumn(
+            state = state,
+            modifier = Modifier.fillMaxSize().dragDropGesture(dragDropState)
+        ) {
+            itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+                Box(modifier = Modifier.fillMaxWidth().alpha(if (index == draggedIndex) 0f else 1f)) {
+                    SwipeableProductItem(
+                        item = item,
+                        onToggleBought = onToggleBought,
+                        onDelete = onDelete,
+                        onEdit = onEdit,
+                        isDragging = draggedIndex != null
+                    )
+                }
+            }
+        }
+
+        if (draggedIndex != null && draggedIndex in items.indices) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(1f)
+                    .offset { dragDropState.overlayOffset() }
+            ) {
+                SwipeableProductItem(
+                    item = items[draggedIndex],
+                    onToggleBought = onToggleBought,
+                    onDelete = onDelete,
+                    onEdit = onEdit
+                )
             }
         }
     }
@@ -403,7 +430,8 @@ fun SwipeableProductItem(
     item: ShoppingItemEntity,
     onToggleBought: (ShoppingItemEntity) -> Unit,
     onDelete: (ShoppingItemEntity) -> Unit,
-    onEdit: (ShoppingItemEntity) -> Unit
+    onEdit: (ShoppingItemEntity) -> Unit,
+    isDragging: Boolean = false
 ) {
     val state = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
@@ -417,7 +445,7 @@ fun SwipeableProductItem(
     SwipeToDismissBox(
         state = state,
         backgroundContent = { SwipeBackground(state.targetValue) },
-        content = { ProductItemRow(item = item, onToggleBought = onToggleBought) }
+        content = { ProductItemRow(item = item, onToggleBought = onToggleBought, isDragging = isDragging) }
     )
 }
 
@@ -472,7 +500,8 @@ fun ProductCheckbox(
 fun ProductItemRow(
     item: ShoppingItemEntity,
     onToggleBought: (ShoppingItemEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDragging: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -508,6 +537,13 @@ fun ProductItemRow(
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_trailingelement_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.alpha(if (isDragging) 1f else 0f)
+            )
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     }

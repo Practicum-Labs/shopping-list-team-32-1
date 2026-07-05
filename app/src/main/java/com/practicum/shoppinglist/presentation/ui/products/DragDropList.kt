@@ -14,12 +14,14 @@ import kotlin.math.roundToInt
 
 class DragDropState(
     val lazyListState: LazyListState,
-    private val onMove: (Int, Int) -> Unit
+    private val onMove: (Int, Int) -> Unit,
+    private val onDragEnd: () -> Unit = {}
 ) {
     var draggedIndex by mutableStateOf<Int?>(null)
         private set
 
-    private var dragOffset by mutableFloatStateOf(0f)
+    private var initialItemOffset = 0f
+    private var totalDragOffset by mutableFloatStateOf(0f)
 
     private val draggedItemInfo
         get() = lazyListState.layoutInfo.visibleItemsInfo
@@ -27,39 +29,40 @@ class DragDropState(
 
     fun onDragStart(index: Int) {
         draggedIndex = index
+        totalDragOffset = 0f
+        initialItemOffset = lazyListState.layoutInfo.visibleItemsInfo
+            .firstOrNull { it.index == index }
+            ?.offset
+            ?.toFloat() ?: 0f
     }
 
     fun onDrag(offset: Offset) {
-        dragOffset += offset.y
+        totalDragOffset += offset.y
         val currentItemInfo = draggedItemInfo ?: return
         val currentItemIndex = currentItemInfo.index
-        val currentItemOffset = currentItemInfo.offset
+
+        val desiredTop = initialItemOffset + totalDragOffset
+        val desiredCenter = desiredTop + currentItemInfo.size / 2
 
         val targetItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { item ->
-            val relativeOffset = currentItemOffset + dragOffset
-            relativeOffset.roundToInt() in item.offset..(item.offset + item.size) &&
-                item.index != currentItemIndex
+            item.index != currentItemIndex &&
+                desiredCenter.roundToInt() in item.offset..(item.offset + item.size)
         }
 
         if (targetItem != null) {
             onMove(currentItemIndex, targetItem.index)
             draggedIndex = targetItem.index
-            dragOffset = 0f
         }
     }
 
     fun onDragInterrupted() {
         draggedIndex = null
-        dragOffset = 0f
+        totalDragOffset = 0f
+        onDragEnd()
     }
 
-    fun getItemOffset(index: Int): IntOffset {
-        return if (index == draggedIndex) {
-            IntOffset(0, dragOffset.roundToInt())
-        } else {
-            IntOffset.Zero
-        }
-    }
+    fun overlayOffset(): IntOffset =
+        IntOffset(0, (initialItemOffset + totalDragOffset).roundToInt())
 }
 
 fun Modifier.dragDropGesture(state: DragDropState): Modifier = this.pointerInput(state) {
