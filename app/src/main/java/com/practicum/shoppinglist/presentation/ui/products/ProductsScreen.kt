@@ -1,24 +1,19 @@
 package com.practicum.shoppinglist.presentation.ui.products
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +49,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -105,6 +101,7 @@ import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialog
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuContent
 import com.practicum.shoppinglist.presentation.ui.main.components.SwipeableListItem
@@ -166,7 +163,9 @@ fun ProductsScreenContent(
     var showAddDialog by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<ShoppingItemEntity?>(null) }
     var showMenuSheet by remember { mutableStateOf(false) }
+    var pendingMenuAction by remember { mutableStateOf<PendingMenuAction?>(null) }
     val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val editSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val coroutineScope = rememberCoroutineScope()
 
     fun closeMenuSheet() {
@@ -206,8 +205,10 @@ fun ProductsScreenContent(
             val quantityDouble = qtyInput.toDoubleOrNull() ?: 1.0
             actions.onUpdateProduct(currentEditingItem, nameInput, quantityDouble, unitInput)
         }
-        showAddDialog = false
-        editingItem = null
+        coroutineScope.launch { editSheetState.hide() }.invokeOnCompletion {
+            showAddDialog = false
+            editingItem = null
+        }
     }
 
     Scaffold(
@@ -243,62 +244,48 @@ fun ProductsScreenContent(
                 onCommitOrder = actions.onCommitOrder,
                 onEdit = { editingItem = it }
             )
+        }
+    }
 
-            // Dimmed overlay when sheet is open
-            AnimatedVisibility(
-                visible = isSheetOpen,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.32f))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            closeSheet()
+    if (isSheetOpen) {
+        ModalBottomSheet(
+            onDismissRequest = { closeSheet() },
+            sheetState = editSheetState,
+            dragHandle = null,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            containerColor = MaterialTheme.colors.iconPickerSheetSurface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ) {
+            BottomSheetContent(
+                modifier = Modifier.fillMaxHeight(),
+                autoFocusName = editingItem == null,
+                name = nameInput,
+                onNameChange = { nameInput = it },
+                qtyStr = qtyInput,
+                onQtyChange = { input ->
+                    if (input.isEmpty() || input.all { it.isDigit() }) {
+                        qtyInput = input
+                    }
+                },
+                unit = unitInput,
+                onUnitChange = { unitInput = it },
+                suggestions = suggestions,
+                onQueryChange = actions.onUpdateSuggestionQuery,
+                onSaveClick = {
+                    if (nameInput.isNotBlank()) {
+                        val quantityDouble = qtyInput.toDoubleOrNull() ?: 1.0
+                        if (editingItem != null) {
+                            actions.onUpdateProduct(editingItem!!, nameInput, quantityDouble, unitInput)
+                        } else {
+                            actions.onAddProduct(nameInput, quantityDouble, unitInput)
                         }
-                )
-            }
-
-            // Custom sliding Bottom Sheet
-            AnimatedVisibility(
-                visible = isSheetOpen,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it }),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .imePadding()
-            ) {
-                BottomSheetContent(
-                    name = nameInput,
-                    onNameChange = { nameInput = it },
-                    qtyStr = qtyInput,
-                    onQtyChange = { input ->
-                        if (input.isEmpty() || input.all { it.isDigit() }) {
-                            qtyInput = input
-                        }
-                    },
-                    unit = unitInput,
-                    onUnitChange = { unitInput = it },
-                    suggestions = suggestions,
-                    onQueryChange = actions.onUpdateSuggestionQuery,
-                    onSaveClick = {
-                        if (nameInput.isNotBlank()) {
-                            val quantityDouble = qtyInput.toDoubleOrNull() ?: 1.0
-                            if (editingItem != null) {
-                                actions.onUpdateProduct(editingItem!!, nameInput, quantityDouble, unitInput)
-                            } else {
-                                actions.onAddProduct(nameInput, quantityDouble, unitInput)
-                            }
+                        coroutineScope.launch { editSheetState.hide() }.invokeOnCompletion {
                             showAddDialog = false
                             editingItem = null
                         }
                     }
-                )
-            }
+                }
+            )
         }
     }
 
@@ -314,15 +301,44 @@ fun ProductsScreenContent(
                 closeMenuSheet()
             },
             onDeleteAllClick = {
-                actions.onClearAllItems()
+                pendingMenuAction = PendingMenuAction.DeleteAll
                 closeMenuSheet()
             },
             onClearPurchasedClick = {
-                actions.onClearBought()
+                pendingMenuAction = PendingMenuAction.ClearBought
                 closeMenuSheet()
             }
         )
     }
+
+    when (pendingMenuAction) {
+        PendingMenuAction.ClearBought -> ConfirmationDialog(
+            title = "Удалить все купленные товары?",
+            confirmText = "Удалить",
+            cancelText = "Отмена",
+            onConfirm = {
+                actions.onClearBought()
+                pendingMenuAction = null
+            },
+            onDismiss = { pendingMenuAction = null }
+        )
+        PendingMenuAction.DeleteAll -> ConfirmationDialog(
+            title = "Удалить все товары?",
+            confirmText = "Удалить",
+            cancelText = "Отмена",
+            onConfirm = {
+                actions.onClearAllItems()
+                pendingMenuAction = null
+            },
+            onDismiss = { pendingMenuAction = null }
+        )
+        null -> Unit
+    }
+}
+
+private enum class PendingMenuAction {
+    ClearBought,
+    DeleteAll
 }
 
 @Composable
@@ -639,57 +655,83 @@ fun BottomSheetContent(
     suggestions: List<String>,
     onQueryChange: (String) -> Unit,
     onSaveClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    autoFocusName: Boolean = false
 ) {
     val quantityDouble = qtyStr.toDoubleOrNull() ?: 1.0
     val focusManager = LocalFocusManager.current
     val unitFocusRequester = remember { FocusRequester() }
-    Box(
+    val nameFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        if (autoFocusName) {
+            nameFocusRequester.requestFocus()
+        }
+    }
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colors.iconPickerSheetSurface,
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+            )
+            .navigationBarsPadding()
+            .imePadding()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 24.dp, top = 8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colors.iconPickerSheetSurface,
-                    shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                )
-                .navigationBarsPadding()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 24.dp, top = 8.dp)
-        ) {
-            // Drag handle representation
+        // Drag handle + Save button row
+        Box(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.Center)
                     .padding(vertical = 8.dp)
                     .width(32.dp)
                     .height(4.dp)
                     .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(2.dp))
             )
-            
-            Spacer(modifier = Modifier.height(8.dp))
 
-            // Product Name Field
-            var isSuggestionsExpanded by remember { mutableStateOf(false) }
-            Box(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = {
-                        onNameChange(it)
-                        onQueryChange(it)
-                        isSuggestionsExpanded = it.isNotEmpty()
-                    },
-                    label = { Text("Товар") },
-                    placeholder = { Text("Добавить новый товар") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            FloatingActionButton(
+                onClick = onSaveClick,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Сохранить",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Product Name Field
+        var isSuggestionsExpanded by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = name,
+                onValueChange = {
+                    onNameChange(it)
+                    onQueryChange(it)
+                    isSuggestionsExpanded = it.isNotEmpty()
+                },
+                label = { Text("Товар") },
+                placeholder = { Text("Добавить новый товар") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(nameFocusRequester),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
@@ -904,27 +946,7 @@ fun BottomSheetContent(
                 }
             }
         }
-
-        // The FAB checkmark button floating exactly 32.dp above the sheet top edge
-        FloatingActionButton(
-            onClick = onSaveClick,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 16.dp)
-                .offset(y = (-88).dp) // FAB height (56dp) + Gap (32dp) = 88dp offset!
-                .size(56.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "Сохранить",
-                modifier = Modifier.size(24.dp)
-            )
-        }
     }
-}
 
 private val productListPreviewItems = listOf(
     ShoppingItemEntity(id = 1, listId = 1, name = "Молоко", quantity = 1.0, unit = "л.", isBought = false, sortOrder = 0),
@@ -1127,5 +1149,147 @@ private fun ProductsScreenWithMenuSheetSortCustomDarkPreview() {
             currentSortType = SortType.Custom,
             initialSortExpanded = true
         )
+    }
+}
+
+private val previewEditingItem = ShoppingItemEntity(
+    id = 10,
+    listId = 1,
+    name = "Йогурт",
+    quantity = 4.0,
+    unit = "шт.",
+    isBought = false,
+    sortOrder = 0
+)
+
+@Composable
+private fun ProductBottomSheetPreviewContent(
+    isEditing: Boolean,
+    isFullScreen: Boolean
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        ProductsScreenContent(
+            state = productsScreenPreviewState,
+            suggestions = emptyList(),
+            onBack = {}
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.32f))
+        )
+
+        Surface(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .then(if (isFullScreen) Modifier.fillMaxHeight() else Modifier),
+            color = MaterialTheme.colors.iconPickerSheetSurface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+        ) {
+            BottomSheetContent(
+                modifier = if (isFullScreen) Modifier.fillMaxHeight() else Modifier,
+                autoFocusName = false,
+                name = if (isEditing) previewEditingItem.name else "",
+                onNameChange = {},
+                qtyStr = if (isEditing) previewEditingItem.quantity.toInt().toString() else "",
+                onQtyChange = {},
+                unit = if (isEditing) previewEditingItem.unit else "",
+                onUnitChange = {},
+                suggestions = emptyList(),
+                onQueryChange = {},
+                onSaveClick = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Add Product - Compact", showBackground = true, widthDp = 428, heightDp = 908)
+@Composable
+private fun AddProductCompactPreview() {
+    Theme {
+        ProductBottomSheetPreviewContent(isEditing = false, isFullScreen = false)
+    }
+}
+
+@Preview(
+    name = "Add Product - Compact (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun AddProductCompactDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductBottomSheetPreviewContent(isEditing = false, isFullScreen = false)
+    }
+}
+
+@Preview(name = "Add Product - Fullscreen", showBackground = true, widthDp = 428, heightDp = 908)
+@Composable
+private fun AddProductFullscreenPreview() {
+    Theme {
+        ProductBottomSheetPreviewContent(isEditing = false, isFullScreen = true)
+    }
+}
+
+@Preview(
+    name = "Add Product - Fullscreen (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun AddProductFullscreenDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductBottomSheetPreviewContent(isEditing = false, isFullScreen = true)
+    }
+}
+
+@Preview(name = "Edit Product - Compact", showBackground = true, widthDp = 428, heightDp = 908)
+@Composable
+private fun EditProductCompactPreview() {
+    Theme {
+        ProductBottomSheetPreviewContent(isEditing = true, isFullScreen = false)
+    }
+}
+
+@Preview(
+    name = "Edit Product - Compact (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun EditProductCompactDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductBottomSheetPreviewContent(isEditing = true, isFullScreen = false)
+    }
+}
+
+@Preview(name = "Edit Product - Fullscreen", showBackground = true, widthDp = 428, heightDp = 908)
+@Composable
+private fun EditProductFullscreenPreview() {
+    Theme {
+        ProductBottomSheetPreviewContent(isEditing = true, isFullScreen = true)
+    }
+}
+
+@Preview(
+    name = "Edit Product - Fullscreen (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun EditProductFullscreenDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductBottomSheetPreviewContent(isEditing = true, isFullScreen = true)
     }
 }
