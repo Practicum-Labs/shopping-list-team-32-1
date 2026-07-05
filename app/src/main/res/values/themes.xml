@@ -21,6 +21,7 @@
         <item name="shoppingColorSurfaceVariant">@color/shopping_light_surface_variant</item>
         <item name="shoppingColorOnSurfaceVariant">@color/shopping_light_on_surface_variant</item>
         <item name="shoppingColorOutline">@color/shopping_light_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_light_outline_variant</item>
         <item name="shoppingColorError">@color/shopping_light_error</item>
         <item name="shoppingColorOnError">@color/shopping_light_on_error</item>
         <item name="shoppingColorAddListDialogSurface">@color/shopping_light_add_list_dialog_surface</item>
@@ -61,6 +62,7 @@
         <item name="shoppingColorSurfaceVariant">@color/shopping_dark_surface_variant</item>
         <item name="shoppingColorOnSurfaceVariant">@color/shopping_dark_on_surface_variant</item>
         <item name="shoppingColorOutline">@color/shopping_dark_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_dark_outline_variant</item>
         <item name="shoppingColorError">@color/shopping_dark_error</item>
         <item name="shoppingColorOnError">@color/shopping_dark_on_error</item>
         <item name="shoppingColorAddListDialogSurface">@color/shopping_dark_add_list_dialog_surface</item>

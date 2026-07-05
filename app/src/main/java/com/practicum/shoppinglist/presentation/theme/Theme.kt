@@ -119,6 +119,7 @@ private fun shoppingColorScheme(darkTheme: Boolean): ColorScheme {
             surfaceVariant = colorAttr(R.attr.shoppingColorSurfaceVariant),
             onSurfaceVariant = colorAttr(R.attr.shoppingColorOnSurfaceVariant),
             outline = colorAttr(R.attr.shoppingColorOutline),
+            outlineVariant = colorAttr(R.attr.shoppingColorOutlineVariant),
             error = colorAttr(R.attr.shoppingColorError),
             onError = colorAttr(R.attr.shoppingColorOnError),
         )
@@ -137,6 +138,7 @@ private fun shoppingColorScheme(darkTheme: Boolean): ColorScheme {
             surfaceVariant = colorAttr(R.attr.shoppingColorSurfaceVariant),
             onSurfaceVariant = colorAttr(R.attr.shoppingColorOnSurfaceVariant),
             outline = colorAttr(R.attr.shoppingColorOutline),
+            outlineVariant = colorAttr(R.attr.shoppingColorOutlineVariant),
             error = colorAttr(R.attr.shoppingColorError),
             onError = colorAttr(R.attr.shoppingColorOnError),
         )

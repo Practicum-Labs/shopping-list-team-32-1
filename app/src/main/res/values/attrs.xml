@@ -13,6 +13,7 @@
     <attr name="shoppingColorSurfaceVariant" format="color" />
     <attr name="shoppingColorOnSurfaceVariant" format="color" />
     <attr name="shoppingColorOutline" format="color" />
+    <attr name="shoppingColorOutlineVariant" format="color" />
     <attr name="shoppingColorError" format="color" />
     <attr name="shoppingColorOnError" format="color" />
     <attr name="shoppingColorAddListDialogSurface" format="color" />
