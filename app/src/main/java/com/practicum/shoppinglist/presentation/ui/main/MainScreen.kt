@@ -60,6 +60,7 @@ import org.koin.androidx.compose.koinViewModel
 fun MainRoute(
     isDarkTheme: Boolean,
     onThemeClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
@@ -70,6 +71,7 @@ fun MainRoute(
         isDarkTheme = isDarkTheme,
         actions = MainScreenActions(
             onThemeClick = onThemeClick,
+            onLogoutClick = { viewModel.onLogoutClick(onSuccess = onLogoutClick) },
             onAddClick = viewModel::onAddListClick,
             onAddListDismiss = viewModel::onAddListDismiss,
             onNewListNameChange = viewModel::onNewListNameChange,

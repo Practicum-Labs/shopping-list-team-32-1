@@ -1,11 +1,7 @@
 <resources>
-    <style name="Base.Theme.Shoppinglist" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-    </style>
-
     <style name="Theme.Shoppinglist.Light" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
 
         <item name="shoppingColorPrimary">@color/shopping_light_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_light_on_primary</item>
@@ -41,6 +37,7 @@
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
 
         <item name="shoppingColorPrimary">@color/shopping_dark_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_dark_on_primary</item>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.LightMode
@@ -45,6 +46,11 @@ fun MainActionsRow(
             icon = if (isDarkTheme) Icons.Outlined.LightMode else Icons.Outlined.DarkMode,
             contentDescription = stringResource(id = R.string.main_theme_content_description),
             onClick = actions.onThemeClick,
+        )
+        MainActionButton(
+            icon = Icons.AutoMirrored.Outlined.Logout,
+            contentDescription = stringResource(id = R.string.main_logout_content_description),
+            onClick = actions.onLogoutClick,
         )
     }
 }

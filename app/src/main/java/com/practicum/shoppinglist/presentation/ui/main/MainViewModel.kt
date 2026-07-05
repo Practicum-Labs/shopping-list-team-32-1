@@ -10,6 +10,7 @@ import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.ObserveShoppingListsUseCase
 import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.UpdateShoppingListIconUseCase
+import com.practicum.shoppinglist.domain.usecase.auth.LogoutUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,7 @@ class MainViewModel(
     private val deleteShoppingListUseCase: DeleteShoppingListUseCase,
     private val copyShoppingListUseCase: CopyShoppingListUseCase,
     private val renameShoppingListUseCase: RenameShoppingListUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val screenState = MutableStateFlow(MainUiState())
     private val retryRequests = MutableStateFlow(0)
@@ -231,6 +233,13 @@ class MainViewModel(
     fun onSearchQueryChange(query: String) {
         screenState.update { currentState ->
             currentState.copy(searchQuery = query)
+        }
+    }
+
+    fun onLogoutClick(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            logoutUseCase()
+            onSuccess()
         }
     }
 
