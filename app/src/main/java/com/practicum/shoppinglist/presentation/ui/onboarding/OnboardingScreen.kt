@@ -18,6 +18,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,10 +27,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.theme.colors
+import org.koin.androidx.compose.koinViewModel
+
+@Composable
+fun OnboardingRoute(
+    isDarkTheme: Boolean,
+    onNavigate: (OnboardingDestination) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingViewModel = koinViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.destination) {
+        uiState.destination?.let(onNavigate)
+    }
+
+    OnboardingScreen(
+        isDarkTheme = isDarkTheme,
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun OnboardingScreen(
