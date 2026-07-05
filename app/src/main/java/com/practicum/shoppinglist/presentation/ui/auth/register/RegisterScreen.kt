@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,6 +75,7 @@ fun RegisterScreen(
             onVisibilityClick = onPasswordVisibilityClick,
             isError = uiState.isPasswordErrorVisible,
             errorResId = R.string.auth_error_password_requirements,
+            autofillContentType = ContentType.NewPassword,
         )
         Spacer(modifier = Modifier.height(Dimens.Auth.fieldSpacing))
         AuthPasswordField(
@@ -84,6 +86,7 @@ fun RegisterScreen(
             isError = uiState.isRepeatedPasswordErrorVisible,
             errorResId = R.string.auth_error_password_mismatch,
             labelResId = R.string.auth_repeat_password_label,
+            autofillContentType = ContentType.NewPassword,
         )
         AuthMessageText(message = uiState.message)
         Spacer(modifier = Modifier.height(Dimens.Auth.buttonTopPadding))

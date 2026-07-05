@@ -1,5 +1,10 @@
 package com.practicum.shoppinglist.data.mapper
 
+import com.practicum.shoppinglist.data.remote.HTTP_BAD_REQUEST
+import com.practicum.shoppinglist.data.remote.HTTP_CONFLICT
+import com.practicum.shoppinglist.data.remote.HTTP_SERVER_ERROR_END
+import com.practicum.shoppinglist.data.remote.HTTP_SERVER_ERROR_START
+import com.practicum.shoppinglist.data.remote.HTTP_UNAUTHORIZED
 import com.practicum.shoppinglist.data.remote.auth.dto.AuthResponseDto
 import com.practicum.shoppinglist.data.remote.auth.dto.RefreshTokenResponseDto
 import com.practicum.shoppinglist.domain.model.AuthError
@@ -57,9 +62,3 @@ fun <T> Response<T>.errorToAuthError(unauthorizedAsInvalidCredentials: Boolean =
         else -> AuthError.Unknown()
     }
 }
-
-private const val HTTP_BAD_REQUEST = 400
-private const val HTTP_UNAUTHORIZED = 401
-private const val HTTP_CONFLICT = 409
-private const val HTTP_SERVER_ERROR_START = 500
-private const val HTTP_SERVER_ERROR_END = 599

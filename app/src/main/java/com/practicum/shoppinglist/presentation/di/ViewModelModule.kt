@@ -4,10 +4,14 @@ import com.practicum.shoppinglist.presentation.ui.auth.login.LoginViewModel
 import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryViewModel
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterViewModel
 import com.practicum.shoppinglist.presentation.ui.main.MainViewModel
+import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
+    viewModel {
+        OnboardingViewModel(observeAuthSessionUseCase = get())
+    }
     viewModel {
         LoginViewModel(loginUseCase = get())
     }
@@ -26,6 +30,7 @@ val viewModelModule = module {
             deleteShoppingListUseCase = get(),
             copyShoppingListUseCase = get(),
             renameShoppingListUseCase = get(),
+            checkAuthUseCase = get(),
             logoutUseCase = get(),
         )
     }

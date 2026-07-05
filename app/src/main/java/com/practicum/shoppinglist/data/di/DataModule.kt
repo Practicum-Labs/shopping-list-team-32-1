@@ -45,7 +45,10 @@ val dataModule = module {
             klass = AppDatabase::class.java,
             name = "shopping_list_database",
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(
+                AppDatabase.MIGRATION_1_2,
+                AppDatabase.MIGRATION_2_3,
+            )
             .build()
     }
     single {
