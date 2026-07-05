@@ -10,6 +10,7 @@ import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.ObserveShoppingListsUseCase
 import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.UpdateShoppingListIconUseCase
+import com.practicum.shoppinglist.domain.usecase.auth.CheckAuthUseCase
 import com.practicum.shoppinglist.domain.usecase.auth.LogoutUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ class MainViewModel(
     private val deleteShoppingListUseCase: DeleteShoppingListUseCase,
     private val copyShoppingListUseCase: CopyShoppingListUseCase,
     private val renameShoppingListUseCase: RenameShoppingListUseCase,
+    private val checkAuthUseCase: CheckAuthUseCase,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val screenState = MutableStateFlow(MainUiState())
@@ -73,6 +75,16 @@ class MainViewModel(
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
             initialValue = MainUiState(),
         )
+
+    fun checkSessionInBackground(onInvalidSession: () -> Unit) {
+        viewModelScope.launch {
+            val isSessionValid = checkAuthUseCase()
+            if (!isSessionValid) {
+                logoutUseCase()
+                onInvalidSession()
+            }
+        }
+    }
 
     fun onAddListClick() {
         screenState.update { currentState ->

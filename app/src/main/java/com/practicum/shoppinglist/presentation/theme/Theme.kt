@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import com.practicum.shoppinglist.R
 
 @Composable
@@ -36,7 +35,7 @@ fun Theme(
 
     CompositionLocalProvider(LocalContext provides themedContext) {
         CompositionLocalProvider(
-            LocalColors provides colors(darkTheme = darkTheme),
+            LocalColors provides colors(),
             LocalDarkTheme provides darkTheme,
         ) {
             MaterialTheme(
@@ -85,7 +84,7 @@ private val LocalDarkTheme = staticCompositionLocalOf { false }
 
 @Composable
 @ReadOnlyComposable
-private fun colors(darkTheme: Boolean): Colors {
+private fun colors(): Colors {
     return Colors(
         addListDialogSurface = colorAttr(R.attr.shoppingColorAddListDialogSurface),
         addListDialogLabelContainer = colorAttr(R.attr.shoppingColorAddListDialogLabelContainer),
@@ -102,11 +101,7 @@ private fun colors(darkTheme: Boolean): Colors {
         confirmDialogDeleteBackground = colorAttr(R.attr.shoppingColorConfirmDialogDeleteBackground),
         confirmDialogCancelText = colorAttr(R.attr.shoppingColorConfirmDialogCancelText),
         confirmDialogDeleteText = colorAttr(R.attr.shoppingColorConfirmDialogDeleteText),
-        authButtonLoader = if (darkTheme) {
-            colorResource(id = R.color.shopping_light_icon_picker_item_container)
-        } else {
-            colorAttr(R.attr.shoppingColorAddListDialogAccent)
-        },
+        authButtonLoader = colorAttr(R.attr.shoppingColorAuthButtonLoader),
     )
 }
 

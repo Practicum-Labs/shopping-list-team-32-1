@@ -9,22 +9,23 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.practicum.shoppinglist.domain.usecase.auth.CheckAuthUseCase
 import com.practicum.shoppinglist.presentation.theme.Motion
 import com.practicum.shoppinglist.presentation.ui.auth.login.LoginRoute
 import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryRoute
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterRoute
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
+import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingDestination
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingScreen
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
+import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ShoppingListNavHost(
@@ -33,14 +34,13 @@ fun ShoppingListNavHost(
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
-    val checkAuthUseCase: CheckAuthUseCase = koinInject()
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingListRoute.Onboarding,
+        startDestination = ONBOARDING_ROUTE,
         modifier = modifier,
     ) {
-        onboardingRoute(navController, checkAuthUseCase, isDarkTheme)
+        onboardingRoute(navController, isDarkTheme)
         loginRoute(navController)
         registerRoute(navController)
         recoveryRoute(navController)
@@ -50,32 +50,29 @@ fun ShoppingListNavHost(
 
 private fun NavGraphBuilder.onboardingRoute(
     navController: NavHostController,
-    checkAuthUseCase: CheckAuthUseCase,
     isDarkTheme: Boolean,
 ) {
     composable(
-        route = ShoppingListRoute.Onboarding,
+        route = ONBOARDING_ROUTE,
         exitTransition = {
-            if (targetState.destination.route == ShoppingListRoute.Main) {
+            if (targetState.destination.route == MAIN_ROUTE) {
                 onboardingExitTransition()
             } else {
                 ExitTransition.None
             }
         },
     ) {
-        LaunchedEffect(Unit) {
-            val authCheck = async { checkAuthUseCase() }
-            delay(Motion.Navigation.loadingScreenDelayMillis)
-            val nextRoute = if (authCheck.await()) {
-                ShoppingListRoute.Main
-            } else {
-                ShoppingListRoute.Login
-            }
-            navController.navigate(nextRoute) {
-                popUpTo(ShoppingListRoute.Onboarding) {
-                    inclusive = true
+        val viewModel: OnboardingViewModel = koinViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        LaunchedEffect(uiState.destination) {
+            uiState.destination?.let { destination ->
+                navController.navigate(destination.toRoute()) {
+                    popUpTo(ONBOARDING_ROUTE) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
                 }
-                launchSingleTop = true
             }
         }
 
@@ -85,9 +82,9 @@ private fun NavGraphBuilder.onboardingRoute(
 
 private fun NavGraphBuilder.loginRoute(navController: NavHostController) {
     composable(
-        route = ShoppingListRoute.Login,
+        route = LOGIN_ROUTE,
         exitTransition = {
-            if (targetState.destination.route == ShoppingListRoute.Main) {
+            if (targetState.destination.route == MAIN_ROUTE) {
                 mainExitTransition()
             } else {
                 ExitTransition.None
@@ -96,17 +93,17 @@ private fun NavGraphBuilder.loginRoute(navController: NavHostController) {
     ) {
         LoginRoute(
             onLoginSuccess = { navController.navigateToMainFromLogin() },
-            onRegisterClick = { navController.navigate(ShoppingListRoute.Register) },
-            onRecoveryClick = { navController.navigate(ShoppingListRoute.Recovery) },
+            onRegisterClick = { navController.navigate(REGISTER_ROUTE) },
+            onRecoveryClick = { navController.navigate(RECOVERY_ROUTE) },
         )
     }
 }
 
 private fun NavGraphBuilder.registerRoute(navController: NavHostController) {
     composable(
-        route = ShoppingListRoute.Register,
+        route = REGISTER_ROUTE,
         exitTransition = {
-            if (targetState.destination.route == ShoppingListRoute.Main) {
+            if (targetState.destination.route == MAIN_ROUTE) {
                 mainExitTransition()
             } else {
                 ExitTransition.None
@@ -121,7 +118,7 @@ private fun NavGraphBuilder.registerRoute(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.recoveryRoute(navController: NavHostController) {
-    composable(route = ShoppingListRoute.Recovery) {
+    composable(route = RECOVERY_ROUTE) {
         RecoveryRoute(
             onBackClick = { navController.navigateBackToLogin() },
         )
@@ -134,10 +131,10 @@ private fun NavGraphBuilder.mainRoute(
     onThemeClick: () -> Unit,
 ) {
     composable(
-        route = ShoppingListRoute.Main,
+        route = MAIN_ROUTE,
         enterTransition = {
             if (
-                initialState.destination.route == ShoppingListRoute.Onboarding ||
+                initialState.destination.route == ONBOARDING_ROUTE ||
                 initialState.destination.route.isAuthRoute()
             ) {
                 mainEnterTransition()
@@ -155,8 +152,8 @@ private fun NavGraphBuilder.mainRoute(
 }
 
 private fun NavHostController.navigateToMainFromLogin() {
-    navigate(ShoppingListRoute.Main) {
-        popUpTo(ShoppingListRoute.Login) {
+    navigate(MAIN_ROUTE) {
+        popUpTo(LOGIN_ROUTE) {
             inclusive = true
         }
         launchSingleTop = true
@@ -164,8 +161,8 @@ private fun NavHostController.navigateToMainFromLogin() {
 }
 
 private fun NavHostController.navigateToLoginFromMain() {
-    navigate(ShoppingListRoute.Login) {
-        popUpTo(ShoppingListRoute.Main) {
+    navigate(LOGIN_ROUTE) {
+        popUpTo(MAIN_ROUTE) {
             inclusive = true
         }
         launchSingleTop = true
@@ -174,17 +171,9 @@ private fun NavHostController.navigateToLoginFromMain() {
 
 private fun NavHostController.navigateBackToLogin() {
     popBackStack(
-        route = ShoppingListRoute.Login,
+        route = LOGIN_ROUTE,
         inclusive = false,
     )
-}
-
-private object ShoppingListRoute {
-    const val Onboarding = "onboarding"
-    const val Login = "login"
-    const val Register = "register"
-    const val Recovery = "recovery"
-    const val Main = "main"
 }
 
 private fun onboardingExitTransition(): ExitTransition {
@@ -227,5 +216,18 @@ private fun mainExitTransition(): ExitTransition {
 }
 
 private fun String?.isAuthRoute(): Boolean {
-    return this == ShoppingListRoute.Login || this == ShoppingListRoute.Register
+    return this == LOGIN_ROUTE || this == REGISTER_ROUTE
 }
+
+private fun OnboardingDestination.toRoute(): String {
+    return when (this) {
+        OnboardingDestination.Main -> MAIN_ROUTE
+        OnboardingDestination.Login -> LOGIN_ROUTE
+    }
+}
+
+private const val ONBOARDING_ROUTE = "onboarding"
+private const val LOGIN_ROUTE = "login"
+private const val REGISTER_ROUTE = "register"
+private const val RECOVERY_ROUTE = "recovery"
+private const val MAIN_ROUTE = "main"

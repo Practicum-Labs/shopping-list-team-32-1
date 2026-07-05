@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -46,6 +47,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -163,6 +166,7 @@ fun AuthEmailField(
         isError = isError,
         errorResId = R.string.auth_error_invalid_email,
         keyboardType = KeyboardType.Email,
+        autofillContentType = ContentType.EmailAddress,
         modifier = modifier,
     )
 }
@@ -177,11 +181,12 @@ fun AuthPasswordField(
     @StringRes errorResId: Int,
     modifier: Modifier = Modifier,
     @StringRes labelResId: Int = R.string.auth_password_label,
+    autofillContentType: ContentType? = ContentType.Password,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.passwordFieldModifier(autofillContentType),
         label = { Text(text = stringResource(id = labelResId)) },
         isError = isError,
         singleLine = true,
@@ -205,6 +210,15 @@ fun AuthPasswordField(
             }
         },
     )
+}
+
+private fun Modifier.passwordFieldModifier(autofillContentType: ContentType?): Modifier {
+    val fieldModifier = fillMaxWidth()
+    return if (autofillContentType == null) {
+        fieldModifier
+    } else {
+        fieldModifier.semantics { contentType = autofillContentType }
+    }
 }
 
 @Composable
@@ -329,12 +343,15 @@ private fun AuthTextField(
     isError: Boolean,
     @StringRes errorResId: Int,
     keyboardType: KeyboardType,
+    autofillContentType: ContentType,
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { contentType = autofillContentType },
         label = { Text(text = stringResource(id = labelResId)) },
         isError = isError,
         singleLine = true,

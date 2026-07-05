@@ -6,6 +6,8 @@ import com.practicum.shoppinglist.data.mapper.errorToAuthError
 import com.practicum.shoppinglist.data.mapper.refreshTokenOrThrow
 import com.practicum.shoppinglist.data.mapper.toAuthError
 import com.practicum.shoppinglist.data.mapper.toDomain
+import com.practicum.shoppinglist.data.remote.HTTP_BAD_REQUEST
+import com.practicum.shoppinglist.data.remote.HTTP_UNAUTHORIZED
 import com.practicum.shoppinglist.data.remote.auth.AuthApi
 import com.practicum.shoppinglist.data.remote.auth.dto.LoginRequestDto
 import com.practicum.shoppinglist.data.remote.auth.dto.RefreshTokenRequestDto
@@ -117,6 +119,3 @@ class AuthRepositoryImpl(
         return this == HTTP_BAD_REQUEST || this == HTTP_UNAUTHORIZED
     }
 }
-
-private const val HTTP_BAD_REQUEST = 400
-private const val HTTP_UNAUTHORIZED = 401
