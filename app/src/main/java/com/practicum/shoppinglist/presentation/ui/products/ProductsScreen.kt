@@ -106,6 +106,7 @@ import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.ui.main.SortType
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
+import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuContent
 import com.practicum.shoppinglist.presentation.ui.main.components.SwipeableListItem
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 import kotlinx.coroutines.launch
@@ -933,45 +934,6 @@ private val productListPreviewItems = listOf(
     ShoppingItemEntity(id = 5, listId = 1, name = "Кофе", quantity = 1.0, unit = "шт.", isBought = false, sortOrder = 4),
 )
 
-@Preview(
-    name = "Light",
-    showBackground = true,
-    widthDp = 428,
-    heightDp = 908,
-)
-@Composable
-private fun ProductListLightPreview() {
-    Theme {
-        ProductList(
-            items = productListPreviewItems,
-            onToggleBought = {},
-            onDelete = {},
-            onEdit = {},
-            onMove = { _, _ -> }
-        )
-    }
-}
-
-@Preview(
-    name = "Dark",
-    showBackground = true,
-    widthDp = 428,
-    heightDp = 908,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
-@Composable
-private fun ProductListDarkPreview() {
-    Theme(darkTheme = true) {
-        ProductList(
-            items = productListPreviewItems,
-            onToggleBought = {},
-            onDelete = {},
-            onEdit = {},
-            onMove = { _, _ -> }
-        )
-    }
-}
-
 private val productsScreenPreviewState = ProductsUiState(
     list = ShoppingList(id = 1, name = "Выходные", iconName = "shopping_bag"),
     items = productListPreviewItems,
@@ -1030,6 +992,140 @@ private fun ProductsScreenEmptyPreview() {
             ),
             suggestions = emptyList(),
             onBack = {}
+        )
+    }
+}
+
+@Composable
+private fun ProductsScreenWithMenuSheetPreviewContent(
+    currentSortType: SortType,
+    initialSortExpanded: Boolean
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        ProductsScreenContent(
+            state = productsScreenPreviewState.copy(sortType = currentSortType),
+            suggestions = emptyList(),
+            onBack = {}
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.32f))
+        )
+
+        Surface(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+            color = MaterialTheme.colors.menuSheetSurface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(
+                topStart = Dimens.Main.menuSheetCornerRadius,
+                topEnd = Dimens.Main.menuSheetCornerRadius
+            )
+        ) {
+            ShoppingListMenuContent(
+                currentSortType = currentSortType,
+                onSortTypeSelected = {},
+                onDeleteAllClick = {},
+                onClearPurchasedClick = {},
+                initialSortExpanded = initialSortExpanded
+            )
+        }
+    }
+}
+
+@Preview(name = "Screen + Menu Sheet - Base", showBackground = true, widthDp = 428, heightDp = 908)
+@Composable
+private fun ProductsScreenWithMenuSheetBasePreview() {
+    Theme {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Custom,
+            initialSortExpanded = false
+        )
+    }
+}
+
+@Preview(
+    name = "Screen + Menu Sheet - Base (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun ProductsScreenWithMenuSheetBaseDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Custom,
+            initialSortExpanded = false
+        )
+    }
+}
+
+@Preview(
+    name = "Screen + Menu Sheet - Sort Open (Alphabetical)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908
+)
+@Composable
+private fun ProductsScreenWithMenuSheetSortAlphabeticalPreview() {
+    Theme {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Alphabetical,
+            initialSortExpanded = true
+        )
+    }
+}
+
+@Preview(
+    name = "Screen + Menu Sheet - Sort Open (Alphabetical) (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun ProductsScreenWithMenuSheetSortAlphabeticalDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Alphabetical,
+            initialSortExpanded = true
+        )
+    }
+}
+
+@Preview(
+    name = "Screen + Menu Sheet - Sort Open (Custom)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908
+)
+@Composable
+private fun ProductsScreenWithMenuSheetSortCustomPreview() {
+    Theme {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Custom,
+            initialSortExpanded = true
+        )
+    }
+}
+
+@Preview(
+    name = "Screen + Menu Sheet - Sort Open (Custom) (Dark)",
+    showBackground = true,
+    widthDp = 428,
+    heightDp = 908,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun ProductsScreenWithMenuSheetSortCustomDarkPreview() {
+    Theme(darkTheme = true) {
+        ProductsScreenWithMenuSheetPreviewContent(
+            currentSortType = SortType.Custom,
+            initialSortExpanded = true
         )
     }
 }
