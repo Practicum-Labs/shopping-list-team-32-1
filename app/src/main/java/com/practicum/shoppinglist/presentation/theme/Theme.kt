@@ -34,7 +34,10 @@ fun Theme(
     }
 
     CompositionLocalProvider(LocalContext provides themedContext) {
-        CompositionLocalProvider(LocalColors provides colors()) {
+        CompositionLocalProvider(
+            LocalColors provides colors(),
+            LocalDarkTheme provides darkTheme,
+        ) {
             MaterialTheme(
                 colorScheme = shoppingColorScheme(darkTheme = darkTheme),
                 typography = AppTypography,
@@ -60,16 +63,24 @@ data class Colors(
     val confirmDialogDeleteBackground: Color,
     val confirmDialogCancelText: Color,
     val confirmDialogDeleteText: Color,
+    val authButtonLoader: Color,
 )
 
 val MaterialTheme.colors: Colors
     @Composable
     @ReadOnlyComposable
-    get() = LocalColors.current
+    get() = this.run { LocalColors.current }
+
+val MaterialTheme.isDarkTheme: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = this.run { LocalDarkTheme.current }
 
 private val LocalColors = staticCompositionLocalOf<Colors> {
     error("Shopping list colors are not provided")
 }
+
+private val LocalDarkTheme = staticCompositionLocalOf { false }
 
 @Composable
 @ReadOnlyComposable
@@ -90,6 +101,7 @@ private fun colors(): Colors {
         confirmDialogDeleteBackground = colorAttr(R.attr.shoppingColorConfirmDialogDeleteBackground),
         confirmDialogCancelText = colorAttr(R.attr.shoppingColorConfirmDialogCancelText),
         confirmDialogDeleteText = colorAttr(R.attr.shoppingColorConfirmDialogDeleteText),
+        authButtonLoader = colorAttr(R.attr.shoppingColorAuthButtonLoader),
     )
 }
 

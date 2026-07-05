@@ -4,6 +4,7 @@ data class MainScreenActions(
     val onSearchClick: () -> Unit = {},
     val onDeleteClick: () -> Unit = {},
     val onThemeClick: () -> Unit = {},
+    val onLogoutClick: () -> Unit = {},
     val onAddClick: () -> Unit = {},
     val onAddListDismiss: () -> Unit = {},
     val onNewListNameChange: (String) -> Unit = {},
