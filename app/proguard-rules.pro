@@ -19,3 +19,19 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Gson / Retrofit DTO ------------------------------------------------------
+# Дженерики, аннотации и внутренние классы нужны Gson для рефлексии.
+-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod
+
+# Поля, помеченные @SerializedName, не должны удаляться/переименовываться.
+-keepclassmembers,allowobfuscation class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# DTO авторизации заполняются Gson через рефлексию — сохраняем целиком.
+-keep class com.practicum.shoppinglist.data.remote.auth.dto.** { *; }
+
+# --- Читаемые стектрейсы в release --------------------------------------------
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
