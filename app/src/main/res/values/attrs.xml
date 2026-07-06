@@ -35,4 +35,5 @@
     <attr name="shoppingColorSortSubmenuBackground" format="color" />
     <attr name="shoppingColorMenuSheetSurface" format="color" />
     <attr name="shoppingColorMenuSheetSortActive" format="color" />
+    <attr name="shoppingColorAuthButtonLoader" format="color" />
 </resources>

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ShoppingListDao {
-    @Query("SELECT * FROM shopping_lists ORDER BY id DESC")
-    fun observeShoppingLists(): Flow<List<ShoppingListEntity>>
+    @Query("SELECT * FROM shopping_lists WHERE owner_user_id = :ownerUserId ORDER BY id DESC")
+    fun observeShoppingLists(ownerUserId: Long): Flow<List<ShoppingListEntity>>
 
     @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId LIMIT 1")
     suspend fun getShoppingListById(shoppingListId: Long): ShoppingListEntity?
@@ -17,21 +17,35 @@ interface ShoppingListDao {
     @Insert
     suspend fun insertShoppingList(shoppingList: ShoppingListEntity): Long
 
-    @Query("UPDATE shopping_lists SET icon_name = :iconName WHERE id = :shoppingListId")
+    @Query(
+        """
+        UPDATE shopping_lists
+        SET icon_name = :iconName
+        WHERE id = :shoppingListId AND owner_user_id = :ownerUserId
+        """,
+    )
     suspend fun updateShoppingListIcon(
         shoppingListId: Long,
         iconName: String,
+        ownerUserId: Long,
     )
 
-    @Query("DELETE FROM shopping_lists")
-    suspend fun deleteAllShoppingLists()
+    @Query("DELETE FROM shopping_lists WHERE owner_user_id = :ownerUserId")
+    suspend fun deleteAllShoppingLists(ownerUserId: Long)
 
-    @Query("DELETE FROM shopping_lists WHERE id = :shoppingListId")
-    suspend fun deleteShoppingList(shoppingListId: Long)
+    @Query("DELETE FROM shopping_lists WHERE id = :shoppingListId AND owner_user_id = :ownerUserId")
+    suspend fun deleteShoppingList(shoppingListId: Long, ownerUserId: Long)
 
-    @Query("UPDATE shopping_lists SET name = :name WHERE id = :shoppingListId")
+    @Query(
+        """
+        UPDATE shopping_lists
+        SET name = :name
+        WHERE id = :shoppingListId AND owner_user_id = :ownerUserId
+        """,
+    )
     suspend fun updateShoppingListName(
         shoppingListId: Long,
         name: String,
+        ownerUserId: Long,
     )
 }
