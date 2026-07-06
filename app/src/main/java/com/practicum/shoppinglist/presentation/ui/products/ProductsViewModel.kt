@@ -2,7 +2,7 @@ package com.practicum.shoppinglist.presentation.ui.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
+import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 data class ProductsUiState(
     val list: ShoppingList? = null,
-    val items: List<ShoppingItemEntity> = emptyList(),
+    val items: List<ShoppingItem> = emptyList(),
     val suggestions: List<String> = emptyList(),
     val isLoading: Boolean = true,
     val listDeleted: Boolean = false
@@ -48,20 +48,19 @@ class ProductsViewModel(
 
     init {
         loadData()
+        seedDefaultSuggestions()
     }
 
     private fun loadData() {
         viewModelScope.launch {
             val list = listRepository.getShoppingListById(listId)
             if (list == null) {
-                // If list doesn't exist, create a default one
-                val newId = listRepository.createShoppingList(name = "Продукты", iconName = "list_alt")
-                val createdList = listRepository.getShoppingListById(newId)
-                _uiState.value = _uiState.value.copy(list = createdList, isLoading = false)
+                _uiState.value = _uiState.value.copy(listDeleted = true, isLoading = false)
             } else {
                 _uiState.value = _uiState.value.copy(list = list, isLoading = false)
             }
-
+        }
+        viewModelScope.launch {
             itemRepository.getItemsForListFlow(listId).collect { items ->
                 _uiState.value = _uiState.value.copy(items = items)
             }
@@ -73,7 +72,7 @@ class ProductsViewModel(
             val trimmedName = name.trim()
             itemRepository.addSuggestion(trimmedName)
             val maxOrder = _uiState.value.items.maxOfOrNull { it.sortOrder } ?: 0
-            val newItem = ShoppingItemEntity(
+            val newItem = ShoppingItem(
                 listId = listId,
                 name = trimmedName,
                 quantity = quantity,
@@ -84,7 +83,7 @@ class ProductsViewModel(
         }
     }
 
-    fun updateProduct(item: ShoppingItemEntity, name: String, quantity: Double, unit: String) {
+    fun updateProduct(item: ShoppingItem, name: String, quantity: Double, unit: String) {
         viewModelScope.launch {
             val trimmedName = name.trim()
             itemRepository.addSuggestion(trimmedName)
@@ -92,13 +91,13 @@ class ProductsViewModel(
         }
     }
 
-    fun deleteProduct(item: ShoppingItemEntity) {
+    fun deleteProduct(item: ShoppingItem) {
         viewModelScope.launch {
             itemRepository.deleteItem(item)
         }
     }
 
-    fun toggleProductBought(item: ShoppingItemEntity) {
+    fun toggleProductBought(item: ShoppingItem) {
         viewModelScope.launch {
             itemRepository.updateItem(item.copy(isBought = !item.isBought))
         }
@@ -149,5 +148,25 @@ class ProductsViewModel(
 
     fun updateSuggestionQuery(query: String) {
         suggestionQuery.value = query
+    }
+
+    private fun seedDefaultSuggestions() {
+        viewModelScope.launch {
+            val defaults = listOf(
+                "Кокосовое молоко",
+                "Молоко",
+                "Соевое молоко",
+                "Сухое молоко",
+                "Хлеб",
+                "Яблоки",
+                "Бананы",
+                "Яйца",
+                "Сыр",
+                "Масло"
+            )
+            defaults.forEach { suggestion ->
+                itemRepository.addSuggestion(suggestion)
+            }
+        }
     }
 }

@@ -37,4 +37,13 @@
     <string name="main_copy_suffix">%1$s (копия)</string>
     <string name="main_search_back">Назад</string>
     <string name="main_search_clear">Очистить</string>
+    <string-array name="product_units">
+        <item>л</item>
+        <item>мл</item>
+        <item>уп</item>
+        <item>пач</item>
+        <item>шт</item>
+        <item>кг</item>
+        <item>г</item>
+    </string-array>
 </resources>

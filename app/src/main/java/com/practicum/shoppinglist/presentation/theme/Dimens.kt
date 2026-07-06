@@ -85,4 +85,42 @@ object Dimens {
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp
     }
+
+    object Products {
+        val listHorizontalPadding = 16.dp
+        val listVerticalPadding = 8.dp
+        val listItemVerticalPadding = 12.dp
+        val listItemHorizontalPadding = 4.dp
+        val checkboxSize = 24.dp
+        val checkboxBorderWidth = 2.dp
+        val checkboxIconSize = 16.dp
+        val itemSpacing = 16.dp
+        val verticalSpacing = 16.dp
+
+        val sheetCornerRadius = 28.dp
+        val sheetBorderWidth = 1.dp
+        val sheetHorizontalPadding = 20.dp
+        val sheetTopPadding = 8.dp
+        val sheetBottomPadding = 24.dp
+
+        val dragHandleWidth = 32.dp
+        val dragHandleHeight = 4.dp
+        val dragHandleVerticalPadding = 8.dp
+
+        val textFieldHeight = 64.dp
+        val fieldWidthQuantity = 120.dp
+        val fieldWidthUnit = 120.dp
+
+        val frame55Width = 96.dp
+        val frame55Height = 60.dp
+        val frame55TopPadding = 12.dp
+
+        val buttonClickSize = 48.dp
+        val buttonCircleSize = 40.dp
+
+        val fabOffset = (-88).dp
+        val fabSize = 56.dp
+        val fabEndPadding = 16.dp
+        val fabBottomPadding = 16.dp
+    }
 }

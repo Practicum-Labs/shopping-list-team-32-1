@@ -40,7 +40,7 @@ interface ShoppingItemDao {
     @Query("DELETE FROM shopping_items WHERE listId = :listId AND isBought = 1")
     suspend fun deleteBoughtItemsForList(listId: Long)
 
-    @Query("SELECT * FROM product_suggestions WHERE name LIKE :query || '%' LIMIT 5")
+    @Query("SELECT * FROM product_suggestions WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%' LIMIT 5")
     fun getSuggestionsFlow(query: String): Flow<List<ProductSuggestionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

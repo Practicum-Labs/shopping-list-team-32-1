@@ -20,7 +20,7 @@ val dataModule = module {
             context = androidContext(),
             klass = AppDatabase::class.java,
             name = "shopping_list_database",
-        ).fallbackToDestructiveMigration()
+        ).addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
     }
     single {
