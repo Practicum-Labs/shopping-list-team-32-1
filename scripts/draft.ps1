@@ -1,14 +1,13 @@
-﻿<#
+<#
 .SYNOPSIS
-    Собирает подписанный RELEASE APK (R8 + подпись) и публикует его в GitHub Release.
+    Собирает DEBUG APK и публикует его в GitHub Release (черновая раздача для демо).
 
 .DESCRIPTION
     Шаги, которые выполняет скрипт:
       1. Проверяет, что установлен и авторизован gh CLI.
-      2. Проверяет наличие keystore.properties (иначе APK был бы неподписан).
-      3. Собирает release APK: gradlew :app:assembleRelease
-      4. Копирует app-release.apk -> shopping-list-<Tag>.apk
-      5. Создаёт (или обновляет) GitHub Release с этим тегом и прикрепляет APK.
+      2. Собирает debug APK: gradlew :app:assembleDebug
+      3. Копирует app-debug.apk -> shopping-list-<Tag>.apk
+      4. Создаёт (или обновляет) GitHub Release с этим тегом и прикрепляет APK.
 
     Запускать можно из любой папки — скрипт сам переходит в корень репозитория.
 
@@ -38,13 +37,13 @@
     Не пересобирать APK (использовать уже собранный app-debug.apk).
 
 .EXAMPLE
-    .\scripts\release.ps1 -Tag v1.0.0
+    .\scripts\draft.ps1 -Tag v1.0.0
 
 .EXAMPLE
-    .\scripts\release.ps1 -Tag v1.0.0 -Title "MVP" -NotesFile .\docs\release-notes.md -Draft
+    .\scripts\draft.ps1 -Tag v1.0.0 -Title "MVP" -NotesFile .\docs\release-notes.md -Draft
 
 .EXAMPLE
-    .\scripts\release.ps1 -Tag v1.0.1 -Notes "Багфиксы" -Target main
+    .\scripts\draft.ps1 -Tag v1.0.1 -Notes "Багфиксы" -Target main
 #>
 
 [CmdletBinding()]
@@ -91,18 +90,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "gh не авторизован. Выполните: gh auth login"
 }
 
-# --- Проверка ключа подписи -------------------------------------------------
-$KeystoreProps = Join-Path $RepoRoot "keystore.properties"
-if (-not (Test-Path $KeystoreProps)) {
-    throw "Нет keystore.properties в корне репозитория — release-APK будет неподписан. См. docs/release-signing.md"
-}
-
 # --- Сборка -----------------------------------------------------------------
-$ApkPath = Join-Path $RepoRoot "app\build\outputs\apk\release\app-release.apk"
+$ApkPath = Join-Path $RepoRoot "app\build\outputs\apk\debug\app-debug.apk"
 
 if (-not $SkipBuild) {
-    Write-Host "Собираю release APK..." -ForegroundColor Cyan
-    & "$RepoRoot\gradlew.bat" ":app:assembleRelease" --stacktrace
+    Write-Host "Собираю debug APK..." -ForegroundColor Cyan
+    & "$RepoRoot\gradlew.bat" ":app:assembleDebug" --stacktrace
     if ($LASTEXITCODE -ne 0) {
         throw "Сборка провалилась (gradlew exit $LASTEXITCODE)."
     }
