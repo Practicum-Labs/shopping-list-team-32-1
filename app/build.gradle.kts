@@ -9,7 +9,7 @@ plugins {
 
 detekt {
     toolVersion = "1.23.6"
-    config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
+    config.setFrom(files("${project.rootDir}/conf/detekt.yml"))
     buildUponDefaultConfig = true
     allRules = false
 }
@@ -78,6 +78,9 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
 
     ksp(libs.androidx.room.compiler)
+
+    detektPlugins(libs.staticAnalysis.detektFormatting)
+    detektPlugins(libs.staticAnalysis.detektLibraries)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -103,6 +103,7 @@ import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.theme.isDarkTheme
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 
 data class TopBarActions(
@@ -153,94 +154,95 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
 
     val isSheetOpen = showAddDialog || editingItem != null
 
-    Scaffold(
-        topBar = {
-            ProductsTopBar(
-                title = state.list?.name ?: "Продукты",
-                onBack = onBack,
-                actions = TopBarActions(
-                    onRename = { showRenameDialog = true },
-                    onDelete = { showDeleteConfirmDialog = true },
-                    onClearBought = { viewModel.clearBought() },
-                    onSortAlphabetically = { viewModel.sortAlphabetically() }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                ProductsTopBar(
+                    title = state.list?.name ?: "Продукты",
+                    onBack = onBack,
+                    actions = TopBarActions(
+                        onRename = { showRenameDialog = true },
+                        onDelete = { showDeleteConfirmDialog = true },
+                        onClearBought = { viewModel.clearBought() },
+                        onSortAlphabetically = { viewModel.sortAlphabetically() }
+                    ),
+                    enabled = !isSheetOpen
                 )
-            )
-        },
-        floatingActionButton = {
-            if (!isSheetOpen) {
-                FloatingActionButton(
-                    onClick = { showAddDialog = true },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Добавить товар")
-                }
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            ProductsContent(innerPadding, state, viewModel) { editingItem = it }
-
-            // Dimmed overlay when sheet is open
-            AnimatedVisibility(
-                visible = isSheetOpen,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.32f))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            showAddDialog = false
-                            editingItem = null
-                        }
-                )
-            }
-
-            // Custom sliding Bottom Sheet
-            AnimatedVisibility(
-                visible = isSheetOpen,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it }),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .imePadding()
-            ) {
-                BottomSheetContent(
-                    name = nameInput,
-                    onNameChange = { nameInput = it },
-                    qtyStr = qtyInput,
-                    onQtyChange = { input ->
-                        val decimalRegex = Regex("^\\d*[.,]?\\d*$")
-                        if (input.isEmpty() || input.matches(decimalRegex)) {
-                            qtyInput = input
-                        }
-                    },
-                    unit = unitInput,
-                    onUnitChange = { unitInput = it },
-                    suggestions = suggestions,
-                    onQueryChange = { viewModel.updateSuggestionQuery(it) },
-                    onSaveClick = {
-                        if (nameInput.isNotBlank()) {
-                            val quantityDouble = qtyInput.replace(',', '.').toDoubleOrNull() ?: 1.0
-                            editingItem?.let { item ->
-                                viewModel.updateProduct(item, nameInput, quantityDouble, unitInput)
-                            } ?: run {
-                                viewModel.addProduct(nameInput, quantityDouble, unitInput)
-                            }
-                            showAddDialog = false
-                            editingItem = null
-                        }
+            },
+            floatingActionButton = {
+                if (!isSheetOpen) {
+                    FloatingActionButton(
+                        onClick = { showAddDialog = true },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Добавить товар")
                     }
-                )
-            }
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background
+        ) { innerPadding ->
+            ProductsContent(innerPadding, state, viewModel) { editingItem = it }
+        }
+
+        // Dimmed overlay when sheet is open
+        AnimatedVisibility(
+            visible = isSheetOpen,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.32f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        showAddDialog = false
+                        editingItem = null
+                    }
+            )
+        }
+
+        // Custom sliding Bottom Sheet
+        AnimatedVisibility(
+            visible = isSheetOpen,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it }),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .imePadding()
+        ) {
+            BottomSheetContent(
+                name = nameInput,
+                onNameChange = { nameInput = it },
+                qtyStr = qtyInput,
+                onQtyChange = { input ->
+                    val decimalRegex = Regex("^\\d*[.,]?\\d*$")
+                    if (input.isEmpty() || input.matches(decimalRegex)) {
+                        qtyInput = input
+                    }
+                },
+                unit = unitInput,
+                onUnitChange = { unitInput = it },
+                suggestions = suggestions,
+                onQueryChange = { viewModel.updateSuggestionQuery(it) },
+                onSaveClick = {
+                    if (nameInput.isNotBlank()) {
+                        val quantityDouble = qtyInput.replace(',', '.').toDoubleOrNull() ?: 1.0
+                        editingItem?.let { item ->
+                            viewModel.updateProduct(item, nameInput, quantityDouble, unitInput)
+                        } ?: run {
+                            viewModel.addProduct(nameInput, quantityDouble, unitInput)
+                        }
+                        showAddDialog = false
+                        editingItem = null
+                    }
+                }
+            )
         }
     }
 
@@ -311,19 +313,25 @@ fun DeleteConfirmDialogWrapper(
 fun ProductsTopBar(
     title: String,
     onBack: () -> Unit,
-    actions: TopBarActions
+    actions: TopBarActions,
+    enabled: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val tintColor = if (enabled) {
+        MaterialTheme.colorScheme.onBackground
+    } else {
+        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
+    }
     TopAppBar(
-        title = { Text(title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        title = { Text(title, color = tintColor, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад", tint = MaterialTheme.colorScheme.onBackground)
+            IconButton(onClick = onBack, enabled = enabled) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад", tint = tintColor)
             }
         },
         actions = {
-            IconButton(onClick = { expanded = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = MaterialTheme.colorScheme.onBackground)
+            IconButton(onClick = { expanded = true }, enabled = enabled) {
+                Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = tintColor)
             }
             DropdownMenu(
                 expanded = expanded,
@@ -438,17 +446,24 @@ fun ProductCheckbox(
     onCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val checkedBgColor = if (MaterialTheme.isDarkTheme) {
+        MaterialTheme.colors.confirmDialogDeleteBackground
+    } else {
+        MaterialTheme.colors.addListDialogAccent
+    }
+    val checkmarkColor = MaterialTheme.colors.confirmDialogDeleteText
+
     Box(
         modifier = modifier
             .size(Dimens.Products.checkboxSize)
             .clickable(onClick = onCheckedChange)
             .background(
-                color = if (checked) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                color = if (checked) checkedBgColor else Color.Transparent,
                 shape = CircleShape
             )
             .border(
                 width = Dimens.Products.checkboxBorderWidth,
-                color = if (checked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant,
+                color = if (checked) checkedBgColor else MaterialTheme.colorScheme.onSurfaceVariant,
                 shape = CircleShape
             ),
         contentAlignment = Alignment.Center
@@ -457,7 +472,7 @@ fun ProductCheckbox(
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = checkmarkColor,
                 modifier = Modifier.size(Dimens.Products.checkboxIconSize)
             )
         }
@@ -491,15 +506,14 @@ fun ProductItemRow(
                     text = item.name,
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (item.isBought) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground,
-                    textDecoration = if (item.isBought) TextDecoration.LineThrough else null,
-                    fontWeight = FontWeight.Medium
+                    textDecoration = if (item.isBought) TextDecoration.LineThrough else null
                 )
                 if (item.quantity > 0) {
                     Spacer(modifier = Modifier.height(2.dp))
                     val qtyStr = if (item.quantity % 1.0 == 0.0) item.quantity.toInt().toString() else item.quantity.toString()
                     Text(
                         text = "$qtyStr ${item.unit}".trim(),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -532,7 +546,7 @@ fun ProductNameInputField(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedLabelColor = MaterialTheme.colors.addListDialogAccent,
                 unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 cursorColor = MaterialTheme.colors.addListDialogAccent,
@@ -585,7 +599,6 @@ fun QuantityAndUnitSelectors(
             value = qtyStr,
             onValueChange = onQtyChange,
             label = { Text("Количество", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            placeholder = { Text("Количест...") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
@@ -593,7 +606,7 @@ fun QuantityAndUnitSelectors(
             modifier = Modifier.width(Dimens.Products.fieldWidthQuantity).height(Dimens.Products.textFieldHeight),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedLabelColor = MaterialTheme.colors.addListDialogAccent,
                 unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 cursorColor = MaterialTheme.colors.addListDialogAccent,
@@ -610,7 +623,6 @@ fun QuantityAndUnitSelectors(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Единицы", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                placeholder = { Text("Един...") },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -623,7 +635,7 @@ fun QuantityAndUnitSelectors(
                     .focusRequester(unitFocusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     focusedLabelColor = MaterialTheme.colors.addListDialogAccent,
                     unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     focusedContainerColor = Color.Transparent,
