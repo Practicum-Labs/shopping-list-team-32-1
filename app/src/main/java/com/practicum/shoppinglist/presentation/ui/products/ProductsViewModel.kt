@@ -41,7 +41,7 @@ class ProductsViewModel(
             if (query.isBlank()) {
                 flowOf(emptyList())
             } else {
-                itemRepository.getSuggestionsFlow(query).map { list -> list.map { it.name } }
+                itemRepository.getSuggestionsFlow(query)
             }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

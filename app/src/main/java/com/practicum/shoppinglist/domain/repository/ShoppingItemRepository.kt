@@ -1,6 +1,5 @@
 package com.practicum.shoppinglist.domain.repository
 
-import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +13,6 @@ interface ShoppingItemRepository {
     suspend fun clearBoughtItems(listId: Long)
     suspend fun updateItems(items: List<ShoppingItem>)
 
-    fun getSuggestionsFlow(query: String): Flow<List<ProductSuggestionEntity>>
+    fun getSuggestionsFlow(query: String): Flow<List<String>>
     suspend fun addSuggestion(name: String)
 }

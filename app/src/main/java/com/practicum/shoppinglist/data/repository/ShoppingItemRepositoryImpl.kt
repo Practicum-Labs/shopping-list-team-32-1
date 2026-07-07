@@ -47,8 +47,10 @@ class ShoppingItemRepositoryImpl(
         shoppingItemDao.updateItems(items.map { it.toEntity() })
     }
 
-    override fun getSuggestionsFlow(query: String): Flow<List<ProductSuggestionEntity>> {
-        return shoppingItemDao.getSuggestionsFlow(query)
+    override fun getSuggestionsFlow(query: String): Flow<List<String>> {
+        return shoppingItemDao.getSuggestionsFlow(query).map { list ->
+            list.map { it.name }
+        }
     }
 
     override suspend fun addSuggestion(name: String) {
