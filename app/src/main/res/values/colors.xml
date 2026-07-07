@@ -28,6 +28,7 @@
     <color name="shopping_light_icon_picker_item_container">#FEDDBD</color>
     <color name="shopping_light_list_item_surface">#FFF8F4</color>
     <color name="shopping_light_list_item_title">#211A14</color>
+    <color name="shopping_light_auth_button_loader">#845416</color>
 
     <color name="shopping_dark_primary">#E4BE9F</color>
     <color name="shopping_dark_on_primary">#3F2A1A</color>
@@ -57,4 +58,5 @@
     <color name="shopping_dark_list_item_title">#FFFAF8</color>
     <color name="shopping_dark_confirm_dialog_delete">#FFBE77</color>
     <color name="shopping_dark_confirm_dialog_cancel">#A78C70</color>
+    <color name="shopping_dark_auth_button_loader">#FEDDBD</color>
 </resources>

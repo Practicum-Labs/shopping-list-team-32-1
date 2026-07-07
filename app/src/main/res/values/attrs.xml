@@ -31,4 +31,5 @@
     <attr name="shoppingColorConfirmDialogDeleteBackground" format="color" />
     <attr name="shoppingColorConfirmDialogCancelText" format="color" />
     <attr name="shoppingColorConfirmDialogDeleteText" format="color" />
+    <attr name="shoppingColorAuthButtonLoader" format="color" />
 </resources>

@@ -12,6 +12,7 @@
     <string name="main_delete_content_description">Удалить</string>
     <string name="main_copy_content_description">Копировать</string>
     <string name="main_theme_content_description">Сменить тему</string>
+    <string name="main_logout_content_description">Выйти из аккаунта</string>
     <string name="main_add_list_content_description">Создать список</string>
     <string name="main_shopping_list_icon_content_description">Иконка списка покупок</string>
     <string name="main_error_message">Не удалось загрузить списки, попробуйте еще раз</string>
@@ -46,4 +47,33 @@
         <item>кг</item>
         <item>г</item>
     </string-array>
+    <string name="auth_login_title">Вход в аккаунт</string>
+    <string name="auth_login_subtitle">Войдите, чтобы продолжить работу со своими списками</string>
+    <string name="auth_email_label">Email</string>
+    <string name="auth_password_label">Пароль</string>
+    <string name="auth_repeat_password_label">Повторите пароль</string>
+    <string name="auth_login_button">Войти</string>
+    <string name="auth_register_button">Зарегистрироваться</string>
+    <string name="auth_recovery_button">Восстановить пароль</string>
+    <string name="auth_go_to_register">Создать аккаунт</string>
+    <string name="auth_go_to_recovery">Забыли пароль?</string>
+    <string name="auth_register_title">Регистрация</string>
+    <string name="auth_register_subtitle">Создайте аккаунт, чтобы хранить свои списки отдельно</string>
+    <string name="auth_recovery_title">Восстановление пароля</string>
+    <string name="auth_recovery_subtitle">Укажите email, и мы отправим письмо для восстановления пароля</string>
+    <string name="auth_back_content_description">Назад</string>
+    <string name="auth_password_visible_content_description">Показать пароль</string>
+    <string name="auth_password_hidden_content_description">Скрыть пароль</string>
+    <string name="auth_error_invalid_email">Введите корректный email</string>
+    <string name="auth_error_login_password">Пароль должен содержать минимум 7 символов</string>
+    <string name="auth_error_password_requirements">Пароль должен содержать минимум 7 символов, заглавную и строчную буквы, цифру и спецсимвол</string>
+    <string name="auth_error_password_mismatch">Пароли не совпадают</string>
+    <string name="auth_error_weak_password">Пароль не соответствует требованиям безопасности</string>
+    <string name="auth_error_user_exists">Пользователь с таким email уже существует</string>
+    <string name="auth_error_invalid_credentials">Проверьте email и пароль</string>
+    <string name="auth_error_unauthorized">Сессия истекла, войдите снова</string>
+    <string name="auth_error_network">Не удалось подключиться к серверу. Проверьте подключение к интернету и попробуйте снова.</string>
+    <string name="auth_error_server">Сервер временно недоступен</string>
+    <string name="auth_error_unknown">Что-то пошло не так, попробуйте еще раз</string>
+    <string name="auth_recovery_success">Если аккаунт с таким email существует, мы уже отправили письмо для восстановления пароля</string>
 </resources>

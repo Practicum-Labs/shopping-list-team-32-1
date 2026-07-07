@@ -6,7 +6,6 @@
 
     <style name="Theme.Shoppinglist.Light" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
 
         <item name="shoppingColorPrimary">@color/shopping_light_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_light_on_primary</item>
@@ -39,11 +38,11 @@
         <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_light_primary</item>
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
     </style>
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
 
         <item name="shoppingColorPrimary">@color/shopping_dark_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_dark_on_primary</item>
@@ -76,6 +75,7 @@
         <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_dark_confirm_dialog_delete</item>
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
     </style>
 
     <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />

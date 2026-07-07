@@ -16,7 +16,7 @@ import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
         ShoppingItemEntity::class,
         ProductSuggestionEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -24,7 +24,21 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun shoppingItemDao(): ShoppingItemDao
 
     companion object {
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_1_2 = object : Migration(
+            DATABASE_VERSION_1,
+            DATABASE_VERSION_2,
+        ) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE shopping_lists ADD COLUMN owner_user_id INTEGER NOT NULL DEFAULT 0",
+                )
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(
+            DATABASE_VERSION_2,
+            DATABASE_VERSION_3,
+        ) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `shopping_items` (" +
@@ -46,3 +60,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
+
+private const val DATABASE_VERSION_1 = 1
+private const val DATABASE_VERSION_2 = 2
+private const val DATABASE_VERSION_3 = 3
