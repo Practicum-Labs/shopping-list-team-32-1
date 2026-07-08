@@ -106,6 +106,18 @@ import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.theme.isDarkTheme
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 
+private const val COLOR_LIGHT_LABEL_BG = 0xFFFFF8F4
+private const val COLOR_DARK_LABEL_BG = 0xFF19120C
+private const val COLOR_LIGHT_CHECKED_BG = 0xFF845416
+private const val COLOR_DARK_CHECKED_BG = 0xFFFFBE77
+private const val COLOR_DARK_TICK = 0xFF19120C
+private const val COLOR_LIGHT_TICK = 0xFFFFFFFF
+private const val COLOR_LIGHT_MORE_VERT = 0xFF50453A
+private const val COLOR_DARK_MORE_VERT = 0xFFD9C8B9
+private const val COLOR_DIVIDER = 0xFFCAC4D0
+private const val MAX_PRODUCT_NAME_LENGTH = 64
+private const val MAX_PRODUCT_QUANTITY = 10000.0
+
 data class TopBarActions(
     val onRename: () -> Unit,
     val onDelete: () -> Unit,
@@ -117,11 +129,14 @@ data class TopBarActions(
 fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
+    val context = LocalContext.current
+    val units = remember { context.resources.getStringArray(R.array.product_units).toList() }
     
     var showAddDialog by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var showRenameDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var showCancelConfirmDialog by remember { mutableStateOf(false) }
 
     // Input States
     var nameInput by remember { mutableStateOf("") }
@@ -201,8 +216,22 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
                     ) {
-                        showAddDialog = false
-                        editingItem = null
+                        val originalName = editingItem?.name ?: ""
+                        val originalQty = editingItem?.quantity?.let { qty ->
+                            if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
+                        } ?: ""
+                        val originalUnit = editingItem?.unit ?: ""
+                        
+                        val isModified = nameInput != originalName ||
+                                qtyInput != originalQty ||
+                                unitInput != originalUnit
+
+                        if (isModified && (nameInput.isNotBlank() || qtyInput.isNotBlank())) {
+                            showCancelConfirmDialog = true
+                        } else {
+                            showAddDialog = false
+                            editingItem = null
+                        }
                     }
             )
         }
@@ -216,6 +245,11 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                 .align(Alignment.BottomCenter)
                 .imePadding()
         ) {
+            val isSaveEnabled = nameInput.isNotBlank() &&
+                    qtyInput.isNotBlank() &&
+                    units.contains(unitInput) &&
+                    qtyInput.replace(',', '.').toDoubleOrNull()?.let { it > 0.0 && it <= MAX_PRODUCT_QUANTITY } == true
+
             BottomSheetContent(
                 name = nameInput,
                 onNameChange = { nameInput = it },
@@ -223,7 +257,10 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                 onQtyChange = { input ->
                     val decimalRegex = Regex("^\\d*[.,]?\\d*$")
                     if (input.isEmpty() || input.matches(decimalRegex)) {
-                        qtyInput = input
+                        val num = input.replace(',', '.').toDoubleOrNull()
+                        if (num == null || num <= MAX_PRODUCT_QUANTITY) {
+                            qtyInput = input
+                        }
                     }
                 },
                 unit = unitInput,
@@ -231,7 +268,7 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                 suggestions = suggestions,
                 onQueryChange = { viewModel.updateSuggestionQuery(it) },
                 onSaveClick = {
-                    if (nameInput.isNotBlank()) {
+                    if (isSaveEnabled) {
                         val quantityDouble = qtyInput.replace(',', '.').toDoubleOrNull() ?: 1.0
                         editingItem?.let { item ->
                             viewModel.updateProduct(item, nameInput, quantityDouble, unitInput)
@@ -241,13 +278,22 @@ fun ProductsScreen(viewModel: ProductsViewModel, onBack: () -> Unit) {
                         showAddDialog = false
                         editingItem = null
                     }
-                }
+                },
+                isSaveEnabled = isSaveEnabled
             )
         }
     }
 
     RenameDialogWrapper(showRenameDialog, state.list?.name ?: "Продукты", viewModel) { showRenameDialog = false }
     DeleteConfirmDialogWrapper(showDeleteConfirmDialog, viewModel) { showDeleteConfirmDialog = false }
+    CancelConfirmDialogWrapper(
+        visible = showCancelConfirmDialog,
+        onDismiss = { showCancelConfirmDialog = false },
+        onConfirm = {
+            showAddDialog = false
+            editingItem = null
+        }
+    )
 }
 
 @Composable
@@ -322,6 +368,12 @@ fun ProductsTopBar(
     } else {
         MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
     }
+    val moreVertBaseColor = if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_MORE_VERT) else Color(COLOR_LIGHT_MORE_VERT)
+    val moreVertTintColor = if (enabled) {
+        moreVertBaseColor
+    } else {
+        moreVertBaseColor.copy(alpha = 0.38f)
+    }
     TopAppBar(
         title = { Text(title, color = tintColor, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
@@ -331,7 +383,7 @@ fun ProductsTopBar(
         },
         actions = {
             IconButton(onClick = { expanded = true }, enabled = enabled) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = tintColor)
+                Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = moreVertTintColor)
             }
             DropdownMenu(
                 expanded = expanded,
@@ -390,7 +442,7 @@ fun ProductList(
     val dragDropState = remember { DragDropState(state, onMove) }
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().padding(horizontal = Dimens.Products.listHorizontalPadding, vertical = Dimens.Products.listVerticalPadding).dragDropGesture(dragDropState)
+        modifier = Modifier.fillMaxSize().padding(vertical = Dimens.Products.listVerticalPadding).dragDropGesture(dragDropState)
     ) {
         itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
             val offset by animateDpAsState(targetValue = dragDropState.getItemOffset(index).y.dp, label = "offset")
@@ -409,15 +461,20 @@ fun SwipeableProductItem(
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit
 ) {
-    val state = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            when (value) {
-                SwipeToDismissBoxValue.EndToStart -> { onDelete(item); true }
-                SwipeToDismissBoxValue.StartToEnd -> { onEdit(item); false }
-                else -> false
+    val state = rememberSwipeToDismissBoxState()
+
+    LaunchedEffect(state.currentValue) {
+        when (state.currentValue) {
+            SwipeToDismissBoxValue.EndToStart -> {
+                onDelete(item)
             }
+            SwipeToDismissBoxValue.StartToEnd -> {
+                onEdit(item)
+                state.snapTo(SwipeToDismissBoxValue.Settled)
+            }
+            SwipeToDismissBoxValue.Settled -> {}
         }
-    )
+    }
     SwipeToDismissBox(
         state = state,
         backgroundContent = { SwipeBackground(state.targetValue) },
@@ -446,12 +503,8 @@ fun ProductCheckbox(
     onCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val checkedBgColor = if (MaterialTheme.isDarkTheme) {
-        MaterialTheme.colors.confirmDialogDeleteBackground
-    } else {
-        MaterialTheme.colors.addListDialogAccent
-    }
-    val checkmarkColor = MaterialTheme.colors.confirmDialogDeleteText
+    val checkedBgColor = if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_CHECKED_BG) else Color(COLOR_LIGHT_CHECKED_BG)
+    val checkmarkColor = if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_TICK) else Color(COLOR_LIGHT_TICK)
 
     Box(
         modifier = modifier
@@ -488,7 +541,7 @@ fun ProductItemRow(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.listItemSurface)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Row(
             modifier = Modifier
@@ -519,7 +572,7 @@ fun ProductItemRow(
                 }
             }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        HorizontalDivider(color = Color(COLOR_DIVIDER))
     }
 }
 
@@ -529,6 +582,7 @@ fun ProductNameInputField(
     onNameChange: (String) -> Unit,
     suggestions: List<String>,
     onQueryChange: (String) -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier
 ) {
     var isSuggestionsExpanded by remember { mutableStateOf(false) }
@@ -536,13 +590,24 @@ fun ProductNameInputField(
         OutlinedTextField(
             value = name,
             onValueChange = {
-                onNameChange(it)
-                onQueryChange(it)
-                isSuggestionsExpanded = it.isNotEmpty()
+                if (it.length <= MAX_PRODUCT_NAME_LENGTH) {
+                    onNameChange(it)
+                    onQueryChange(it)
+                    isSuggestionsExpanded = it.isNotEmpty()
+                }
             },
-            label = { Text("Товар") },
+            label = {
+                Text(
+                    text = "Товар",
+                    modifier = Modifier
+                        .background(if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_LABEL_BG) else Color(COLOR_LIGHT_LABEL_BG))
+                        .padding(horizontal = 4.dp)
+                )
+            },
             placeholder = { Text("Добавить новый товар") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
@@ -589,6 +654,14 @@ fun QuantityAndUnitSelectors(
     val context = LocalContext.current
     val units = remember { context.resources.getStringArray(R.array.product_units).toList() }
 
+    val filteredUnits = remember(unit, units) {
+        if (unit.isEmpty()) {
+            units
+        } else {
+            units.filter { it.contains(unit, ignoreCase = true) }
+        }
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -598,7 +671,16 @@ fun QuantityAndUnitSelectors(
         OutlinedTextField(
             value = qtyStr,
             onValueChange = onQtyChange,
-            label = { Text("Количество", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            label = {
+                Text(
+                    text = "Количество",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .background(if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_LABEL_BG) else Color(COLOR_LIGHT_LABEL_BG))
+                        .padding(horizontal = 4.dp)
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
@@ -620,9 +702,21 @@ fun QuantityAndUnitSelectors(
         Box(modifier = Modifier.width(Dimens.Products.fieldWidthUnit)) {
             OutlinedTextField(
                 value = unit,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Единицы", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                onValueChange = {
+                    onUnitChange(it)
+                    isUnitsExpanded = true
+                },
+                readOnly = false,
+                label = {
+                    Text(
+                        text = "Единицы",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .background(if (MaterialTheme.isDarkTheme) Color(COLOR_DARK_LABEL_BG) else Color(COLOR_LIGHT_LABEL_BG))
+                            .padding(horizontal = 4.dp)
+                    )
+                },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -632,7 +726,12 @@ fun QuantityAndUnitSelectors(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimens.Products.textFieldHeight)
-                    .focusRequester(unitFocusRequester),
+                    .focusRequester(unitFocusRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            isUnitsExpanded = true
+                        }
+                    },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colors.addListDialogAccent,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
@@ -643,27 +742,17 @@ fun QuantityAndUnitSelectors(
                 )
             )
 
-            // Transparent overlay to intercept clicks and open/focus correctly
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clickable {
-                        isUnitsExpanded = true
-                        unitFocusRequester.requestFocus()
-                    }
-            )
-
             DropdownMenu(
-                expanded = isUnitsExpanded,
+                expanded = isUnitsExpanded && filteredUnits.isNotEmpty(),
                 onDismissRequest = {
                     isUnitsExpanded = false
-                    focusManager.clearFocus()
                 },
+                properties = PopupProperties(focusable = false),
                 modifier = Modifier
                     .width(Dimens.Products.fieldWidthUnit)
                     .background(MaterialTheme.colors.addListDialogSurface)
             ) {
-                units.forEach { u ->
+                filteredUnits.forEach { u ->
                     DropdownMenuItem(
                         text = { Text(u, color = MaterialTheme.colorScheme.onSurface) },
                         onClick = {
@@ -676,11 +765,11 @@ fun QuantityAndUnitSelectors(
             }
         }
 
-        // Buttons container (Frame 55) - fixed width 96.dp!
+        // Quantity adjustment buttons container - fixed width 96.dp
         Row(
             modifier = Modifier
-                .width(Dimens.Products.frame55Width)
-                .height(Dimens.Products.frame55Height),
+                .width(Dimens.Products.quantityAdjustmentContainerWidth)
+                .height(Dimens.Products.quantityAdjustmentContainerHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -689,6 +778,7 @@ fun QuantityAndUnitSelectors(
             Box(
                 modifier = Modifier
                     .size(Dimens.Products.buttonClickSize)
+                    .clip(CircleShape)
                     .clickable(enabled = isDecrementEnabled) {
                         val current = qtyStr.replace(',', '.').toDoubleOrNull() ?: 1.0
                         if (current > 1.0) {
@@ -726,10 +816,13 @@ fun QuantityAndUnitSelectors(
             Box(
                 modifier = Modifier
                     .size(Dimens.Products.buttonClickSize)
+                    .clip(CircleShape)
                     .clickable {
                         val current = qtyStr.replace(',', '.').toDoubleOrNull() ?: 0.0
                         val next = current + 1.0
-                        onQtyChange(if (next % 1.0 == 0.0) next.toInt().toString() else next.toString())
+                        if (next <= MAX_PRODUCT_QUANTITY) {
+                            onQtyChange(if (next % 1.0 == 0.0) next.toInt().toString() else next.toString())
+                        }
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -778,9 +871,16 @@ fun BottomSheetContent(
     suggestions: List<String>,
     onQueryChange: (String) -> Unit,
     onSaveClick: () -> Unit,
+    isSaveEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     val quantityDouble = qtyStr.replace(',', '.').toDoubleOrNull() ?: 1.0
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -816,7 +916,8 @@ fun BottomSheetContent(
                 name = name,
                 onNameChange = onNameChange,
                 suggestions = suggestions,
-                onQueryChange = onQueryChange
+                onQueryChange = onQueryChange,
+                focusRequester = focusRequester
             )
 
             Spacer(modifier = Modifier.height(Dimens.Products.verticalSpacing))
@@ -832,9 +933,21 @@ fun BottomSheetContent(
 
         // The FAB checkmark button floating exactly 32.dp above the sheet top edge
         FloatingActionButton(
-            onClick = onSaveClick,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            onClick = {
+                if (isSaveEnabled) {
+                    onSaveClick()
+                }
+            },
+            containerColor = if (isSaveEnabled) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+            contentColor = if (isSaveEnabled) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            },
             shape = RoundedCornerShape(Dimens.Products.sheetHorizontalPadding),
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -908,6 +1021,45 @@ fun DeleteConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     )
 }
 
+@Composable
+fun CancelConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    val colors = MaterialTheme.colors
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Отменить добавление?", color = colors.addListDialogTitle) },
+        text = { Text("Введенные данные будут потеряны.", color = colors.addListDialogPlaceholder) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Да", color = colors.addListDialogAccent)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Нет", color = colors.addListDialogPlaceholder)
+            }
+        },
+        containerColor = colors.addListDialogSurface
+    )
+}
+
+@Composable
+fun CancelConfirmDialogWrapper(
+    visible: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    if (visible) {
+        CancelConfirmDialog(
+            onDismiss = onDismiss,
+            onConfirm = {
+                onConfirm()
+                onDismiss()
+            }
+        )
+    }
+}
+
+@Suppress("MagicNumber")
 @Preview(showBackground = true, name = "Light Theme")
 @Preview(showBackground = true, name = "Dark Theme", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable

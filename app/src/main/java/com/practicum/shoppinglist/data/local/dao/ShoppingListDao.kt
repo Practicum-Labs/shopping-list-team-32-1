@@ -11,8 +11,8 @@ interface ShoppingListDao {
     @Query("SELECT * FROM shopping_lists WHERE owner_user_id = :ownerUserId ORDER BY id DESC")
     fun observeShoppingLists(ownerUserId: Long): Flow<List<ShoppingListEntity>>
 
-    @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId LIMIT 1")
-    suspend fun getShoppingListById(shoppingListId: Long): ShoppingListEntity?
+    @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId AND owner_user_id = :ownerUserId LIMIT 1")
+    suspend fun getShoppingListById(shoppingListId: Long, ownerUserId: Long): ShoppingListEntity?
 
     @Insert
     suspend fun insertShoppingList(shoppingList: ShoppingListEntity): Long

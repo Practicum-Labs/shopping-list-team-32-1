@@ -1,6 +1,8 @@
 package com.practicum.shoppinglist.data.di
 
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.practicum.shoppinglist.data.local.database.AppDatabase
 import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
@@ -48,7 +50,26 @@ val dataModule = module {
             context = androidContext(),
             klass = AppDatabase::class.java,
             name = "shopping_list_database",
-        ).addMigrations(
+        ).addCallback(object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                val defaults = listOf(
+                    "Кокосовое молоко",
+                    "Молоко",
+                    "Соевое молоко",
+                    "Сухое молоко",
+                    "Хлеб",
+                    "Яблоки",
+                    "Бананы",
+                    "Яйца",
+                    "Сыр",
+                    "Масло"
+                )
+                defaults.forEach { suggestion ->
+                    db.execSQL("INSERT OR IGNORE INTO product_suggestions (name) VALUES ('$suggestion')")
+                }
+            }
+        }).addMigrations(
             AppDatabase.MIGRATION_1_2,
             AppDatabase.MIGRATION_2_3,
         ).build()

@@ -93,7 +93,7 @@ object Dimens {
         val listHorizontalPadding = 16.dp
         val listVerticalPadding = 8.dp
         val listItemVerticalPadding = 12.dp
-        val listItemHorizontalPadding = 4.dp
+        val listItemHorizontalPadding = 20.dp
         val checkboxSize = 24.dp
         val checkboxBorderWidth = 2.dp
         val checkboxIconSize = 16.dp
@@ -114,9 +114,9 @@ object Dimens {
         val fieldWidthQuantity = 120.dp
         val fieldWidthUnit = 120.dp
 
-        val frame55Width = 96.dp
-        val frame55Height = 60.dp
-        val frame55TopPadding = 12.dp
+        val quantityAdjustmentContainerWidth = 96.dp
+        val quantityAdjustmentContainerHeight = 60.dp
+        val quantityAdjustmentContainerTopPadding = 12.dp
 
         val buttonClickSize = 48.dp
         val buttonCircleSize = 40.dp

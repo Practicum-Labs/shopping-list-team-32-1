@@ -79,9 +79,6 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
-    detektPlugins(libs.staticAnalysis.detektFormatting)
-    detektPlugins(libs.staticAnalysis.detektLibraries)
-
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 

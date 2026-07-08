@@ -38,8 +38,18 @@ val viewModelModule = module {
     viewModel { (listId: Long) ->
         ProductsViewModel(
             listId = listId,
-            listRepository = get(),
-            itemRepository = get(),
+            renameShoppingListUseCase = get(),
+            deleteShoppingListUseCase = get(),
+            getShoppingListUseCase = get(),
+            observeShoppingItemsUseCase = get(),
+            addShoppingItemUseCase = get(),
+            updateShoppingItemUseCase = get(),
+            deleteShoppingItemUseCase = get(),
+            toggleShoppingItemBoughtUseCase = get(),
+            clearBoughtItemsUseCase = get(),
+            sortShoppingItemsAlphabeticallyUseCase = get(),
+            moveShoppingItemUseCase = get(),
+            getProductSuggestionsUseCase = get(),
         )
     }
 }
