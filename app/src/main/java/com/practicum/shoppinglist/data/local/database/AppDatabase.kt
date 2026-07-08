@@ -48,17 +48,18 @@ abstract class AppDatabase : RoomDatabase() {
         ) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `shopping_items` (" +
-                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                        "`listId` INTEGER NOT NULL, " +
-                        "`name` TEXT NOT NULL, " +
-                        "`quantity` REAL NOT NULL, " +
-                        "`unit` TEXT NOT NULL, " +
-                        "`isBought` INTEGER NOT NULL, " +
-                        "`sortOrder` INTEGER NOT NULL, " +
-                        "FOREIGN KEY(`listId`) REFERENCES `shopping_lists`(`id`) " +
-                        "ON UPDATE NO ACTION ON DELETE CASCADE" +
-                        ")"
+                    """
+                    CREATE TABLE IF NOT EXISTS `shopping_items` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `listId` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `quantity` REAL NOT NULL,
+                        `unit` TEXT NOT NULL,
+                        `isBought` INTEGER NOT NULL,
+                        `sortOrder` INTEGER NOT NULL,
+                        FOREIGN KEY(`listId`) REFERENCES `shopping_lists`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                    """.trimIndent()
                 )
                 db.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_shopping_items_listId` " +
@@ -69,6 +70,25 @@ abstract class AppDatabase : RoomDatabase() {
                         "`name` TEXT NOT NULL PRIMARY KEY" +
                         ")"
                 )
+                seedProductSuggestions(db)
+            }
+        }
+
+        fun seedProductSuggestions(db: SupportSQLiteDatabase) {
+            val defaults = listOf(
+                "Кокосовое молоко",
+                "Молоко",
+                "Соевое молоко",
+                "Сухое молоко",
+                "Хлеб",
+                "Яблоки",
+                "Бананы",
+                "Яйца",
+                "Сыр",
+                "Масло"
+            )
+            defaults.forEach { suggestion ->
+                db.execSQL("INSERT OR IGNORE INTO product_suggestions (name) VALUES ('${suggestion}')")
             }
         }
     }

@@ -51,21 +51,7 @@ val dataModule = module {
         ).addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                val defaults = listOf(
-                    "Кокосовое молоко",
-                    "Молоко",
-                    "Соевое молоко",
-                    "Сухое молоко",
-                    "Хлеб",
-                    "Яблоки",
-                    "Бананы",
-                    "Яйца",
-                    "Сыр",
-                    "Масло"
-                )
-                defaults.forEach { suggestion ->
-                    db.execSQL("INSERT OR IGNORE INTO product_suggestions (name) VALUES ('$suggestion')")
-                }
+                AppDatabase.seedProductSuggestions(db)
             }
         }).addMigrations(
             AppDatabase.MIGRATION_1_2,
