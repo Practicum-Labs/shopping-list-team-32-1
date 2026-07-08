@@ -11,7 +11,7 @@ class MoveShoppingItemUseCase(
         if (fromIndex in currentItems.indices && toIndex in currentItems.indices) {
             val item = currentItems.removeAt(fromIndex)
             currentItems.add(toIndex, item)
-            val updated = currentItems.mapIndexed { index, it -> it.copy(sortOrder = index) }
+            val updated = currentItems.mapIndexed { index, item -> item.copy(sortOrder = index) }
             shoppingItemRepository.updateItems(updated)
             return updated
         }

@@ -10,14 +10,25 @@ import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
 import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
 import kotlinx.coroutines.flow.Flow
 
+@Suppress("TooManyFunctions")
 @Dao
 interface ShoppingItemDao {
 
-    @Query("SELECT * FROM shopping_items WHERE listId = :listId ORDER BY sortOrder ASC")
-    fun getItemsForListFlow(listId: Long): Flow<List<ShoppingItemEntity>>
+    @Query("""
+        SELECT i.* FROM shopping_items i
+        INNER JOIN shopping_lists l ON i.listId = l.id
+        WHERE i.listId = :listId AND l.owner_user_id = :ownerUserId
+        ORDER BY i.sortOrder ASC
+    """)
+    fun getItemsForListFlow(listId: Long, ownerUserId: Long): Flow<List<ShoppingItemEntity>>
 
-    @Query("SELECT * FROM shopping_items WHERE listId = :listId ORDER BY sortOrder ASC")
-    suspend fun getItemsForList(listId: Long): List<ShoppingItemEntity>
+    @Query("""
+        SELECT i.* FROM shopping_items i
+        INNER JOIN shopping_lists l ON i.listId = l.id
+        WHERE i.listId = :listId AND l.owner_user_id = :ownerUserId
+        ORDER BY i.sortOrder ASC
+    """)
+    suspend fun getItemsForList(listId: Long, ownerUserId: Long): List<ShoppingItemEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(item: ShoppingItemEntity): Long
@@ -34,11 +45,23 @@ interface ShoppingItemDao {
     @Delete
     suspend fun deleteItem(item: ShoppingItemEntity)
 
-    @Query("DELETE FROM shopping_items WHERE listId = :listId")
-    suspend fun deleteItemsForList(listId: Long)
+    @Query("""
+        DELETE FROM shopping_items
+        WHERE listId = :listId AND EXISTS (
+            SELECT 1 FROM shopping_lists
+            WHERE id = :listId AND owner_user_id = :ownerUserId
+        )
+    """)
+    suspend fun deleteItemsForList(listId: Long, ownerUserId: Long)
 
-    @Query("DELETE FROM shopping_items WHERE listId = :listId AND isBought = 1")
-    suspend fun deleteBoughtItemsForList(listId: Long)
+    @Query("""
+        DELETE FROM shopping_items
+        WHERE listId = :listId AND isBought = 1 AND EXISTS (
+            SELECT 1 FROM shopping_lists
+            WHERE id = :listId AND owner_user_id = :ownerUserId
+        )
+    """)
+    suspend fun deleteBoughtItemsForList(listId: Long, ownerUserId: Long)
 
     @Query("SELECT * FROM product_suggestions WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%' LIMIT 5")
     fun getSuggestionsFlow(query: String): Flow<List<ProductSuggestionEntity>>

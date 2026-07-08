@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
-import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
+import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
@@ -33,6 +33,7 @@ data class ProductsUiState(
     val listDeleted: Boolean = false
 )
 
+@Suppress("LongParameterList")
 class ProductsViewModel(
     private val listId: Long,
     private val renameShoppingListUseCase: RenameShoppingListUseCase,
@@ -115,9 +116,12 @@ class ProductsViewModel(
 
     fun renameList(newName: String) {
         viewModelScope.launch {
-            val currentList = _uiState.value.list ?: return@launch
-            renameShoppingListUseCase(listId, newName.trim())
-            _uiState.value = _uiState.value.copy(list = currentList.copy(name = newName.trim()))
+            _uiState.value.list?.let { currentList ->
+                renameShoppingListUseCase(listId, newName.trim())
+                _uiState.value = _uiState.value.copy(
+                    list = currentList.copy(name = newName.trim())
+                )
+            }
         }
     }
 
@@ -128,7 +132,7 @@ class ProductsViewModel(
         }
     }
 
-    fun clearBought() {
+    fun clearBoughtItems() {
         viewModelScope.launch {
             clearBoughtItemsUseCase(listId)
         }
@@ -150,6 +154,4 @@ class ProductsViewModel(
     fun updateSuggestionQuery(query: String) {
         suggestionQuery.value = query
     }
-
-
 }

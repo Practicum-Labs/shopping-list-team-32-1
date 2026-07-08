@@ -4,11 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.practicum.shoppinglist.data.local.dao.ShoppingListDao
 import com.practicum.shoppinglist.data.local.dao.ShoppingItemDao
-import com.practicum.shoppinglist.data.local.entity.ShoppingListEntity
-import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
+import com.practicum.shoppinglist.data.local.dao.ShoppingListDao
 import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
+import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
+import com.practicum.shoppinglist.data.local.entity.ShoppingListEntity
 
 @Database(
     entities = [
@@ -16,7 +16,7 @@ import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
         ShoppingItemEntity::class,
         ProductSuggestionEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,6 +39,13 @@ abstract class AppDatabase : RoomDatabase() {
             DATABASE_VERSION_2,
             DATABASE_VERSION_3,
         ) {
+            override fun migrate(db: SupportSQLiteDatabase) = Unit
+        }
+
+        val MIGRATION_3_4 = object : Migration(
+            DATABASE_VERSION_3,
+            DATABASE_VERSION_4,
+        ) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `shopping_items` (" +
@@ -48,8 +55,14 @@ abstract class AppDatabase : RoomDatabase() {
                         "`quantity` REAL NOT NULL, " +
                         "`unit` TEXT NOT NULL, " +
                         "`isBought` INTEGER NOT NULL, " +
-                        "`sortOrder` INTEGER NOT NULL" +
+                        "`sortOrder` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`listId`) REFERENCES `shopping_lists`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE" +
                         ")"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_shopping_items_listId` " +
+                        "ON `shopping_items` (`listId`)"
                 )
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `product_suggestions` (" +
@@ -64,3 +77,4 @@ abstract class AppDatabase : RoomDatabase() {
 private const val DATABASE_VERSION_1 = 1
 private const val DATABASE_VERSION_2 = 2
 private const val DATABASE_VERSION_3 = 3
+private const val DATABASE_VERSION_4 = 4

@@ -6,6 +6,7 @@ import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 class AddShoppingItemUseCase(
     private val shoppingItemRepository: ShoppingItemRepository
 ) {
+    @Suppress("LongParameterList")
     suspend operator fun invoke(
         listId: Long,
         name: String,

@@ -64,6 +64,10 @@ data class Colors(
     val confirmDialogCancelText: Color,
     val confirmDialogDeleteText: Color,
     val authButtonLoader: Color,
+    val productCheckedBackground: Color,
+    val productTick: Color,
+    val productMoreVert: Color,
+    val productDivider: Color,
 )
 
 val MaterialTheme.colors: Colors
@@ -102,6 +106,10 @@ private fun colors(): Colors {
         confirmDialogCancelText = colorAttr(R.attr.shoppingColorConfirmDialogCancelText),
         confirmDialogDeleteText = colorAttr(R.attr.shoppingColorConfirmDialogDeleteText),
         authButtonLoader = colorAttr(R.attr.shoppingColorAuthButtonLoader),
+        productCheckedBackground = colorAttr(R.attr.shoppingColorProductCheckedBackground),
+        productTick = colorAttr(R.attr.shoppingColorProductTick),
+        productMoreVert = colorAttr(R.attr.shoppingColorProductMoreVert),
+        productDivider = colorAttr(R.attr.shoppingColorProductDivider),
     )
 }
 

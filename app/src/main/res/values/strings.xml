@@ -76,4 +76,32 @@
     <string name="auth_error_server">Сервер временно недоступен</string>
     <string name="auth_error_unknown">Что-то пошло не так, попробуйте еще раз</string>
     <string name="auth_recovery_success">Если аккаунт с таким email существует, мы уже отправили письмо для восстановления пароля</string>
+
+    <!-- Products Screen -->
+    <string name="products_default_title">Продукты</string>
+    <string name="products_back_content_description">Назад</string>
+    <string name="products_menu_content_description">Меню</string>
+    <string name="products_menu_rename">Переименовать список</string>
+    <string name="products_menu_sort_alphabetically">Сортировать по алфавиту</string>
+    <string name="products_menu_clear_bought">Очистить список (удалить купленные)</string>
+    <string name="products_menu_delete">Удалить список</string>
+    <string name="products_empty_state_title">В списке покупок пока пусто</string>
+    <string name="products_empty_state_subtitle">Нажмите на кнопку + ниже,\nчтобы добавить товары</string>
+    <string name="products_add_item_content_description">Добавить товар</string>
+    <string name="products_input_name_label">Товар</string>
+    <string name="products_input_name_placeholder">Добавить новый товар</string>
+    <string name="products_input_qty_label">Количество</string>
+    <string name="products_input_unit_label">Единицы</string>
+    <string name="products_save_content_description">Сохранить</string>
+    <string name="products_dialog_rename_title">Переименовать список</string>
+    <string name="products_dialog_rename_label">Название списка</string>
+    <string name="products_dialog_rename_save">Сохранить</string>
+    <string name="products_dialog_cancel">Отмена</string>
+    <string name="products_dialog_delete_title">Удалить список?</string>
+    <string name="products_dialog_delete_message">Вы уверены, что хотите безвозвратно удалить этот список покупок?</string>
+    <string name="products_dialog_delete_confirm">Удалить</string>
+    <string name="products_dialog_cancel_confirm_title">Отменить добавление?</string>
+    <string name="products_dialog_cancel_confirm_message">Введенные данные будут потеряны.</string>
+    <string name="products_dialog_cancel_confirm_yes">Да</string>
+    <string name="products_dialog_cancel_confirm_no">Нет</string>
 </resources>

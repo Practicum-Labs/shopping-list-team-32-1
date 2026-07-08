@@ -1,7 +1,7 @@
 package com.practicum.shoppinglist.domain.usecase
 
-import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
+import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 
 class CopyShoppingListUseCase(
     private val shoppingListRepository: ShoppingListRepository,

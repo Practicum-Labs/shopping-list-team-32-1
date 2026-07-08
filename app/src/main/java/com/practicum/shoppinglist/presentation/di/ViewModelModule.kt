@@ -4,8 +4,8 @@ import com.practicum.shoppinglist.presentation.ui.auth.login.LoginViewModel
 import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryViewModel
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterViewModel
 import com.practicum.shoppinglist.presentation.ui.main.MainViewModel
-import com.practicum.shoppinglist.presentation.ui.products.ProductsViewModel
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingViewModel
+import com.practicum.shoppinglist.presentation.ui.products.ProductsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

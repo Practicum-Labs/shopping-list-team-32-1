@@ -8,9 +8,11 @@ import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
 import com.practicum.shoppinglist.data.remote.auth.AuthApi
 import com.practicum.shoppinglist.data.repository.AuthRepositoryImpl
+import com.practicum.shoppinglist.data.repository.ShoppingItemRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ShoppingListRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ThemeRepositoryImpl
 import com.practicum.shoppinglist.domain.repository.AuthRepository
+import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ThemeRepository
 import okhttp3.OkHttpClient
@@ -19,10 +21,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
-import com.practicum.shoppinglist.data.local.dao.ShoppingItemDao
-import com.practicum.shoppinglist.data.repository.ShoppingItemRepositoryImpl
-import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 
 val dataModule = module {
     single {
@@ -72,6 +70,7 @@ val dataModule = module {
         }).addMigrations(
             AppDatabase.MIGRATION_1_2,
             AppDatabase.MIGRATION_2_3,
+            AppDatabase.MIGRATION_3_4,
         ).build()
     }
     single {
@@ -96,7 +95,11 @@ val dataModule = module {
         )
     }
     single<ShoppingItemRepository> {
-        ShoppingItemRepositoryImpl(shoppingItemDao = get())
+        ShoppingItemRepositoryImpl(
+            shoppingItemDao = get(),
+            shoppingListDao = get(),
+            authRepository = get()
+        )
     }
     single {
         ThemePreferencesDataSource(context = androidContext())

@@ -2,6 +2,7 @@ package com.practicum.shoppinglist.presentation.theme
 
 import androidx.compose.ui.unit.dp
 
+@Suppress("MagicNumber")
 object Dimens {
     object Onboarding {
         val logoTopPadding = 16.dp

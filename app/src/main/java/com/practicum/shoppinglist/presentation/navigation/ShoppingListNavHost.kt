@@ -9,9 +9,9 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,12 +21,9 @@ import com.practicum.shoppinglist.presentation.ui.auth.login.LoginRoute
 import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryRoute
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterRoute
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
-import com.practicum.shoppinglist.presentation.ui.products.ProductsScreen
-import com.practicum.shoppinglist.presentation.ui.products.ProductsViewModel
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingDestination
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingRoute
+import com.practicum.shoppinglist.presentation.ui.products.ProductsRoute
 
 @Composable
 fun ShoppingListNavHost(
@@ -200,7 +197,7 @@ private fun NavGraphBuilder.mainRoute(
             onThemeClick = onThemeClick,
             onLogoutClick = { navController.navigateToLoginFromMain() },
             onListClick = { listId ->
-                navController.navigate("products/$listId")
+                navController.navigate(productsRoutePath(listId))
             }
         )
     }
@@ -208,17 +205,18 @@ private fun NavGraphBuilder.mainRoute(
 
 private fun NavGraphBuilder.productsRoute(navController: NavHostController) {
     composable(
-        route = "products/{listId}",
+        route = PRODUCTS_ROUTE,
         arguments = listOf(
-            navArgument("listId") { type = NavType.LongType }
+            navArgument(PRODUCTS_ROUTE_ARG_LIST_ID) { type = NavType.LongType }
         )
     ) { backStackEntry ->
-        val listId = backStackEntry.arguments?.getLong("listId") ?: return@composable
-        val viewModel: ProductsViewModel = koinViewModel(parameters = { parametersOf(listId) })
-        ProductsScreen(
-            viewModel = viewModel,
-            onBack = { navController.popBackStack() }
-        )
+        val listId = backStackEntry.arguments?.getLong(PRODUCTS_ROUTE_ARG_LIST_ID)
+        if (listId != null) {
+            ProductsRoute(
+                listId = listId,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
 
@@ -319,3 +317,6 @@ private const val LOGIN_ROUTE = "login"
 private const val REGISTER_ROUTE = "register"
 private const val RECOVERY_ROUTE = "recovery"
 private const val MAIN_ROUTE = "main"
+private const val PRODUCTS_ROUTE_ARG_LIST_ID = "listId"
+private const val PRODUCTS_ROUTE = "products/{$PRODUCTS_ROUTE_ARG_LIST_ID}"
+private fun productsRoutePath(listId: Long) = "products/$listId"

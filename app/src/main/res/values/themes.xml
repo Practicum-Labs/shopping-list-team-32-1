@@ -39,6 +39,10 @@
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_light_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_light_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_light_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_light_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
@@ -76,6 +80,10 @@
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_dark_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_dark_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_dark_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_dark_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />

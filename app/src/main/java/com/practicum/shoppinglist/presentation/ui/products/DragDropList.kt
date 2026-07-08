@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName")
+
 package com.practicum.shoppinglist.presentation.ui.products
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -37,7 +39,7 @@ class DragDropState(
 
         val targetItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { item ->
             val relativeOffset = currentItemOffset + dragOffset
-            relativeOffset.roundToInt() in item.offset..(item.offset + item.size) &&
+            relativeOffset.roundToInt() in item.offset..item.offset + item.size &&
                 item.index != currentItemIndex
         }
 
@@ -67,7 +69,7 @@ fun Modifier.dragDropGesture(state: DragDropState): Modifier = this.pointerInput
         onDragStart = { offset ->
             val layoutInfo = state.lazyListState.layoutInfo
             val item = layoutInfo.visibleItemsInfo.firstOrNull {
-                offset.y.toInt() in it.offset..(it.offset + it.size)
+                offset.y.toInt() in it.offset..it.offset + it.size
             }
             if (item != null) {
                 state.onDragStart(item.index)
