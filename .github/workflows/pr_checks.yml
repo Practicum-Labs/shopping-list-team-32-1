@@ -7,6 +7,8 @@ on:
 
 env:
     commonGradleFlags: --parallel --stacktrace --no-configuration-cache --no-daemon
+    detektReportPath: ./build/reports/detekt/detekt.xml
+    reviewdogSetup: -f=checkstyle -name="detekt" -level=error -filter-mode=added
 
 jobs:
     detekt:
@@ -14,6 +16,11 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
+
+            -   name: Setup Reviewdog
+                uses: reviewdog/action-setup@v1
+                with:
+                    reviewdog_version: latest
 
             -   name: Setup JDK 17
                 uses: actions/setup-java@v4
@@ -27,6 +34,18 @@ jobs:
 
             -   name: Run detekt
                 run: ./gradlew detektAll $commonGradleFlags
+
+            -   name: Run Reviewdog for Detekt as Github Review
+                env:
+                    REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    reviewdog $reviewdogSetup -reporter=github-pr-review <$detektReportPath
+
+            -   name: Run Reviewdog for Detekt as Github CHECK
+                env:
+                    REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    reviewdog $reviewdogSetup -reporter=github-pr-check <$detektReportPath
 
     assemble:
         runs-on: ubuntu-latest
