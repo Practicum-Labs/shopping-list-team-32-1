@@ -88,7 +88,10 @@ abstract class AppDatabase : RoomDatabase() {
                 "Масло"
             )
             defaults.forEach { suggestion ->
-                db.execSQL("INSERT OR IGNORE INTO product_suggestions (name) VALUES ('${suggestion}')")
+                db.execSQL(
+                    "INSERT OR IGNORE INTO product_suggestions (name) VALUES (?)",
+                    arrayOf(suggestion)
+                )
             }
         }
     }
