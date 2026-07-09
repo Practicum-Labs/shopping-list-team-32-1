@@ -61,6 +61,7 @@ fun MainRoute(
     isDarkTheme: Boolean,
     onThemeClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
@@ -99,6 +100,7 @@ fun MainRoute(
             onRenameListNameChange = viewModel::onRenameListNameChange,
             onRenameListConfirm = viewModel::onRenameListConfirm,
             onRenameListDismiss = viewModel::onRenameListDismiss,
+            onListClick = onListClick,
         ),
         modifier = modifier,
     )
@@ -357,6 +359,7 @@ private fun BoxScope.MainContent(
                     onDeleteListClick = actions.onDeleteListClick,
                     onCopyListClick = actions.onCopyListClick,
                     onRenameListClick = actions.onRenameListClick,
+                    onListClick = actions.onListClick,
                     isSearching = isSearching,
                     modifier = Modifier
                         .align(Alignment.TopCenter)

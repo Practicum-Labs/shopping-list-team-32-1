@@ -16,6 +16,7 @@
         <item name="shoppingColorSurfaceVariant">@color/shopping_light_surface_variant</item>
         <item name="shoppingColorOnSurfaceVariant">@color/shopping_light_on_surface_variant</item>
         <item name="shoppingColorOutline">@color/shopping_light_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_light_outline_variant</item>
         <item name="shoppingColorError">@color/shopping_light_error</item>
         <item name="shoppingColorOnError">@color/shopping_light_on_error</item>
         <item name="shoppingColorAddListDialogSurface">@color/shopping_light_add_list_dialog_surface</item>
@@ -34,6 +35,10 @@
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_light_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_light_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_light_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_light_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
@@ -53,6 +58,7 @@
         <item name="shoppingColorSurfaceVariant">@color/shopping_dark_surface_variant</item>
         <item name="shoppingColorOnSurfaceVariant">@color/shopping_dark_on_surface_variant</item>
         <item name="shoppingColorOutline">@color/shopping_dark_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_dark_outline_variant</item>
         <item name="shoppingColorError">@color/shopping_dark_error</item>
         <item name="shoppingColorOnError">@color/shopping_dark_on_error</item>
         <item name="shoppingColorAddListDialogSurface">@color/shopping_dark_add_list_dialog_surface</item>
@@ -71,6 +77,10 @@
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_dark_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_dark_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_dark_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_dark_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />

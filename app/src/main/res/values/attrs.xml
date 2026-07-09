@@ -13,6 +13,7 @@
     <attr name="shoppingColorSurfaceVariant" format="color" />
     <attr name="shoppingColorOnSurfaceVariant" format="color" />
     <attr name="shoppingColorOutline" format="color" />
+    <attr name="shoppingColorOutlineVariant" format="color" />
     <attr name="shoppingColorError" format="color" />
     <attr name="shoppingColorOnError" format="color" />
     <attr name="shoppingColorAddListDialogSurface" format="color" />
@@ -31,4 +32,10 @@
     <attr name="shoppingColorConfirmDialogCancelText" format="color" />
     <attr name="shoppingColorConfirmDialogDeleteText" format="color" />
     <attr name="shoppingColorAuthButtonLoader" format="color" />
+
+    <!-- Products Screen -->
+    <attr name="shoppingColorProductCheckedBackground" format="color" />
+    <attr name="shoppingColorProductTick" format="color" />
+    <attr name="shoppingColorProductMoreVert" format="color" />
+    <attr name="shoppingColorProductDivider" format="color" />
 </resources>

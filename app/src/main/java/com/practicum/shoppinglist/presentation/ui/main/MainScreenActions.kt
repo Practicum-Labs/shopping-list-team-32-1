@@ -26,4 +26,5 @@ data class MainScreenActions(
     val onRenameListNameChange: (String) -> Unit = {},
     val onRenameListConfirm: () -> Unit = {},
     val onRenameListDismiss: () -> Unit = {},
+    val onListClick: (Long) -> Unit = {},
 )

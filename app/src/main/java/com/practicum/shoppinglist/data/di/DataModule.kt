@@ -1,14 +1,18 @@
 package com.practicum.shoppinglist.data.di
 
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.practicum.shoppinglist.data.local.database.AppDatabase
 import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
 import com.practicum.shoppinglist.data.remote.auth.AuthApi
 import com.practicum.shoppinglist.data.repository.AuthRepositoryImpl
+import com.practicum.shoppinglist.data.repository.ShoppingItemRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ShoppingListRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ThemeRepositoryImpl
 import com.practicum.shoppinglist.domain.repository.AuthRepository
+import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ThemeRepository
 import okhttp3.OkHttpClient
@@ -44,15 +48,22 @@ val dataModule = module {
             context = androidContext(),
             klass = AppDatabase::class.java,
             name = "shopping_list_database",
-        )
-            .addMigrations(
-                AppDatabase.MIGRATION_1_2,
-                AppDatabase.MIGRATION_2_3,
-            )
-            .build()
+        ).addCallback(object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                AppDatabase.seedProductSuggestions(db)
+            }
+        }).addMigrations(
+            AppDatabase.MIGRATION_1_2,
+            AppDatabase.MIGRATION_2_3,
+            AppDatabase.MIGRATION_3_4,
+        ).build()
     }
     single {
         get<AppDatabase>().shoppingListDao()
+    }
+    single {
+        get<AppDatabase>().shoppingItemDao()
     }
     single {
         AuthTokenDataSource(context = androidContext())
@@ -67,6 +78,13 @@ val dataModule = module {
         ShoppingListRepositoryImpl(
             shoppingListDao = get(),
             authRepository = get(),
+        )
+    }
+    single<ShoppingItemRepository> {
+        ShoppingItemRepositoryImpl(
+            shoppingItemDao = get(),
+            shoppingListDao = get(),
+            authRepository = get()
         )
     }
     single {

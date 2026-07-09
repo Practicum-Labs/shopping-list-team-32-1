@@ -5,6 +5,7 @@ import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryViewMode
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterViewModel
 import com.practicum.shoppinglist.presentation.ui.main.MainViewModel
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingViewModel
+import com.practicum.shoppinglist.presentation.ui.products.ProductsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -32,6 +33,23 @@ val viewModelModule = module {
             renameShoppingListUseCase = get(),
             checkAuthUseCase = get(),
             logoutUseCase = get(),
+        )
+    }
+    viewModel { (listId: Long) ->
+        ProductsViewModel(
+            listId = listId,
+            renameShoppingListUseCase = get(),
+            deleteShoppingListUseCase = get(),
+            getShoppingListUseCase = get(),
+            observeShoppingItemsUseCase = get(),
+            addShoppingItemUseCase = get(),
+            updateShoppingItemUseCase = get(),
+            deleteShoppingItemUseCase = get(),
+            toggleShoppingItemBoughtUseCase = get(),
+            clearBoughtItemsUseCase = get(),
+            sortShoppingItemsAlphabeticallyUseCase = get(),
+            moveShoppingItemUseCase = get(),
+            getProductSuggestionsUseCase = get(),
         )
     }
 }

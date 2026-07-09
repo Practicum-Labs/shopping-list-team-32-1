@@ -309,7 +309,11 @@ class MainViewModel(
         val targetList = lists.find { it.id == shoppingListId } ?: return
         viewModelScope.launch {
             runCatching {
-                copyShoppingListUseCase(copiedName, targetList.iconName)
+                copyShoppingListUseCase(
+                    originalListId = shoppingListId,
+                    copiedName = copiedName,
+                    iconName = targetList.iconName,
+                )
             }.onSuccess { createdId ->
                 screenState.update { currentState ->
                     currentState.copy(scrollToShoppingListId = createdId)

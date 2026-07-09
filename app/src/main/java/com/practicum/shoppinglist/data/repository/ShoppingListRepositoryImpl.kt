@@ -31,6 +31,11 @@ class ShoppingListRepositoryImpl(
             }
     }
 
+    override suspend fun getShoppingListById(shoppingListId: Long): ShoppingList? {
+        val ownerUserId = authRepository.requireCurrentUserId()
+        return shoppingListDao.getShoppingListById(shoppingListId, ownerUserId)?.toDomain()
+    }
+
     override suspend fun createShoppingList(
         name: String,
         iconName: String,

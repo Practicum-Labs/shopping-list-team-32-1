@@ -1,0 +1,303 @@
+package com.practicum.shoppinglist.presentation.ui.products
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.practicum.shoppinglist.R
+import com.practicum.shoppinglist.domain.model.ShoppingItem
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+const val MAX_PRODUCT_NAME_LENGTH = 64
+const val MAX_PRODUCT_QUANTITY = 10000.0
+
+@Composable
+fun ProductsRoute(
+    listId: Long,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ProductsViewModel = koinViewModel(parameters = { parametersOf(listId) })
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+
+    ProductsScreen(
+        state = state,
+        suggestions = suggestions,
+        onBack = onBack,
+        onRenameList = viewModel::renameList,
+        onDeleteList = viewModel::deleteList,
+        onClearBought = viewModel::clearBoughtItems,
+        onSortAlphabetically = viewModel::sortAlphabetically,
+        onAddProduct = viewModel::addProduct,
+        onUpdateProduct = viewModel::updateProduct,
+        onDeleteProduct = viewModel::deleteProduct,
+        onToggleProductBought = viewModel::toggleProductBought,
+        onMoveItem = viewModel::moveItem,
+        onUpdateSuggestionQuery = viewModel::updateSuggestionQuery,
+        modifier = modifier
+    )
+}
+
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod", "LongParameterList")
+@Composable
+fun ProductsScreen(
+    state: ProductsUiState,
+    suggestions: List<String>,
+    onBack: () -> Unit,
+    onRenameList: (String) -> Unit,
+    onDeleteList: () -> Unit,
+    onClearBought: () -> Unit,
+    onSortAlphabetically: () -> Unit,
+    onAddProduct: (String, Double, String) -> Unit,
+    onUpdateProduct: (ShoppingItem, String, Double, String) -> Unit,
+    onDeleteProduct: (ShoppingItem) -> Unit,
+    onToggleProductBought: (ShoppingItem) -> Unit,
+    onMoveItem: (Int, Int) -> Unit,
+    onUpdateSuggestionQuery: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val units = remember { context.resources.getStringArray(R.array.product_units).toList() }
+
+    var showAddDialog by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var showCancelConfirmDialog by remember { mutableStateOf(false) }
+
+    // Input States
+    var nameInput by remember { mutableStateOf("") }
+    var qtyInput by remember { mutableStateOf("") }
+    var unitInput by remember { mutableStateOf("") }
+
+    LaunchedEffect(editingItem) {
+        editingItem?.let { item ->
+            nameInput = item.name
+            qtyInput = item.quantity.let { qty ->
+                if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
+            }
+            unitInput = item.unit
+        } ?: run {
+            nameInput = ""
+            qtyInput = ""
+            unitInput = ""
+        }
+    }
+
+    LaunchedEffect(showAddDialog) {
+        if (showAddDialog) {
+            nameInput = ""
+            qtyInput = ""
+            unitInput = ""
+        }
+    }
+
+    LaunchedEffect(state.listDeleted) {
+        if (state.listDeleted) onBack()
+    }
+
+    val isSheetOpen = showAddDialog || editingItem != null
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                ProductsTopBar(
+                    title = state.list?.name ?: stringResource(R.string.products_default_title),
+                    onBack = onBack,
+                    actions = TopBarActions(
+                        onRename = { showRenameDialog = true },
+                        onDelete = { showDeleteConfirmDialog = true },
+                        onClearBought = onClearBought,
+                        onSortAlphabetically = onSortAlphabetically
+                    ),
+                    enabled = !isSheetOpen
+                )
+            },
+            floatingActionButton = {
+                if (!isSheetOpen) {
+                    FloatingActionButton(
+                        onClick = { showAddDialog = true },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(
+                                R.string.products_add_item_content_description
+                            )
+                        )
+                    }
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background
+        ) { innerPadding ->
+            ProductsContent(
+                innerPadding = innerPadding,
+                state = state,
+                onToggleBought = onToggleProductBought,
+                onDelete = onDeleteProduct,
+                onEdit = { editingItem = it },
+                onMove = onMoveItem
+            )
+        }
+
+        // Dimmed overlay when sheet is open
+        AnimatedVisibility(
+            visible = isSheetOpen,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.32f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        val isModified = isItemModified(
+                            nameInput = nameInput,
+                            qtyInput = qtyInput,
+                            unitInput = unitInput,
+                            editingItem = editingItem
+                        )
+
+                        if (isModified && (nameInput.isNotBlank() || qtyInput.isNotBlank())) {
+                            showCancelConfirmDialog = true
+                        } else {
+                            showAddDialog = false
+                            editingItem = null
+                        }
+                    }
+            )
+        }
+
+        // Custom sliding Bottom Sheet
+        AnimatedVisibility(
+            visible = isSheetOpen,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it }),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .imePadding()
+        ) {
+            val isSaveEnabled = isSaveButtonEnabled(
+                nameInput = nameInput,
+                qtyInput = qtyInput,
+                unitInput = unitInput,
+                units = units
+            )
+
+            BottomSheetContent(
+                name = nameInput,
+                onNameChange = { nameInput = it },
+                qtyStr = qtyInput,
+                onQtyChange = { input ->
+                    val decimalRegex = Regex("^\\d*[.,]?\\d*$")
+                    if (input.isEmpty() || input.matches(decimalRegex)) {
+                        val num = input.replace(',', '.').toDoubleOrNull()
+                        if (num == null || num <= MAX_PRODUCT_QUANTITY) {
+                            qtyInput = input
+                        }
+                    }
+                },
+                unit = unitInput,
+                onUnitChange = { unitInput = it },
+                suggestions = suggestions,
+                onQueryChange = onUpdateSuggestionQuery,
+                onSaveClick = {
+                    if (isSaveEnabled) {
+                        val quantityDouble = qtyInput.replace(',', '.').toDoubleOrNull() ?: 1.0
+                        editingItem?.let { item ->
+                            onUpdateProduct(item, nameInput, quantityDouble, unitInput)
+                        } ?: run {
+                            onAddProduct(nameInput, quantityDouble, unitInput)
+                        }
+                        showAddDialog = false
+                        editingItem = null
+                    }
+                },
+                isSaveEnabled = isSaveEnabled
+            )
+        }
+    }
+
+    RenameDialogWrapper(
+        visible = showRenameDialog,
+        currentName = state.list?.name ?: stringResource(R.string.products_default_title),
+        onRename = onRenameList,
+        onDismiss = { showRenameDialog = false }
+    )
+    DeleteConfirmDialogWrapper(
+        visible = showDeleteConfirmDialog,
+        onDeleteConfirm = onDeleteList,
+        onDismiss = { showDeleteConfirmDialog = false }
+    )
+    CancelConfirmDialogWrapper(
+        visible = showCancelConfirmDialog,
+        onDismiss = { showCancelConfirmDialog = false },
+        onConfirm = {
+            showAddDialog = false
+            editingItem = null
+        }
+    )
+}
+
+private fun isItemModified(
+    nameInput: String,
+    qtyInput: String,
+    unitInput: String,
+    editingItem: ShoppingItem?
+): Boolean {
+    val originalName = editingItem?.name ?: ""
+    val originalQty = editingItem?.quantity?.let { qty ->
+        if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
+    } ?: ""
+    val originalUnit = editingItem?.unit ?: ""
+    return nameInput != originalName || qtyInput != originalQty || unitInput != originalUnit
+}
+
+private fun isSaveButtonEnabled(
+    nameInput: String,
+    qtyInput: String,
+    unitInput: String,
+    units: List<String>
+): Boolean {
+    val quantity = qtyInput.replace(',', '.').toDoubleOrNull()
+    return nameInput.isNotBlank() &&
+        qtyInput.isNotBlank() &&
+        units.contains(unitInput) &&
+        quantity != null && quantity > 0.0 && quantity <= MAX_PRODUCT_QUANTITY
+}
