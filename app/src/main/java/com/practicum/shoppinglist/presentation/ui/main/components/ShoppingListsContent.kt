@@ -4,6 +4,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -44,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -72,6 +76,7 @@ fun ShoppingListsContent(
     isSearching: Boolean = false,
 ) {
     val listState = rememberLazyListState()
+    var openedItemKey by remember { mutableStateOf<Any?>(null) }
 
     LaunchedEffect(scrollToShoppingListId, shoppingLists) {
         scrollToShoppingListId?.let { targetListId ->
@@ -108,6 +113,9 @@ fun ShoppingListsContent(
             } else {
                 SwipeableListItem(
                     onDelete = { onDeleteListClick(shoppingList.id) },
+                    itemKey = shoppingList.id,
+                    openedItemKey = openedItemKey,
+                    onOpenedChange = { openedItemKey = it },
                     backgroundContent = { isLongSwipe, closeItem ->
                         Box(
                             modifier = Modifier
@@ -219,11 +227,14 @@ fun ShoppingListsContent(
 }
 
 @Composable
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongParameterList")
 fun SwipeableListItem(
     onDelete: () -> Unit,
     backgroundContent: @Composable (isLongSwipe: Boolean, closeItem: () -> Unit) -> Unit,
     content: @Composable () -> Unit,
+    itemKey: Any,
+    openedItemKey: Any?,
+    onOpenedChange: (Any?) -> Unit,
     modifier: Modifier = Modifier,
     actionsWidth: Dp = Dimens.Main.swipeActionsWidth,
 ) {
@@ -236,11 +247,11 @@ fun SwipeableListItem(
 
     val isLongSwipe = offsetX < actionsWidthPx * 1.5f
 
-    val closeItem: () -> Unit = {
+    fun animateOffsetTo(target: Float) {
         coroutineScope.launch {
             androidx.compose.animation.core.animate(
                 initialValue = offsetX,
-                targetValue = 0f,
+                targetValue = target,
                 animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
             ) { value, _ ->
                 offsetX = value
@@ -248,9 +259,28 @@ fun SwipeableListItem(
         }
     }
 
+    val closeItem: () -> Unit = {
+        if (openedItemKey == itemKey) onOpenedChange(null)
+        animateOffsetTo(0f)
+    }
+
+    LaunchedEffect(openedItemKey) {
+        if (openedItemKey != itemKey && offsetX != 0f) {
+            animateOffsetTo(0f)
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .pointerInput(itemKey, openedItemKey) {
+                awaitEachGesture {
+                    awaitFirstDown(pass = PointerEventPass.Initial)
+                    if (openedItemKey != null && openedItemKey != itemKey) {
+                        onOpenedChange(null)
+                    }
+                }
+            }
     ) {
         Box(
             modifier = Modifier
@@ -275,15 +305,12 @@ fun SwipeableListItem(
                             } else {
                                 0f
                             }
-                            coroutineScope.launch {
-                                androidx.compose.animation.core.animate(
-                                    initialValue = offsetX,
-                                    targetValue = targetOffset,
-                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                                ) { value, _ ->
-                                    offsetX = value
-                                }
+                            if (targetOffset == 0f) {
+                                if (openedItemKey == itemKey) onOpenedChange(null)
+                            } else {
+                                onOpenedChange(itemKey)
                             }
+                            animateOffsetTo(targetOffset)
                         },
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()

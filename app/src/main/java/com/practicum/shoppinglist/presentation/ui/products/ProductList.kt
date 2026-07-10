@@ -27,7 +27,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -84,6 +87,7 @@ fun ProductList(
     val state = rememberLazyListState()
     val dragDropState = remember { DragDropState(state, onMove, onDragEnd) }
     val draggedIndex = dragDropState.draggedIndex
+    var openedItemKey by remember { mutableStateOf<Any?>(null) }
 
     Box(
         modifier = Modifier
@@ -107,7 +111,9 @@ fun ProductList(
                         onToggleBought = onToggleBought,
                         onDelete = onDelete,
                         onEdit = onEdit,
-                        isDragging = draggedIndex != null
+                        isDragging = draggedIndex != null,
+                        openedItemKey = openedItemKey,
+                        onOpenedChange = { openedItemKey = it }
                     )
                 }
             }
@@ -124,24 +130,32 @@ fun ProductList(
                     item = items[draggedIndex],
                     onToggleBought = onToggleBought,
                     onDelete = onDelete,
-                    onEdit = onEdit
+                    onEdit = onEdit,
+                    openedItemKey = openedItemKey,
+                    onOpenedChange = { openedItemKey = it }
                 )
             }
         }
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 fun SwipeableProductItem(
     item: ShoppingItem,
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit,
+    openedItemKey: Any?,
+    onOpenedChange: (Any?) -> Unit,
     isDragging: Boolean = false
 ) {
     SwipeableListItem(
         onDelete = { onDelete(item) },
         actionsWidth = Dimens.Main.swipeActionsWidthTwoButtons,
+        itemKey = item.id,
+        openedItemKey = openedItemKey,
+        onOpenedChange = onOpenedChange,
         backgroundContent = { isLongSwipe, closeItem ->
             ProductSwipeBackground(
                 isLongSwipe = isLongSwipe,
