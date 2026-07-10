@@ -18,10 +18,10 @@ import com.practicum.shoppinglist.domain.usecase.auth.RegisterUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddProductSuggestionUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.CommitShoppingItemOrderUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
-import com.practicum.shoppinglist.domain.usecase.products.MoveShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
@@ -102,7 +102,7 @@ val domainModule = module {
         SortShoppingItemsAlphabeticallyUseCase(shoppingItemRepository = get())
     }
     factory {
-        MoveShoppingItemUseCase(shoppingItemRepository = get())
+        CommitShoppingItemOrderUseCase(shoppingItemRepository = get())
     }
     factory {
         GetProductSuggestionsUseCase(shoppingItemRepository = get())

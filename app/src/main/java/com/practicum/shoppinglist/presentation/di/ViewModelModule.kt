@@ -48,7 +48,7 @@ val viewModelModule = module {
             toggleShoppingItemBoughtUseCase = get(),
             clearBoughtItemsUseCase = get(),
             sortShoppingItemsAlphabeticallyUseCase = get(),
-            moveShoppingItemUseCase = get(),
+            commitShoppingItemOrderUseCase = get(),
             getProductSuggestionsUseCase = get(),
         )
     }

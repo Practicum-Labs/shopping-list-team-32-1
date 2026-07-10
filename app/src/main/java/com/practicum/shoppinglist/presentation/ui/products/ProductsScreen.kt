@@ -67,7 +67,8 @@ fun ProductsRoute(
         onUpdateProduct = viewModel::updateProduct,
         onDeleteProduct = viewModel::deleteProduct,
         onToggleProductBought = viewModel::toggleProductBought,
-        onMoveItem = viewModel::moveItem,
+        onReorderItem = viewModel::reorderItems,
+        onCommitOrder = viewModel::commitItemOrder,
         onUpdateSuggestionQuery = viewModel::updateSuggestionQuery,
         modifier = modifier
     )
@@ -88,7 +89,8 @@ fun ProductsScreen(
     onUpdateProduct: (ShoppingItem, String, Double, String) -> Unit,
     onDeleteProduct: (ShoppingItem) -> Unit,
     onToggleProductBought: (ShoppingItem) -> Unit,
-    onMoveItem: (Int, Int) -> Unit,
+    onReorderItem: (Int, Int) -> Unit,
+    onCommitOrder: () -> Unit,
     onUpdateSuggestionQuery: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -177,7 +179,8 @@ fun ProductsScreen(
                 onToggleBought = onToggleProductBought,
                 onDelete = onDeleteProduct,
                 onEdit = { editingItem = it },
-                onMove = onMoveItem
+                onMove = onReorderItem,
+                onDragEnd = onCommitOrder
             )
         }
 

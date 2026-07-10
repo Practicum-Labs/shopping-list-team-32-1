@@ -1,6 +1,5 @@
 package com.practicum.shoppinglist.presentation.ui.products
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,14 +26,13 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
@@ -45,7 +44,8 @@ fun ProductsContent(
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit,
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -60,7 +60,8 @@ fun ProductsContent(
                 onToggleBought = onToggleBought,
                 onDelete = onDelete,
                 onEdit = onEdit,
-                onMove = onMove
+                onMove = onMove,
+                onDragEnd = onDragEnd
             )
         }
     }
@@ -72,29 +73,50 @@ fun ProductList(
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit,
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit = {}
 ) {
     val state = rememberLazyListState()
-    val dragDropState = remember { DragDropState(state, onMove) }
-    LazyColumn(
-        state = state,
+    val dragDropState = remember { DragDropState(state, onMove, onDragEnd) }
+    val draggedIndex = dragDropState.draggedIndex
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = Dimens.Products.listVerticalPadding)
-            .dragDropGesture(dragDropState)
     ) {
-        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-            val offset by animateDpAsState(
-                targetValue = dragDropState.getItemOffset(index).y.dp,
-                label = "offset"
-            )
+        LazyColumn(
+            state = state,
+            modifier = Modifier
+                .fillMaxSize()
+                .dragDropGesture(dragDropState)
+        ) {
+            itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(if (index == draggedIndex) 0f else 1f)
+                ) {
+                    SwipeableProductItem(
+                        item = item,
+                        onToggleBought = onToggleBought,
+                        onDelete = onDelete,
+                        onEdit = onEdit,
+                        isDragging = draggedIndex != null
+                    )
+                }
+            }
+        }
+
+        if (draggedIndex != null && draggedIndex in items.indices) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .graphicsLayer { translationY = offset.toPx() }
+                    .zIndex(1f)
+                    .offset { dragDropState.overlayOffset() }
             ) {
                 SwipeableProductItem(
-                    item = item,
+                    item = items[draggedIndex],
                     onToggleBought = onToggleBought,
                     onDelete = onDelete,
                     onEdit = onEdit
@@ -110,7 +132,8 @@ fun SwipeableProductItem(
     item: ShoppingItem,
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
-    onEdit: (ShoppingItem) -> Unit
+    onEdit: (ShoppingItem) -> Unit,
+    isDragging: Boolean = false
 ) {
     val state = rememberSwipeToDismissBoxState()
 
@@ -129,7 +152,7 @@ fun SwipeableProductItem(
     SwipeToDismissBox(
         state = state,
         backgroundContent = { SwipeBackground(state.targetValue) },
-        content = { ProductItemRow(item = item, onToggleBought = onToggleBought) }
+        content = { ProductItemRow(item = item, onToggleBought = onToggleBought, isDragging = isDragging) }
     )
 }
 

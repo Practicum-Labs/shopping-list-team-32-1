@@ -8,10 +8,10 @@ import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.CommitShoppingItemOrderUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
-import com.practicum.shoppinglist.domain.usecase.products.MoveShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
@@ -46,7 +46,7 @@ class ProductsViewModel(
     private val toggleShoppingItemBoughtUseCase: ToggleShoppingItemBoughtUseCase,
     private val clearBoughtItemsUseCase: ClearBoughtItemsUseCase,
     private val sortShoppingItemsAlphabeticallyUseCase: SortShoppingItemsAlphabeticallyUseCase,
-    private val moveShoppingItemUseCase: MoveShoppingItemUseCase,
+    private val commitShoppingItemOrderUseCase: CommitShoppingItemOrderUseCase,
     private val getProductSuggestionsUseCase: GetProductSuggestionsUseCase
 ) : ViewModel() {
 
@@ -144,10 +144,19 @@ class ProductsViewModel(
         }
     }
 
-    fun moveItem(fromIndex: Int, toIndex: Int) {
-        viewModelScope.launch {
-            val updated = moveShoppingItemUseCase(fromIndex, toIndex, _uiState.value.items)
+    fun reorderItems(fromIndex: Int, toIndex: Int) {
+        val currentItems = _uiState.value.items.toMutableList()
+        if (fromIndex in currentItems.indices && toIndex in currentItems.indices) {
+            val item = currentItems.removeAt(fromIndex)
+            currentItems.add(toIndex, item)
+            val updated = currentItems.mapIndexed { index, shoppingItem -> shoppingItem.copy(sortOrder = index) }
             _uiState.value = _uiState.value.copy(items = updated)
+        }
+    }
+
+    fun commitItemOrder() {
+        viewModelScope.launch {
+            commitShoppingItemOrderUseCase(_uiState.value.items)
         }
     }
 
