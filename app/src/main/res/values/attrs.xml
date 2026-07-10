@@ -35,4 +35,11 @@
     <attr name="shoppingColorSortSubmenuBackground" format="color" />
     <attr name="shoppingColorMenuSheetSurface" format="color" />
     <attr name="shoppingColorMenuSheetSortActive" format="color" />
+    <attr name="shoppingColorAuthButtonLoader" format="color" />
+
+    <!-- Products Screen -->
+    <attr name="shoppingColorProductCheckedBackground" format="color" />
+    <attr name="shoppingColorProductTick" format="color" />
+    <attr name="shoppingColorProductMoreVert" format="color" />
+    <attr name="shoppingColorProductDivider" format="color" />
 </resources>

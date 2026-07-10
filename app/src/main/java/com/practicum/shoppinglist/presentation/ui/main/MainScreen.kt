@@ -60,17 +60,23 @@ import org.koin.androidx.compose.koinViewModel
 fun MainRoute(
     isDarkTheme: Boolean,
     onThemeClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.checkSessionInBackground(onInvalidSession = onLogoutClick)
+    }
+
     MainScreen(
         uiState = uiState,
         isDarkTheme = isDarkTheme,
         actions = MainScreenActions(
             onThemeClick = onThemeClick,
+            onLogoutClick = { viewModel.onLogoutClick(onSuccess = onLogoutClick) },
             onAddClick = viewModel::onAddListClick,
             onAddListDismiss = viewModel::onAddListDismiss,
             onNewListNameChange = viewModel::onNewListNameChange,

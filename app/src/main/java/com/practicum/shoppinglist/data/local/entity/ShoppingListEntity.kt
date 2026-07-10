@@ -13,4 +13,6 @@ data class ShoppingListEntity(
     val name: String,
     @ColumnInfo(name = "icon_name")
     val iconName: String,
+    @ColumnInfo(name = "owner_user_id", defaultValue = "0")
+    val ownerUserId: Long,
 )

@@ -6,7 +6,6 @@
 
     <style name="Theme.Shoppinglist.Light" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
 
         <item name="shoppingColorPrimary">@color/shopping_light_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_light_on_primary</item>
@@ -43,11 +42,15 @@
         <item name="shoppingColorSortSubmenuBackground">@color/shopping_light_sort_submenu_background</item>
         <item name="shoppingColorMenuSheetSurface">@color/shopping_light_menu_sheet_surface</item>
         <item name="shoppingColorMenuSheetSortActive">@color/shopping_light_menu_sheet_sort_active</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_light_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_light_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_light_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_light_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
 
         <item name="shoppingColorPrimary">@color/shopping_dark_primary</item>
         <item name="shoppingColorOnPrimary">@color/shopping_dark_on_primary</item>
@@ -84,6 +87,11 @@
         <item name="shoppingColorSortSubmenuBackground">@color/shopping_dark_sort_submenu_background</item>
         <item name="shoppingColorMenuSheetSurface">@color/shopping_dark_menu_sheet_surface</item>
         <item name="shoppingColorMenuSheetSortActive">@color/shopping_dark_menu_sheet_sort_active</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_dark_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_dark_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_dark_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_dark_product_divider</item>
     </style>
 
     <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />

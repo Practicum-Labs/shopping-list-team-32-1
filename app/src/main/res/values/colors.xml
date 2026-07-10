@@ -28,6 +28,7 @@
     <color name="shopping_light_icon_picker_item_container">#FEDDBD</color>
     <color name="shopping_light_list_item_surface">#FFF8F4</color>
     <color name="shopping_light_list_item_title">#211A14</color>
+    <color name="shopping_light_auth_button_loader">#845416</color>
 
     <color name="shopping_dark_primary">#E4BE9F</color>
     <color name="shopping_dark_on_primary">#3F2A1A</color>
@@ -64,4 +65,15 @@
     <color name="shopping_dark_menu_sheet_surface">#211A14</color>
     <color name="shopping_light_menu_sheet_sort_active">#FEDDBD</color>
     <color name="shopping_dark_menu_sheet_sort_active">#A78C70</color>
+    <color name="shopping_dark_auth_button_loader">#FEDDBD</color>
+
+    <!-- Products Screen Colors -->
+    <color name="shopping_light_product_checked_bg">#845416</color>
+    <color name="shopping_dark_product_checked_bg">#FFBE77</color>
+    <color name="shopping_light_product_tick">#FFFFFF</color>
+    <color name="shopping_dark_product_tick">#19120C</color>
+    <color name="shopping_light_product_more_vert">#50453A</color>
+    <color name="shopping_dark_product_more_vert">#D9C8B9</color>
+    <color name="shopping_light_product_divider">#CAC4D0</color>
+    <color name="shopping_dark_product_divider">#CAC4D0</color>
 </resources>

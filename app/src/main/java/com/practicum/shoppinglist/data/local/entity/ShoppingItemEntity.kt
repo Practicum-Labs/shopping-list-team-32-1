@@ -2,9 +2,24 @@ package com.practicum.shoppinglist.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "shopping_items")
+@Entity(
+    tableName = "shopping_items",
+    foreignKeys = [
+        ForeignKey(
+            entity = ShoppingListEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["listId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(value = ["listId"])
+    ]
+)
 data class ShoppingItemEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")

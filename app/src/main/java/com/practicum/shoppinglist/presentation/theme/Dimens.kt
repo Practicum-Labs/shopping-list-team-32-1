@@ -2,6 +2,7 @@ package com.practicum.shoppinglist.presentation.theme
 
 import androidx.compose.ui.unit.dp
 
+@Suppress("MagicNumber")
 object Dimens {
     object Onboarding {
         val logoTopPadding = 16.dp
@@ -11,6 +12,9 @@ object Dimens {
         val titleTopPadding = 48.dp
         val bodyTopPadding = 8.dp
         val textHorizontalPadding = 44.dp
+        val loaderBottomPadding = 96.dp
+        val loaderSize = 36.dp
+        val loaderStrokeWidth = 3.dp
         const val logoAspectRatio = 338f / 74f
         const val illustrationAspectRatio = 324f / 300f
     }
@@ -99,5 +103,64 @@ object Dimens {
         val sortSubmenuVerticalPadding = 8.dp
         val sortSubmenuItemHeight = 48.dp
         val sortSubmenuItemHorizontalPadding = 12.dp
+    }
+
+    object Products {
+        val listHorizontalPadding = 16.dp
+        val listVerticalPadding = 8.dp
+        val listItemVerticalPadding = 12.dp
+        val listItemHorizontalPadding = 20.dp
+        val checkboxSize = 24.dp
+        val checkboxBorderWidth = 2.dp
+        val checkboxIconSize = 16.dp
+        val itemSpacing = 16.dp
+        val verticalSpacing = 16.dp
+
+        val sheetCornerRadius = 28.dp
+        val sheetBorderWidth = 1.dp
+        val sheetHorizontalPadding = 20.dp
+        val sheetTopPadding = 8.dp
+        val sheetBottomPadding = 24.dp
+
+        val dragHandleWidth = 32.dp
+        val dragHandleHeight = 4.dp
+        val dragHandleVerticalPadding = 8.dp
+
+        val textFieldHeight = 64.dp
+        val fieldWidthQuantity = 120.dp
+        val fieldWidthUnit = 120.dp
+
+        val quantityAdjustmentContainerWidth = 96.dp
+        val quantityAdjustmentContainerHeight = 60.dp
+        val quantityAdjustmentContainerTopPadding = 12.dp
+
+        val buttonClickSize = 48.dp
+        val buttonCircleSize = 40.dp
+
+        val fabOffset = (-88).dp
+        val fabSize = 56.dp
+        val fabEndPadding = 16.dp
+        val fabBottomPadding = 16.dp
+    }
+
+    object Auth {
+        val screenHorizontalPadding = 24.dp
+        val logoTopPadding = 56.dp
+        val logoHorizontalPadding = 32.dp
+        val titleTopPadding = 48.dp
+        val subtitleTopPadding = 8.dp
+        val fieldTopPadding = 24.dp
+        val fieldSpacing = 14.dp
+        val buttonTopPadding = 28.dp
+        val secondaryActionTopPadding = 2.dp
+        val messageTopPadding = 16.dp
+        val toolbarHeight = 56.dp
+        val toolbarTopPadding = 8.dp
+        val backButtonStartOffset = 16.dp
+        val passwordClearButtonEndOffset = 8.dp
+        val buttonLoaderSize = 20.dp
+        val buttonLoaderStrokeWidth = 2.dp
+        val contentMaxWidth = 420.dp
+        const val logoAspectRatio = 338f / 74f
     }
 }

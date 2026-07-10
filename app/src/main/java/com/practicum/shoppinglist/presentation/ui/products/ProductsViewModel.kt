@@ -2,33 +2,52 @@ package com.practicum.shoppinglist.presentation.ui.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.shoppinglist.data.local.entity.ShoppingItemEntity
+import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
-import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
-import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
-import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
+import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
+import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
+import com.practicum.shoppinglist.domain.usecase.products.MoveShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
+import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
+import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class ProductsUiState(
     val list: ShoppingList? = null,
-    val items: List<ShoppingItemEntity> = emptyList(),
+    val items: List<ShoppingItem> = emptyList(),
     val suggestions: List<String> = emptyList(),
     val isLoading: Boolean = true,
-    val sortType: SortType = SortType.Custom
+    val listDeleted: Boolean = false
 )
 
+@Suppress("LongParameterList")
 class ProductsViewModel(
     private val listId: Long,
-    private val listRepository: ShoppingListRepository,
-    private val itemRepository: ShoppingItemRepository
+    private val renameShoppingListUseCase: RenameShoppingListUseCase,
+    private val deleteShoppingListUseCase: DeleteShoppingListUseCase,
+    private val getShoppingListUseCase: GetShoppingListUseCase,
+    private val observeShoppingItemsUseCase: ObserveShoppingItemsUseCase,
+    private val addShoppingItemUseCase: AddShoppingItemUseCase,
+    private val updateShoppingItemUseCase: UpdateShoppingItemUseCase,
+    private val deleteShoppingItemUseCase: DeleteShoppingItemUseCase,
+    private val toggleShoppingItemBoughtUseCase: ToggleShoppingItemBoughtUseCase,
+    private val clearBoughtItemsUseCase: ClearBoughtItemsUseCase,
+    private val sortShoppingItemsAlphabeticallyUseCase: SortShoppingItemsAlphabeticallyUseCase,
+    private val moveShoppingItemUseCase: MoveShoppingItemUseCase,
+    private val getProductSuggestionsUseCase: GetProductSuggestionsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductsUiState())
@@ -42,7 +61,7 @@ class ProductsViewModel(
             if (query.isBlank()) {
                 flowOf(emptyList())
             } else {
-                itemRepository.getSuggestionsFlow(query).map { list -> list.map { it.name } }
+                getProductSuggestionsUseCase(query)
             }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -53,92 +72,82 @@ class ProductsViewModel(
 
     private fun loadData() {
         viewModelScope.launch {
-            val list = listRepository.getShoppingListById(listId)
+            val list = getShoppingListUseCase(listId)
             if (list == null) {
-                // If list doesn't exist, create a default one
-                val newId = listRepository.createShoppingList(name = "Продукты", iconName = "list_alt")
-                val createdList = listRepository.getShoppingListById(newId)
-                _uiState.value = _uiState.value.copy(list = createdList, isLoading = false)
+                _uiState.value = _uiState.value.copy(listDeleted = true, isLoading = false)
             } else {
                 _uiState.value = _uiState.value.copy(list = list, isLoading = false)
-            }
-
-            itemRepository.getItemsForListFlow(listId).collect { items ->
-                _uiState.value = _uiState.value.copy(items = items)
+                observeShoppingItemsUseCase(listId).collect { items ->
+                    _uiState.value = _uiState.value.copy(items = items)
+                }
             }
         }
     }
 
     fun addProduct(name: String, quantity: Double, unit: String) {
         viewModelScope.launch {
-            val trimmedName = name.trim()
-            itemRepository.addSuggestion(trimmedName)
-            val maxOrder = _uiState.value.items.maxOfOrNull { it.sortOrder } ?: 0
-            val newItem = ShoppingItemEntity(
+            addShoppingItemUseCase(
                 listId = listId,
-                name = trimmedName,
+                name = name,
                 quantity = quantity,
                 unit = unit,
-                sortOrder = maxOrder + 1
+                currentItems = _uiState.value.items
             )
-            itemRepository.insertItem(newItem)
         }
     }
 
-    fun updateProduct(item: ShoppingItemEntity, name: String, quantity: Double, unit: String) {
+    fun updateProduct(item: ShoppingItem, name: String, quantity: Double, unit: String) {
         viewModelScope.launch {
-            val trimmedName = name.trim()
-            itemRepository.addSuggestion(trimmedName)
-            itemRepository.updateItem(item.copy(name = trimmedName, quantity = quantity, unit = unit))
+            updateShoppingItemUseCase(item, name, quantity, unit)
         }
     }
 
-    fun deleteProduct(item: ShoppingItemEntity) {
+    fun deleteProduct(item: ShoppingItem) {
         viewModelScope.launch {
-            itemRepository.deleteItem(item)
+            deleteShoppingItemUseCase(item)
         }
     }
 
-    fun toggleProductBought(item: ShoppingItemEntity) {
+    fun toggleProductBought(item: ShoppingItem) {
         viewModelScope.launch {
-            itemRepository.updateItem(item.copy(isBought = !item.isBought))
+            toggleShoppingItemBoughtUseCase(item)
         }
     }
 
-    fun clearBought() {
+    fun renameList(newName: String) {
         viewModelScope.launch {
-            itemRepository.clearBoughtItems(listId)
+            _uiState.value.list?.let { currentList ->
+                renameShoppingListUseCase(listId, newName.trim())
+                _uiState.value = _uiState.value.copy(
+                    list = currentList.copy(name = newName.trim())
+                )
+            }
         }
     }
 
-    fun clearAllItems() {
+    fun deleteList() {
         viewModelScope.launch {
-            itemRepository.clearAllItems(listId)
+            deleteShoppingListUseCase(listId)
+            _uiState.value = _uiState.value.copy(listDeleted = true)
+        }
+    }
+
+    fun clearBoughtItems() {
+        viewModelScope.launch {
+            clearBoughtItemsUseCase(listId)
         }
     }
 
     fun sortAlphabetically() {
         viewModelScope.launch {
-            val sorted = _uiState.value.items.sortedBy { it.name.lowercase() }
-            val updated = sorted.mapIndexed { index, item -> item.copy(sortOrder = index) }
-            _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Alphabetical)
-            itemRepository.updateItems(updated)
+            sortShoppingItemsAlphabeticallyUseCase(_uiState.value.items)
         }
     }
 
-    fun reorderItems(fromIndex: Int, toIndex: Int) {
-        val currentItems = _uiState.value.items.toMutableList()
-        if (fromIndex in currentItems.indices && toIndex in currentItems.indices) {
-            val item = currentItems.removeAt(fromIndex)
-            currentItems.add(toIndex, item)
-            val updated = currentItems.mapIndexed { index, it -> it.copy(sortOrder = index) }
-            _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Custom)
-        }
-    }
-
-    fun commitItemOrder() {
+    fun moveItem(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch {
-            itemRepository.updateItems(_uiState.value.items)
+            val updated = moveShoppingItemUseCase(fromIndex, toIndex, _uiState.value.items)
+            _uiState.value = _uiState.value.copy(items = updated)
         }
     }
 

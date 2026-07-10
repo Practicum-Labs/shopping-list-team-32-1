@@ -11,10 +11,11 @@ fun ShoppingListEntity.toDomain(): ShoppingList {
     )
 }
 
-fun ShoppingList.toEntity(): ShoppingListEntity {
+fun ShoppingList.toEntity(ownerUserId: Long): ShoppingListEntity {
     return ShoppingListEntity(
         id = id,
         name = name,
         iconName = iconName,
+        ownerUserId = ownerUserId,
     )
 }

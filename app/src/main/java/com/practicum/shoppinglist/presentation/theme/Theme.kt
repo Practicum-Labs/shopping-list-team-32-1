@@ -34,7 +34,10 @@ fun Theme(
     }
 
     CompositionLocalProvider(LocalContext provides themedContext) {
-        CompositionLocalProvider(LocalColors provides colors()) {
+        CompositionLocalProvider(
+            LocalColors provides colors(),
+            LocalDarkTheme provides darkTheme,
+        ) {
             MaterialTheme(
                 colorScheme = shoppingColorScheme(darkTheme = darkTheme),
                 typography = AppTypography,
@@ -64,16 +67,28 @@ data class Colors(
     val sortSubmenuBackground: Color,
     val menuSheetSurface: Color,
     val menuSheetSortActive: Color,
+    val authButtonLoader: Color,
+    val productCheckedBackground: Color,
+    val productTick: Color,
+    val productMoreVert: Color,
+    val productDivider: Color,
 )
 
 val MaterialTheme.colors: Colors
     @Composable
     @ReadOnlyComposable
-    get() = LocalColors.current
+    get() = this.run { LocalColors.current }
+
+val MaterialTheme.isDarkTheme: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = this.run { LocalDarkTheme.current }
 
 private val LocalColors = staticCompositionLocalOf<Colors> {
     error("Shopping list colors are not provided")
 }
+
+private val LocalDarkTheme = staticCompositionLocalOf { false }
 
 @Composable
 @ReadOnlyComposable
@@ -98,6 +113,11 @@ private fun colors(): Colors {
         sortSubmenuBackground = colorAttr(R.attr.shoppingColorSortSubmenuBackground),
         menuSheetSurface = colorAttr(R.attr.shoppingColorMenuSheetSurface),
         menuSheetSortActive = colorAttr(R.attr.shoppingColorMenuSheetSortActive),
+        authButtonLoader = colorAttr(R.attr.shoppingColorAuthButtonLoader),
+        productCheckedBackground = colorAttr(R.attr.shoppingColorProductCheckedBackground),
+        productTick = colorAttr(R.attr.shoppingColorProductTick),
+        productMoreVert = colorAttr(R.attr.shoppingColorProductMoreVert),
+        productDivider = colorAttr(R.attr.shoppingColorProductDivider),
     )
 }
 

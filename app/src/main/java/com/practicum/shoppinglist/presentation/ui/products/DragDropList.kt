@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName")
+
 package com.practicum.shoppinglist.presentation.ui.products
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -14,14 +16,12 @@ import kotlin.math.roundToInt
 
 class DragDropState(
     val lazyListState: LazyListState,
-    private val onMove: (Int, Int) -> Unit,
-    private val onDragEnd: () -> Unit = {}
+    private val onMove: (Int, Int) -> Unit
 ) {
     var draggedIndex by mutableStateOf<Int?>(null)
         private set
 
-    private var initialItemOffset = 0f
-    private var totalDragOffset by mutableFloatStateOf(0f)
+    private var dragOffset by mutableFloatStateOf(0f)
 
     private val draggedItemInfo
         get() = lazyListState.layoutInfo.visibleItemsInfo
@@ -29,40 +29,39 @@ class DragDropState(
 
     fun onDragStart(index: Int) {
         draggedIndex = index
-        totalDragOffset = 0f
-        initialItemOffset = lazyListState.layoutInfo.visibleItemsInfo
-            .firstOrNull { it.index == index }
-            ?.offset
-            ?.toFloat() ?: 0f
     }
 
     fun onDrag(offset: Offset) {
-        totalDragOffset += offset.y
+        dragOffset += offset.y
         val currentItemInfo = draggedItemInfo ?: return
         val currentItemIndex = currentItemInfo.index
-
-        val desiredTop = initialItemOffset + totalDragOffset
-        val desiredCenter = desiredTop + currentItemInfo.size / 2
+        val currentItemOffset = currentItemInfo.offset
 
         val targetItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { item ->
-            item.index != currentItemIndex &&
-                desiredCenter.roundToInt() in item.offset..(item.offset + item.size)
+            val relativeOffset = currentItemOffset + dragOffset
+            relativeOffset.roundToInt() in item.offset..item.offset + item.size &&
+                item.index != currentItemIndex
         }
 
         if (targetItem != null) {
             onMove(currentItemIndex, targetItem.index)
             draggedIndex = targetItem.index
+            dragOffset = 0f
         }
     }
 
     fun onDragInterrupted() {
         draggedIndex = null
-        totalDragOffset = 0f
-        onDragEnd()
+        dragOffset = 0f
     }
 
-    fun overlayOffset(): IntOffset =
-        IntOffset(0, (initialItemOffset + totalDragOffset).roundToInt())
+    fun getItemOffset(index: Int): IntOffset {
+        return if (index == draggedIndex) {
+            IntOffset(0, dragOffset.roundToInt())
+        } else {
+            IntOffset.Zero
+        }
+    }
 }
 
 fun Modifier.dragDropGesture(state: DragDropState): Modifier = this.pointerInput(state) {
@@ -70,7 +69,7 @@ fun Modifier.dragDropGesture(state: DragDropState): Modifier = this.pointerInput
         onDragStart = { offset ->
             val layoutInfo = state.lazyListState.layoutInfo
             val item = layoutInfo.visibleItemsInfo.firstOrNull {
-                offset.y.toInt() in it.offset..(it.offset + it.size)
+                offset.y.toInt() in it.offset..it.offset + it.size
             }
             if (item != null) {
                 state.onDragStart(item.index)
