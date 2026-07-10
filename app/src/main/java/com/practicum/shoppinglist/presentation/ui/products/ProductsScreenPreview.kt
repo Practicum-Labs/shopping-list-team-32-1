@@ -30,12 +30,7 @@ fun ProductsScreenPreview() {
                     ProductsTopBar(
                         title = mockState.list?.name ?: "Продукты",
                         onBack = {},
-                        actions = TopBarActions(
-                            onRename = {},
-                            onDelete = {},
-                            onClearBought = {},
-                            onSortAlphabetically = {}
-                        )
+                        onMenuClick = {}
                     )
                     Box(modifier = Modifier.weight(1f)) {
                         ProductList(

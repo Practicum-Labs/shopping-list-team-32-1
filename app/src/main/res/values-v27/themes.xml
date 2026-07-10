@@ -34,6 +34,10 @@
         <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_light_primary</item>
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
+        <item name="shoppingColorMenuSheetSortLabel">@color/shopping_menu_sheet_sort_label</item>
+        <item name="shoppingColorSortSubmenuBackground">@color/shopping_light_sort_submenu_background</item>
+        <item name="shoppingColorMenuSheetSurface">@color/shopping_light_menu_sheet_surface</item>
+        <item name="shoppingColorMenuSheetSortActive">@color/shopping_light_menu_sheet_sort_active</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
         <item name="shoppingColorProductCheckedBackground">@color/shopping_light_product_checked_bg</item>
         <item name="shoppingColorProductTick">@color/shopping_light_product_tick</item>
@@ -76,6 +80,10 @@
         <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_dark_confirm_dialog_delete</item>
         <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
         <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorMenuSheetSortLabel">@color/shopping_menu_sheet_sort_label</item>
+        <item name="shoppingColorSortSubmenuBackground">@color/shopping_dark_sort_submenu_background</item>
+        <item name="shoppingColorMenuSheetSurface">@color/shopping_dark_menu_sheet_surface</item>
+        <item name="shoppingColorMenuSheetSortActive">@color/shopping_dark_menu_sheet_sort_active</item>
         <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
         <item name="shoppingColorProductCheckedBackground">@color/shopping_dark_product_checked_bg</item>
         <item name="shoppingColorProductTick">@color/shopping_dark_product_tick</item>

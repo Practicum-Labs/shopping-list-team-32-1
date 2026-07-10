@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,11 +51,14 @@ import com.practicum.shoppinglist.presentation.ui.main.SortType
 @Composable
 fun ShoppingListMenuBottomSheet(
     sheetState: SheetState,
-    currentSortType: SortType,
     onDismissRequest: () -> Unit,
-    onSortTypeSelected: (SortType) -> Unit,
     onDeleteAllClick: () -> Unit,
     onClearPurchasedClick: () -> Unit,
+    currentSortType: SortType = SortType.Alphabetical,
+    onSortTypeSelected: (SortType) -> Unit = {},
+    sortLabel: String? = null,
+    onSortClick: (() -> Unit)? = null,
+    onRenameClick: (() -> Unit)? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -71,6 +76,9 @@ fun ShoppingListMenuBottomSheet(
             onSortTypeSelected = onSortTypeSelected,
             onDeleteAllClick = onDeleteAllClick,
             onClearPurchasedClick = onClearPurchasedClick,
+            sortLabel = sortLabel,
+            onSortClick = onSortClick,
+            onRenameClick = onRenameClick,
         )
     }
 }
@@ -82,12 +90,21 @@ internal fun ShoppingListMenuContent(
     onDeleteAllClick: () -> Unit,
     onClearPurchasedClick: () -> Unit,
     modifier: Modifier = Modifier,
+    sortLabel: String? = null,
+    onSortClick: (() -> Unit)? = null,
+    onRenameClick: (() -> Unit)? = null,
     initialSortExpanded: Boolean = false,
 ) {
     var isSortExpanded by remember { mutableStateOf(initialSortExpanded) }
-    val sortLabel = when (currentSortType) {
-        SortType.Alphabetical -> stringResource(R.string.main_menu_sheet_sort_alphabetical)
-        SortType.Custom -> stringResource(R.string.main_menu_sheet_sort_custom)
+    val isSortSingleAction = onSortClick != null
+    val resolvedSortLabel = sortLabel ?: stringResource(R.string.main_menu_sheet_sort)
+    val sortSubtitle = if (isSortSingleAction) {
+        null
+    } else {
+        when (currentSortType) {
+            SortType.Alphabetical -> stringResource(R.string.main_menu_sheet_sort_alphabetical)
+            SortType.Custom -> stringResource(R.string.main_menu_sheet_sort_custom)
+        }
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -98,38 +115,50 @@ internal fun ShoppingListMenuContent(
         Box(modifier = Modifier.fillMaxWidth().zIndex(1f)) {
             MenuItemRow(
                 icon = painterResource(R.drawable.ic_sort_24),
-                iconContentDescription = stringResource(R.string.main_menu_sheet_sort),
-                label = stringResource(R.string.main_menu_sheet_sort),
-                subtitle = sortLabel,
+                iconContentDescription = resolvedSortLabel,
+                label = resolvedSortLabel,
+                subtitle = sortSubtitle,
                 backgroundColor = if (isSortExpanded) MaterialTheme.colors.menuSheetSortActive else MaterialTheme.colors.menuSheetSurface,
-                onClick = { isSortExpanded = !isSortExpanded },
-                trailing = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(Dimens.Main.menuSheetItemIconSize),
-                    )
+                onClick = {
+                    if (isSortSingleAction) {
+                        onSortClick()
+                    } else {
+                        isSortExpanded = !isSortExpanded
+                    }
+                },
+                trailing = if (isSortSingleAction) {
+                    null
+                } else {
+                    {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(Dimens.Main.menuSheetItemIconSize),
+                        )
+                    }
                 },
             )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, 0) {
-                            placeable.placeRelative(0, 0)
-                        }
-                    },
-            ) {
-                SortSubmenu(
-                    expanded = isSortExpanded,
-                    currentSortType = currentSortType,
-                    onSortTypeSelected = { sortType ->
-                        onSortTypeSelected(sortType)
-                        isSortExpanded = false
-                    },
-                )
+            if (!isSortSingleAction) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, 0) {
+                                placeable.placeRelative(0, 0)
+                            }
+                        },
+                ) {
+                    SortSubmenu(
+                        expanded = isSortExpanded,
+                        currentSortType = currentSortType,
+                        onSortTypeSelected = { sortType ->
+                            onSortTypeSelected(sortType)
+                            isSortExpanded = false
+                        },
+                    )
+                }
             }
         }
 
@@ -152,6 +181,18 @@ internal fun ShoppingListMenuContent(
                 onClearPurchasedClick()
             },
         )
+
+        if (onRenameClick != null) {
+            MenuItemRow(
+                icon = rememberVectorPainter(Icons.Default.Edit),
+                iconContentDescription = stringResource(R.string.products_menu_rename),
+                label = stringResource(R.string.products_menu_rename),
+                onClick = {
+                    isSortExpanded = false
+                    onRenameClick()
+                },
+            )
+        }
 
         Spacer(modifier = Modifier.height(Dimens.Main.menuSheetBottomPadding))
     }
@@ -301,6 +342,7 @@ private fun ShoppingListMenuSheetBasePreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
             )
         }
     }
@@ -319,6 +361,7 @@ private fun ShoppingListMenuSheetBaseDarkPreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
             )
         }
     }
@@ -337,6 +380,7 @@ private fun ShoppingListMenuSheetSortAlphabeticalPreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
                 initialSortExpanded = true,
             )
         }
@@ -356,6 +400,7 @@ private fun ShoppingListMenuSheetSortAlphabeticalDarkPreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
                 initialSortExpanded = true,
             )
         }
@@ -375,6 +420,7 @@ private fun ShoppingListMenuSheetSortCustomPreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
                 initialSortExpanded = true,
             )
         }
@@ -394,7 +440,50 @@ private fun ShoppingListMenuSheetSortCustomDarkPreview() {
                 onSortTypeSelected = {},
                 onDeleteAllClick = {},
                 onClearPurchasedClick = {},
+                onRenameClick = {},
                 initialSortExpanded = true,
+            )
+        }
+    }
+}
+
+@Preview(name = "Menu Sheet - Products (Single-action Sort)", showBackground = true, widthDp = 428)
+@Composable
+private fun ShoppingListMenuSheetProductsPreview() {
+    Theme {
+        Surface(
+            color = MaterialTheme.colors.menuSheetSurface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            ShoppingListMenuContent(
+                currentSortType = SortType.Alphabetical,
+                onSortTypeSelected = {},
+                onDeleteAllClick = {},
+                onClearPurchasedClick = {},
+                sortLabel = "Сортировать по алфавиту",
+                onSortClick = {},
+                onRenameClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Menu Sheet - Products (Single-action Sort) (Dark)", showBackground = true, widthDp = 428)
+@Composable
+private fun ShoppingListMenuSheetProductsDarkPreview() {
+    Theme(darkTheme = true) {
+        Surface(
+            color = MaterialTheme.colors.menuSheetSurface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            ShoppingListMenuContent(
+                currentSortType = SortType.Alphabetical,
+                onSortTypeSelected = {},
+                onDeleteAllClick = {},
+                onClearPurchasedClick = {},
+                sortLabel = "Сортировать по алфавиту",
+                onSortClick = {},
+                onRenameClick = {},
             )
         }
     }

@@ -15,15 +15,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
+import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -68,7 +73,8 @@ fun ProductsRoute(
     )
 }
 
-@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod", "LongParameterList")
+@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod", "LongParameterList", "LongMethod")
 @Composable
 fun ProductsScreen(
     state: ProductsUiState,
@@ -94,6 +100,13 @@ fun ProductsScreen(
     var showRenameDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var showCancelConfirmDialog by remember { mutableStateOf(false) }
+    var showMenuSheet by remember { mutableStateOf(false) }
+    val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
+    fun closeMenuSheet() {
+        coroutineScope.launch { menuSheetState.hide() }.invokeOnCompletion { showMenuSheet = false }
+    }
 
     // Input States
     var nameInput by remember { mutableStateOf("") }
@@ -134,12 +147,7 @@ fun ProductsScreen(
                 ProductsTopBar(
                     title = state.list?.name ?: stringResource(R.string.products_default_title),
                     onBack = onBack,
-                    actions = TopBarActions(
-                        onRename = { showRenameDialog = true },
-                        onDelete = { showDeleteConfirmDialog = true },
-                        onClearBought = onClearBought,
-                        onSortAlphabetically = onSortAlphabetically
-                    ),
+                    onMenuClick = { showMenuSheet = true },
                     enabled = !isSheetOpen
                 )
             },
@@ -252,6 +260,30 @@ fun ProductsScreen(
                 isSaveEnabled = isSaveEnabled
             )
         }
+    }
+
+    if (showMenuSheet) {
+        ShoppingListMenuBottomSheet(
+            sheetState = menuSheetState,
+            onDismissRequest = { showMenuSheet = false },
+            sortLabel = stringResource(R.string.products_menu_sort_alphabetically),
+            onSortClick = {
+                onSortAlphabetically()
+                closeMenuSheet()
+            },
+            onDeleteAllClick = {
+                showDeleteConfirmDialog = true
+                closeMenuSheet()
+            },
+            onClearPurchasedClick = {
+                onClearBought()
+                closeMenuSheet()
+            },
+            onRenameClick = {
+                showRenameDialog = true
+                closeMenuSheet()
+            }
+        )
     }
 
     RenameDialogWrapper(
