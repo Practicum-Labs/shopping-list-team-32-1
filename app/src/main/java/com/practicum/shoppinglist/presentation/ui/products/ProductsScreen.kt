@@ -102,6 +102,7 @@ fun ProductsScreen(
     var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var showRenameDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var showClearBoughtConfirmDialog by remember { mutableStateOf(false) }
     var showCancelConfirmDialog by remember { mutableStateOf(false) }
     var showMenuSheet by remember { mutableStateOf(false) }
     val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -277,7 +278,7 @@ fun ProductsScreen(
                 closeMenuSheet()
             },
             onClearPurchasedClick = {
-                onClearBought()
+                showClearBoughtConfirmDialog = true
                 closeMenuSheet()
             },
             onRenameClick = {
@@ -297,6 +298,11 @@ fun ProductsScreen(
         visible = showDeleteConfirmDialog,
         onDeleteConfirm = onDeleteList,
         onDismiss = { showDeleteConfirmDialog = false }
+    )
+    ClearBoughtConfirmDialogWrapper(
+        visible = showClearBoughtConfirmDialog,
+        onClearConfirm = onClearBought,
+        onDismiss = { showClearBoughtConfirmDialog = false }
     )
     CancelConfirmDialogWrapper(
         visible = showCancelConfirmDialog,

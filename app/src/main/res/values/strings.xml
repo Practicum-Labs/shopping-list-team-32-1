@@ -108,6 +108,9 @@
     <string name="products_dialog_delete_title">Удалить список?</string>
     <string name="products_dialog_delete_message">Вы уверены, что хотите безвозвратно удалить этот список покупок?</string>
     <string name="products_dialog_delete_confirm">Удалить</string>
+    <string name="products_dialog_clear_bought_title">Очистить купленные товары?</string>
+    <string name="products_dialog_clear_bought_message">Купленные товары будут удалены из списка. Это действие нельзя отменить.</string>
+    <string name="products_dialog_clear_bought_confirm">Очистить</string>
     <string name="products_dialog_cancel_confirm_title">Отменить добавление?</string>
     <string name="products_dialog_cancel_edit_confirm_title">Отменить изменение?</string>
     <string name="products_dialog_cancel_confirm_message">Введенные данные будут потеряны.</string>

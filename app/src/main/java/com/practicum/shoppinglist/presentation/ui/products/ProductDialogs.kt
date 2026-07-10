@@ -132,7 +132,64 @@ fun DeleteConfirmDialog(
             TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(R.string.products_dialog_delete_confirm),
-                    color = MaterialTheme.colors.confirmDialogDeleteText
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.products_dialog_cancel),
+                    color = colors.addListDialogPlaceholder
+                )
+            }
+        },
+        containerColor = colors.addListDialogSurface
+    )
+}
+
+@Composable
+fun ClearBoughtConfirmDialogWrapper(
+    visible: Boolean,
+    onClearConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (visible) {
+        ClearBoughtConfirmDialog(
+            onDismiss = onDismiss,
+            onConfirm = {
+                onClearConfirm()
+                onDismiss()
+            }
+        )
+    }
+}
+
+@Composable
+fun ClearBoughtConfirmDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    val colors = MaterialTheme.colors
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.products_dialog_clear_bought_title),
+                color = colors.addListDialogTitle
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.products_dialog_clear_bought_message),
+                color = colors.addListDialogPlaceholder
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(R.string.products_dialog_clear_bought_confirm),
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },
