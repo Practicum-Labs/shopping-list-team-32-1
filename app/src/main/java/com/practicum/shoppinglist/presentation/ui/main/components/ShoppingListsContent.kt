@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.practicum.shoppinglist.R
@@ -224,9 +225,9 @@ fun SwipeableListItem(
     backgroundContent: @Composable (isLongSwipe: Boolean, closeItem: () -> Unit) -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    actionsWidth: Dp = Dimens.Main.swipeActionsWidth,
 ) {
     val density = LocalDensity.current
-    val actionsWidth = Dimens.Main.swipeActionsWidth
     val actionsWidthPx = with(density) { -actionsWidth.toPx() }
 
     var offsetX by remember { mutableFloatStateOf(0f) }

@@ -16,6 +16,7 @@ import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUs
 import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
+import com.practicum.shoppinglist.presentation.ui.main.SortType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,8 @@ data class ProductsUiState(
     val items: List<ShoppingItem> = emptyList(),
     val suggestions: List<String> = emptyList(),
     val isLoading: Boolean = true,
-    val listDeleted: Boolean = false
+    val listDeleted: Boolean = false,
+    val sortType: SortType = SortType.Custom
 )
 
 @Suppress("LongParameterList")
@@ -93,6 +95,7 @@ class ProductsViewModel(
                 unit = unit,
                 currentItems = _uiState.value.items
             )
+            _uiState.value = _uiState.value.copy(sortType = SortType.Custom)
         }
     }
 
@@ -138,10 +141,13 @@ class ProductsViewModel(
         }
     }
 
-    fun sortAlphabetically() {
-        viewModelScope.launch {
-            sortShoppingItemsAlphabeticallyUseCase(_uiState.value.items)
+    fun selectSortType(sortType: SortType) {
+        if (sortType == SortType.Alphabetical) {
+            viewModelScope.launch {
+                sortShoppingItemsAlphabeticallyUseCase(_uiState.value.items)
+            }
         }
+        _uiState.value = _uiState.value.copy(sortType = sortType)
     }
 
     fun reorderItems(fromIndex: Int, toIndex: Int) {
@@ -150,7 +156,7 @@ class ProductsViewModel(
             val item = currentItems.removeAt(fromIndex)
             currentItems.add(toIndex, item)
             val updated = currentItems.mapIndexed { index, shoppingItem -> shoppingItem.copy(sortOrder = index) }
-            _uiState.value = _uiState.value.copy(items = updated)
+            _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Custom)
         }
     }
 

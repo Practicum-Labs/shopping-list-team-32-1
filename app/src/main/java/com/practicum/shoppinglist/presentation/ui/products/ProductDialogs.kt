@@ -151,14 +151,21 @@ fun DeleteConfirmDialog(
 @Composable
 fun CancelConfirmDialog(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    isEditing: Boolean = false
 ) {
     val colors = MaterialTheme.colors
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.products_dialog_cancel_confirm_title),
+                text = stringResource(
+                    if (isEditing) {
+                        R.string.products_dialog_cancel_edit_confirm_title
+                    } else {
+                        R.string.products_dialog_cancel_confirm_title
+                    }
+                ),
                 color = colors.addListDialogTitle
             )
         },
@@ -192,7 +199,8 @@ fun CancelConfirmDialog(
 fun CancelConfirmDialogWrapper(
     visible: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    isEditing: Boolean = false
 ) {
     if (visible) {
         CancelConfirmDialog(
@@ -200,7 +208,8 @@ fun CancelConfirmDialogWrapper(
             onConfirm = {
                 onConfirm()
                 onDismiss()
-            }
+            },
+            isEditing = isEditing
         )
     }
 }

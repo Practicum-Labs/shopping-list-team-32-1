@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
+import com.practicum.shoppinglist.presentation.ui.main.SortType
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -62,7 +63,7 @@ fun ProductsRoute(
         onRenameList = viewModel::renameList,
         onDeleteList = viewModel::deleteList,
         onClearBought = viewModel::clearBoughtItems,
-        onSortAlphabetically = viewModel::sortAlphabetically,
+        onSortTypeSelected = viewModel::selectSortType,
         onAddProduct = viewModel::addProduct,
         onUpdateProduct = viewModel::updateProduct,
         onDeleteProduct = viewModel::deleteProduct,
@@ -84,7 +85,7 @@ fun ProductsScreen(
     onRenameList: (String) -> Unit,
     onDeleteList: () -> Unit,
     onClearBought: () -> Unit,
-    onSortAlphabetically: () -> Unit,
+    onSortTypeSelected: (SortType) -> Unit,
     onAddProduct: (String, Double, String) -> Unit,
     onUpdateProduct: (ShoppingItem, String, Double, String) -> Unit,
     onDeleteProduct: (ShoppingItem) -> Unit,
@@ -269,11 +270,8 @@ fun ProductsScreen(
         ShoppingListMenuBottomSheet(
             sheetState = menuSheetState,
             onDismissRequest = { showMenuSheet = false },
-            sortLabel = stringResource(R.string.products_menu_sort_alphabetically),
-            onSortClick = {
-                onSortAlphabetically()
-                closeMenuSheet()
-            },
+            currentSortType = state.sortType,
+            onSortTypeSelected = onSortTypeSelected,
             onDeleteAllClick = {
                 showDeleteConfirmDialog = true
                 closeMenuSheet()
@@ -306,7 +304,8 @@ fun ProductsScreen(
         onConfirm = {
             showAddDialog = false
             editingItem = null
-        }
+        },
+        isEditing = editingItem != null
     )
 }
 
