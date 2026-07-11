@@ -112,55 +112,24 @@ internal fun ShoppingListMenuContent(
 
         Spacer(modifier = Modifier.height(Dimens.Main.menuSheetContentTopPadding))
 
-        Box(modifier = Modifier.fillMaxWidth().zIndex(1f)) {
-            MenuItemRow(
-                icon = painterResource(R.drawable.ic_sort_24),
-                iconContentDescription = resolvedSortLabel,
-                label = resolvedSortLabel,
-                subtitle = sortSubtitle,
-                backgroundColor = if (isSortExpanded) MaterialTheme.colors.menuSheetSortActive else MaterialTheme.colors.menuSheetSurface,
-                onClick = {
-                    if (isSortSingleAction) {
-                        onSortClick()
-                    } else {
-                        isSortExpanded = !isSortExpanded
-                    }
-                },
-                trailing = if (isSortSingleAction) {
-                    null
+        SortMenuRow(
+            label = resolvedSortLabel,
+            subtitle = sortSubtitle,
+            isExpanded = isSortExpanded,
+            isSingleAction = isSortSingleAction,
+            currentSortType = currentSortType,
+            onRowClick = {
+                if (isSortSingleAction) {
+                    onSortClick()
                 } else {
-                    {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(Dimens.Main.menuSheetItemIconSize),
-                        )
-                    }
-                },
-            )
-            if (!isSortSingleAction) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .layout { measurable, constraints ->
-                            val placeable = measurable.measure(constraints)
-                            layout(placeable.width, 0) {
-                                placeable.placeRelative(0, 0)
-                            }
-                        },
-                ) {
-                    SortSubmenu(
-                        expanded = isSortExpanded,
-                        currentSortType = currentSortType,
-                        onSortTypeSelected = { sortType ->
-                            onSortTypeSelected(sortType)
-                            isSortExpanded = false
-                        },
-                    )
+                    isSortExpanded = !isSortExpanded
                 }
-            }
-        }
+            },
+            onSortTypeSelected = { sortType ->
+                onSortTypeSelected(sortType)
+                isSortExpanded = false
+            },
+        )
 
         MenuItemRow(
             icon = painterResource(R.drawable.ic_deleteall_24),
@@ -195,6 +164,62 @@ internal fun ShoppingListMenuContent(
         }
 
         Spacer(modifier = Modifier.height(Dimens.Main.menuSheetBottomPadding))
+    }
+}
+
+@Composable
+private fun SortMenuRow(
+    label: String,
+    subtitle: String?,
+    isExpanded: Boolean,
+    isSingleAction: Boolean,
+    currentSortType: SortType,
+    onRowClick: () -> Unit,
+    onSortTypeSelected: (SortType) -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxWidth().zIndex(1f)) {
+        MenuItemRow(
+            icon = painterResource(R.drawable.ic_sort_24),
+            iconContentDescription = label,
+            label = label,
+            subtitle = subtitle,
+            backgroundColor = if (isExpanded) {
+                MaterialTheme.colors.menuSheetSortActive
+            } else {
+                MaterialTheme.colors.menuSheetSurface
+            },
+            onClick = onRowClick,
+            trailing = if (isSingleAction) {
+                null
+            } else {
+                {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(Dimens.Main.menuSheetItemIconSize),
+                    )
+                }
+            },
+        )
+        if (!isSingleAction) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        layout(placeable.width, 0) {
+                            placeable.placeRelative(0, 0)
+                        }
+                    },
+            ) {
+                SortSubmenu(
+                    expanded = isExpanded,
+                    currentSortType = currentSortType,
+                    onSortTypeSelected = onSortTypeSelected,
+                )
+            }
+        }
     }
 }
 
@@ -284,7 +309,11 @@ private fun MenuItemRow(
     subtitle: String? = null,
     trailing: @Composable (() -> Unit)? = null,
 ) {
-    val resolvedBackground = if (backgroundColor == Color.Unspecified) MaterialTheme.colors.menuSheetSurface else backgroundColor
+    val resolvedBackground = if (backgroundColor == Color.Unspecified) {
+        MaterialTheme.colors.menuSheetSurface
+    } else {
+        backgroundColor
+    }
     Surface(
         onClick = onClick,
         color = resolvedBackground,

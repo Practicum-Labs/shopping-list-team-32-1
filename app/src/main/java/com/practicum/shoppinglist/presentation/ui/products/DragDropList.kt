@@ -48,7 +48,7 @@ class DragDropState(
 
         val targetItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { item ->
             item.index != currentItemIndex &&
-                desiredCenter.roundToInt() in item.offset..(item.offset + item.size)
+                desiredCenter.roundToInt() in item.offset..item.offset + item.size
         }
 
         if (targetItem != null) {
