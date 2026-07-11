@@ -151,6 +151,13 @@ object Dimens {
         val swipeActionSpacing = 8.dp
     }
 
+    object ListDetail {
+        val emptyStateIconSize = 96.dp
+        val emptyStateHorizontalPadding = 44.dp
+        val emptyStateTitleTopPadding = 24.dp
+        val emptyStateSubtitleTopPadding = 8.dp
+    }
+
     object Auth {
         val screenHorizontalPadding = 24.dp
         val logoTopPadding = 56.dp

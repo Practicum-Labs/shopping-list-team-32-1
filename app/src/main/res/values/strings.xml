@@ -82,6 +82,10 @@
     <string name="auth_error_unknown">Что-то пошло не так, попробуйте еще раз</string>
     <string name="auth_recovery_success">Если аккаунт с таким email существует, мы уже отправили письмо для восстановления пароля</string>
 
+    <!-- List-Detail (tablet) -->
+    <string name="list_detail_empty_state_title">Выберите список</string>
+    <string name="list_detail_empty_state_subtitle">Товары выбранного списка появятся здесь</string>
+
     <!-- Products Screen -->
     <string name="products_default_title">Продукты</string>
     <string name="products_back_content_description">Назад</string>
