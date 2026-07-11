@@ -2,7 +2,9 @@ package com.practicum.shoppinglist.presentation.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.automirrored.outlined.ListAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -37,6 +40,7 @@ fun ShoppingListListDetailHost(
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
     val coroutineScope = rememberCoroutineScope()
+    val isTwoPane = navigator.scaffoldDirective.maxHorizontalPartitions > 1
 
     BackHandler(enabled = navigator.canNavigateBack()) {
         coroutineScope.launch { navigator.navigateBack() }
@@ -48,16 +52,26 @@ fun ShoppingListListDetailHost(
         modifier = modifier,
         listPane = {
             AnimatedPane {
-                MainRoute(
-                    isDarkTheme = isDarkTheme,
-                    onThemeClick = onThemeClick,
-                    onLogoutClick = onLogoutClick,
-                    onListClick = { listId ->
-                        coroutineScope.launch {
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, listId)
-                        }
-                    },
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    MainRoute(
+                        isDarkTheme = isDarkTheme,
+                        onThemeClick = onThemeClick,
+                        onLogoutClick = onLogoutClick,
+                        onListClick = { listId ->
+                            coroutineScope.launch {
+                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, listId)
+                            }
+                        },
+                    )
+                    if (isTwoPane) {
+                        VerticalDivider(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .fillMaxHeight(),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
         },
         detailPane = {

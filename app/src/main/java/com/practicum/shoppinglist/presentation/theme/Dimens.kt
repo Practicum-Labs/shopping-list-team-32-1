@@ -15,6 +15,7 @@ object Dimens {
         val loaderBottomPadding = 96.dp
         val loaderSize = 36.dp
         val loaderStrokeWidth = 3.dp
+        val contentMaxWidth = 420.dp
         const val logoAspectRatio = 338f / 74f
         const val illustrationAspectRatio = 324f / 300f
     }

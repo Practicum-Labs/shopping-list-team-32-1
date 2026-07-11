@@ -15,7 +15,8 @@ import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.ui.main.MainContentState
 import com.practicum.shoppinglist.presentation.ui.main.MainScreen
 import com.practicum.shoppinglist.presentation.ui.main.MainUiState
-import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.presentation.ui.common.SortType
+import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingScreen
 import com.practicum.shoppinglist.presentation.ui.products.ProductsScreen
 import com.practicum.shoppinglist.presentation.ui.products.ProductsUiState
 
@@ -53,7 +54,7 @@ private fun TabletTwoPaneContent() {
                 suggestions = emptyList(),
                 onBack = {},
                 onRenameList = {},
-                onDeleteList = {},
+                onDeleteAllItems = {},
                 onClearBought = {},
                 onSortTypeSelected = {},
                 onAddProduct = { _, _, _ -> },
@@ -92,5 +93,32 @@ private fun TabletTwoPaneLightPreview() {
 private fun TabletTwoPaneDarkPreview() {
     Theme(darkTheme = true) {
         TabletTwoPaneContent()
+    }
+}
+
+@Preview(
+    name = "Tablet Onboarding (Light)",
+    showBackground = true,
+    widthDp = 1280,
+    heightDp = 800,
+)
+@Composable
+private fun TabletOnboardingLightPreview() {
+    Theme {
+        OnboardingScreen()
+    }
+}
+
+@Preview(
+    name = "Tablet Onboarding (Dark)",
+    showBackground = true,
+    widthDp = 840,
+    heightDp = 1024,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun TabletOnboardingDarkPreview() {
+    Theme(darkTheme = true) {
+        OnboardingScreen(isDarkTheme = true)
     }
 }
