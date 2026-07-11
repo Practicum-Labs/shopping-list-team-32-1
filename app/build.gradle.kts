@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.koin.androidx.compose.navigation)
     implementation(libs.material)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.play.services.base)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
