@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -98,13 +99,13 @@ fun ProductsScreen(
     val context = LocalContext.current
     val units = remember { context.resources.getStringArray(R.array.product_units).toList() }
 
-    var showAddDialog by remember { mutableStateOf(false) }
-    var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
-    var showClearBoughtConfirmDialog by remember { mutableStateOf(false) }
-    var showCancelConfirmDialog by remember { mutableStateOf(false) }
-    var showMenuSheet by remember { mutableStateOf(false) }
+    var showAddDialog by rememberSaveable { mutableStateOf(false) }
+    var editingItemId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearBoughtConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var showCancelConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuSheet by rememberSaveable { mutableStateOf(false) }
     val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
@@ -112,32 +113,10 @@ fun ProductsScreen(
         coroutineScope.launch { menuSheetState.hide() }.invokeOnCompletion { showMenuSheet = false }
     }
 
-    // Input States
-    var nameInput by remember { mutableStateOf("") }
-    var qtyInput by remember { mutableStateOf("") }
-    var unitInput by remember { mutableStateOf("") }
-
-    LaunchedEffect(editingItem) {
-        editingItem?.let { item ->
-            nameInput = item.name
-            qtyInput = item.quantity.let { qty ->
-                if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
-            }
-            unitInput = item.unit
-        } ?: run {
-            nameInput = ""
-            qtyInput = ""
-            unitInput = ""
-        }
-    }
-
-    LaunchedEffect(showAddDialog) {
-        if (showAddDialog) {
-            nameInput = ""
-            qtyInput = ""
-            unitInput = ""
-        }
-    }
+    val editingItem = editingItemId?.let { id -> state.items.find { item -> item.id == id } }
+    var nameInput by rememberSaveable { mutableStateOf("") }
+    var qtyInput by rememberSaveable { mutableStateOf("") }
+    var unitInput by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(state.listDeleted) {
         if (state.listDeleted) onBack()
@@ -158,7 +137,12 @@ fun ProductsScreen(
             floatingActionButton = {
                 if (!isSheetOpen) {
                     FloatingActionButton(
-                        onClick = { showAddDialog = true },
+                        onClick = {
+                            showAddDialog = true
+                            nameInput = ""
+                            qtyInput = ""
+                            unitInput = ""
+                        },
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         shape = RoundedCornerShape(16.dp),
@@ -180,7 +164,14 @@ fun ProductsScreen(
                 state = state,
                 onToggleBought = onToggleProductBought,
                 onDelete = onDeleteProduct,
-                onEdit = { editingItem = it },
+                onEdit = { item ->
+                    editingItemId = item.id
+                    nameInput = item.name
+                    qtyInput = item.quantity.let { qty ->
+                        if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
+                    }
+                    unitInput = item.unit
+                },
                 onMove = onReorderItem,
                 onDragEnd = onCommitOrder
             )
@@ -211,7 +202,7 @@ fun ProductsScreen(
                             showCancelConfirmDialog = true
                         } else {
                             showAddDialog = false
-                            editingItem = null
+                            editingItemId = null
                         }
                     }
             )
@@ -259,7 +250,7 @@ fun ProductsScreen(
                             onAddProduct(nameInput, quantityDouble, unitInput)
                         }
                         showAddDialog = false
-                        editingItem = null
+                        editingItemId = null
                     }
                 },
                 isSaveEnabled = isSaveEnabled
@@ -309,7 +300,7 @@ fun ProductsScreen(
         onDismiss = { showCancelConfirmDialog = false },
         onConfirm = {
             showAddDialog = false
-            editingItem = null
+            editingItemId = null
         },
         isEditing = editingItem != null
     )
