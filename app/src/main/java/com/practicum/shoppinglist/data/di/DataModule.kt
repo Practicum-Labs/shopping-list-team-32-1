@@ -3,6 +3,8 @@ package com.practicum.shoppinglist.data.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.practicum.shoppinglist.core.network.TlsProviderAwaitInterceptor
+import com.practicum.shoppinglist.core.network.TlsProviderGate
 import com.practicum.shoppinglist.data.local.database.AppDatabase
 import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
@@ -31,7 +33,14 @@ val dataModule = module {
         }
     }
     single {
+        TlsProviderGate()
+    }
+    single {
+        TlsProviderAwaitInterceptor(tlsProviderGate = get())
+    }
+    single {
         OkHttpClient.Builder()
+            .addInterceptor(get<TlsProviderAwaitInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
     }
