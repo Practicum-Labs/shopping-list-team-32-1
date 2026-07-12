@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.BottomSheetDragHandle
 import com.practicum.shoppinglist.presentation.ui.main.MainScreenActions
 import com.practicum.shoppinglist.presentation.ui.main.ShoppingListIconOptions
 import androidx.compose.foundation.lazy.grid.items as gridItems

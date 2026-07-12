@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
-import com.practicum.shoppinglist.presentation.ui.main.SortType
-import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListMenuBottomSheet
+import com.practicum.shoppinglist.presentation.ui.common.ShoppingListMenuBottomSheet
+import com.practicum.shoppinglist.presentation.ui.common.SortType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf

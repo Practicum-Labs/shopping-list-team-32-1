@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Theme
-import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.presentation.ui.common.SortType
 import com.practicum.shoppinglist.presentation.ui.products.BottomSheetContent
 import com.practicum.shoppinglist.presentation.ui.products.CancelConfirmDialog
 import com.practicum.shoppinglist.presentation.ui.products.ClearBoughtConfirmDialog

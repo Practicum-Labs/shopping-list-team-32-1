@@ -15,7 +15,7 @@ import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
-import com.practicum.shoppinglist.presentation.ui.main.SortType
+import com.practicum.shoppinglist.presentation.ui.common.SortType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
