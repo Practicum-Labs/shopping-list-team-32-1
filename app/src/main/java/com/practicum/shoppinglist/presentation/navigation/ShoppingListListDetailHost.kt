@@ -90,12 +90,13 @@ fun ShoppingListListDetailHost(
 }
 
 private fun syncDetailDestination(navController: NavHostController, targetContentKey: Long?) {
+    val startDestinationId = runCatching { navController.graph.startDestinationId }.getOrNull() ?: return
     val targetRoute = if (targetContentKey != null) productsRoutePath(targetContentKey) else DETAIL_EMPTY_ROUTE
     val currentRoute = navController.currentDestination?.route
     if (currentRoute == targetRoute) {
         return
     }
-    val popUpToId = navController.currentDestination?.id ?: navController.graph.startDestinationId
+    val popUpToId = navController.currentDestination?.id ?: startDestinationId
     navController.navigate(targetRoute) {
         popUpTo(popUpToId) { inclusive = true }
     }
