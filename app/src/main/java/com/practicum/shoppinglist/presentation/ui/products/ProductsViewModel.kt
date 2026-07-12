@@ -13,7 +13,6 @@ import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseC
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
-import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
 import com.practicum.shoppinglist.presentation.ui.main.SortType
@@ -47,7 +46,6 @@ class ProductsViewModel(
     private val deleteShoppingItemUseCase: DeleteShoppingItemUseCase,
     private val toggleShoppingItemBoughtUseCase: ToggleShoppingItemBoughtUseCase,
     private val clearBoughtItemsUseCase: ClearBoughtItemsUseCase,
-    private val sortShoppingItemsAlphabeticallyUseCase: SortShoppingItemsAlphabeticallyUseCase,
     private val commitShoppingItemOrderUseCase: CommitShoppingItemOrderUseCase,
     private val getProductSuggestionsUseCase: GetProductSuggestionsUseCase
 ) : ViewModel() {
@@ -56,6 +54,8 @@ class ProductsViewModel(
     val uiState: StateFlow<ProductsUiState> = _uiState.asStateFlow()
 
     private val suggestionQuery = MutableStateFlow("")
+
+    private var persistedItems: List<ShoppingItem> = emptyList()
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val suggestions: StateFlow<List<String>> = suggestionQuery
@@ -80,9 +80,20 @@ class ProductsViewModel(
             } else {
                 _uiState.value = _uiState.value.copy(list = list, isLoading = false)
                 observeShoppingItemsUseCase(listId).collect { items ->
-                    _uiState.value = _uiState.value.copy(items = items)
+                    persistedItems = items
+                    _uiState.value = _uiState.value.copy(
+                        items = sortForDisplay(items, _uiState.value.sortType)
+                    )
                 }
             }
+        }
+    }
+
+    private fun sortForDisplay(items: List<ShoppingItem>, sortType: SortType): List<ShoppingItem> {
+        return if (sortType == SortType.Alphabetical) {
+            items.sortedBy { it.name.lowercase() }
+        } else {
+            items
         }
     }
 
@@ -95,7 +106,7 @@ class ProductsViewModel(
                 unit = unit,
                 currentItems = _uiState.value.items
             )
-            _uiState.value = _uiState.value.copy(sortType = SortType.Custom)
+            _uiState.value = _uiState.value.copy(items = persistedItems, sortType = SortType.Custom)
         }
     }
 
@@ -142,12 +153,10 @@ class ProductsViewModel(
     }
 
     fun selectSortType(sortType: SortType) {
-        if (sortType == SortType.Alphabetical) {
-            viewModelScope.launch {
-                sortShoppingItemsAlphabeticallyUseCase(_uiState.value.items)
-            }
-        }
-        _uiState.value = _uiState.value.copy(sortType = sortType)
+        _uiState.value = _uiState.value.copy(
+            items = sortForDisplay(persistedItems, sortType),
+            sortType = sortType
+        )
     }
 
     fun reorderItems(fromIndex: Int, toIndex: Int) {
@@ -156,6 +165,7 @@ class ProductsViewModel(
             val item = currentItems.removeAt(fromIndex)
             currentItems.add(toIndex, item)
             val updated = currentItems.mapIndexed { index, shoppingItem -> shoppingItem.copy(sortOrder = index) }
+            persistedItems = updated
             _uiState.value = _uiState.value.copy(items = updated, sortType = SortType.Custom)
         }
     }
