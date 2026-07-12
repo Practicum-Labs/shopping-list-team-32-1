@@ -1,4 +1,4 @@
-package com.practicum.shoppinglist.presentation.ui.main.components
+package com.practicum.shoppinglist.presentation.ui.common
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate

@@ -43,7 +43,7 @@ import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
-import com.practicum.shoppinglist.presentation.ui.main.components.SwipeableListItem
+import com.practicum.shoppinglist.presentation.ui.common.SwipeableListItem
 
 @Composable
 fun ProductsContent(
@@ -152,7 +152,7 @@ fun SwipeableProductItem(
 ) {
     SwipeableListItem(
         onDelete = { onDelete(item) },
-        actionsWidth = Dimens.Main.swipeActionsWidthTwoButtons,
+        actionsWidth = Dimens.Products.swipeActionsWidthTwoButtons,
         itemKey = item.id,
         openedItemKey = openedItemKey,
         onOpenedChange = onOpenedChange,
@@ -178,13 +178,13 @@ fun ProductSwipeBackground(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(start = Dimens.Main.swipeActionContainerStartPadding, end = 0.dp),
+            .padding(start = Dimens.Products.swipeActionContainerStartPadding, end = 0.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
         if (isLongSwipe) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Surface(
-                    modifier = Modifier.size(Dimens.Main.swipeActionButtonSize),
+                    modifier = Modifier.size(Dimens.Products.swipeActionButtonSize),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -193,7 +193,7 @@ fun ProductSwipeBackground(
                         Icon(
                             imageVector = Icons.Outlined.Delete,
                             contentDescription = stringResource(id = R.string.products_delete_content_description),
-                            modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                            modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
                         )
                     }
                 }
@@ -206,31 +206,31 @@ fun ProductSwipeBackground(
                 IconButton(
                     onClick = onEditClick,
                     modifier = Modifier
-                        .size(Dimens.Main.swipeActionButtonSize)
+                        .size(Dimens.Products.swipeActionButtonSize)
                         .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = stringResource(id = R.string.products_edit_content_description),
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                        modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
                     )
                 }
-                Spacer(modifier = Modifier.width(Dimens.Main.swipeActionSpacing))
+                Spacer(modifier = Modifier.width(Dimens.Products.swipeActionSpacing))
                 IconButton(
                     onClick = onDeleteClick,
                     modifier = Modifier
-                        .size(Dimens.Main.swipeActionButtonSize)
+                        .size(Dimens.Products.swipeActionButtonSize)
                         .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = stringResource(id = R.string.products_delete_content_description),
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
+                        modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
                     )
                 }
-                Spacer(modifier = Modifier.width(Dimens.Main.swipeActionContainerEndPadding))
+                Spacer(modifier = Modifier.width(Dimens.Products.swipeActionContainerEndPadding))
             }
         }
     }

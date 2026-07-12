@@ -44,6 +44,7 @@ import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.SwipeableListItem
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
 
 @Composable

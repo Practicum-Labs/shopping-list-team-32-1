@@ -142,6 +142,13 @@ object Dimens {
         val fabSize = 56.dp
         val fabEndPadding = 16.dp
         val fabBottomPadding = 16.dp
+
+        val swipeActionsWidthTwoButtons = 136.dp
+        val swipeActionContainerStartPadding = 16.dp
+        val swipeActionContainerEndPadding = 16.dp
+        val swipeActionButtonSize = 48.dp
+        val swipeActionIconSize = 24.dp
+        val swipeActionSpacing = 8.dp
     }
 
     object Auth {

@@ -45,8 +45,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.ConfirmationDialog
 import com.practicum.shoppinglist.presentation.ui.main.components.AddShoppingListDialog
-import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialog
 import com.practicum.shoppinglist.presentation.ui.main.components.MainActionsRow
 import com.practicum.shoppinglist.presentation.ui.main.components.MainEmptyState
 import com.practicum.shoppinglist.presentation.ui.main.components.MainErrorState

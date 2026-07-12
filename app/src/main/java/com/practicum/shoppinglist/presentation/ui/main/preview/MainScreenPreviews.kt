@@ -22,8 +22,8 @@ import com.practicum.shoppinglist.presentation.ui.main.MainContentState
 import com.practicum.shoppinglist.presentation.ui.main.MainScreen
 import com.practicum.shoppinglist.presentation.ui.main.MainScreenActions
 import com.practicum.shoppinglist.presentation.ui.main.MainUiState
+import com.practicum.shoppinglist.presentation.ui.common.ConfirmationDialogContent
 import com.practicum.shoppinglist.presentation.ui.main.components.AddShoppingListDialogContent
-import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialogContent
 import com.practicum.shoppinglist.presentation.ui.main.components.RenameShoppingListDialogContent
 import com.practicum.shoppinglist.presentation.ui.main.components.ShoppingListIconPickerContent
 

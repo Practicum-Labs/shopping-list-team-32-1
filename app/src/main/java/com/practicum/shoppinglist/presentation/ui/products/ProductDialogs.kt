@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.colors
-import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialog
+import com.practicum.shoppinglist.presentation.ui.common.ConfirmationDialog
 
 @Composable
 fun RenameDialogWrapper(
