@@ -4,14 +4,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.detekt)
-}
-
-detekt {
-    toolVersion = "1.23.6"
-    config.setFrom(files("${project.rootDir}/config/detekt/detekt.yml"))
-    buildUponDefaultConfig = true
-    allRules = false
 }
 
 android {
