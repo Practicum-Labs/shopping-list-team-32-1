@@ -52,10 +52,7 @@ fun ProductsRoute(
     listId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProductsViewModel = koinViewModel(
-        key = listId.toString(),
-        parameters = { parametersOf(listId) },
-    )
+    viewModel: ProductsViewModel = koinViewModel(parameters = { parametersOf(listId) })
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()

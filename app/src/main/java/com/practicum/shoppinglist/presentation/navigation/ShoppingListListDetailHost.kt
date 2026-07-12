@@ -21,10 +21,17 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
@@ -42,9 +49,14 @@ fun ShoppingListListDetailHost(
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
     val coroutineScope = rememberCoroutineScope()
     val isTwoPane = navigator.scaffoldDirective.maxHorizontalPartitions > 1
+    val detailNavController = rememberNavController()
 
     BackHandler(enabled = navigator.canNavigateBack()) {
         coroutineScope.launch { navigator.navigateBack() }
+    }
+
+    LaunchedEffect(navigator.currentDestination?.contentKey) {
+        syncDetailDestination(detailNavController, navigator.currentDestination?.contentKey)
     }
 
     ListDetailPaneScaffold(
@@ -53,42 +65,93 @@ fun ShoppingListListDetailHost(
         modifier = modifier.background(MaterialTheme.colorScheme.background),
         listPane = {
             AnimatedPane {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    MainRoute(
-                        isDarkTheme = isDarkTheme,
-                        onThemeClick = onThemeClick,
-                        onLogoutClick = onLogoutClick,
-                        onListClick = { listId ->
-                            coroutineScope.launch {
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, listId)
-                            }
-                        },
-                    )
-                    if (isTwoPane) {
-                        VerticalDivider(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .fillMaxHeight(),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                ListDetailListPane(
+                    isDarkTheme = isDarkTheme,
+                    isTwoPane = isTwoPane,
+                    onThemeClick = onThemeClick,
+                    onLogoutClick = onLogoutClick,
+                    onListClick = { listId ->
+                        coroutineScope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, listId)
+                        }
+                    },
+                )
             }
         },
         detailPane = {
             AnimatedPane {
-                val listId = navigator.currentDestination?.contentKey
-                if (listId != null) {
-                    ProductsRoute(
-                        listId = listId,
-                        onBack = { coroutineScope.launch { navigator.navigateBack() } },
-                    )
-                } else {
-                    ListDetailEmptyState()
-                }
+                ListDetailDetailPane(
+                    navController = detailNavController,
+                    onBack = { coroutineScope.launch { navigator.navigateBack() } },
+                )
             }
         },
     )
+}
+
+private fun syncDetailDestination(navController: NavHostController, targetContentKey: Long?) {
+    val targetRoute = if (targetContentKey != null) productsRoutePath(targetContentKey) else DETAIL_EMPTY_ROUTE
+    val currentRoute = navController.currentDestination?.route
+    if (currentRoute == targetRoute) {
+        return
+    }
+    val popUpToId = navController.currentDestination?.id ?: navController.graph.startDestinationId
+    navController.navigate(targetRoute) {
+        popUpTo(popUpToId) { inclusive = true }
+    }
+}
+
+@Composable
+private fun ListDetailListPane(
+    isDarkTheme: Boolean,
+    isTwoPane: Boolean,
+    onThemeClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onListClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        MainRoute(
+            isDarkTheme = isDarkTheme,
+            onThemeClick = onThemeClick,
+            onLogoutClick = onLogoutClick,
+            onListClick = onListClick,
+        )
+        if (isTwoPane) {
+            VerticalDivider(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ListDetailDetailPane(
+    navController: NavHostController,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = DETAIL_EMPTY_ROUTE,
+        modifier = modifier,
+    ) {
+        composable(DETAIL_EMPTY_ROUTE) {
+            ListDetailEmptyState()
+        }
+        composable(
+            route = PRODUCTS_ROUTE,
+            arguments = listOf(navArgument(PRODUCTS_ROUTE_ARG_LIST_ID) { type = NavType.LongType }),
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getLong(PRODUCTS_ROUTE_ARG_LIST_ID)
+            if (listId != null) {
+                ProductsRoute(listId = listId, onBack = onBack)
+            }
+        }
+    }
 }
 
 @Composable
@@ -121,3 +184,8 @@ private fun ListDetailEmptyState(modifier: Modifier = Modifier) {
         )
     }
 }
+
+private const val DETAIL_EMPTY_ROUTE = "products_empty"
+private const val PRODUCTS_ROUTE_ARG_LIST_ID = "listId"
+private const val PRODUCTS_ROUTE = "products/{$PRODUCTS_ROUTE_ARG_LIST_ID}"
+private fun productsRoutePath(listId: Long) = "products/$listId"
