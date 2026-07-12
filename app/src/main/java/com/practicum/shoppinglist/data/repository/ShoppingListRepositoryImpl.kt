@@ -82,4 +82,12 @@ class ShoppingListRepositoryImpl(
             ownerUserId = authRepository.requireCurrentUserId(),
         )
     }
+
+    override suspend fun updateShoppingListSortType(shoppingListId: Long, sortType: String) {
+        shoppingListDao.updateShoppingListSortType(
+            shoppingListId = shoppingListId,
+            sortType = sortType,
+            ownerUserId = authRepository.requireCurrentUserId(),
+        )
+    }
 }

@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.BottomSheetDragHandle
 import com.practicum.shoppinglist.presentation.ui.main.MainScreenActions
 import com.practicum.shoppinglist.presentation.ui.main.ShoppingListIconOptions
 import androidx.compose.foundation.lazy.grid.items as gridItems
@@ -68,17 +67,7 @@ fun ShoppingListIconPickerContent(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = Dimens.Main.iconPickerDragHandleTopPadding)
-                .width(Dimens.Main.iconPickerDragHandleWidth)
-                .height(Dimens.Main.iconPickerDragHandleHeight)
-                .background(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = RoundedCornerShape(Dimens.Main.iconPickerDragHandleHeight),
-                ),
-        )
+        BottomSheetDragHandle()
         if (isErrorVisible) {
             Text(
                 text = stringResource(id = R.string.main_icon_picker_error),

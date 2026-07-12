@@ -15,4 +15,6 @@ data class ShoppingListEntity(
     val iconName: String,
     @ColumnInfo(name = "owner_user_id", defaultValue = "0")
     val ownerUserId: Long,
+    @ColumnInfo(name = "sort_type", defaultValue = "CUSTOM")
+    val sortType: String = "CUSTOM",
 )

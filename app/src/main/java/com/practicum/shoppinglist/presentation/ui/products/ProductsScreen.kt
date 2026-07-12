@@ -15,15 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
+import com.practicum.shoppinglist.presentation.ui.common.ShoppingListMenuBottomSheet
+import com.practicum.shoppinglist.presentation.ui.common.SortType
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -55,72 +62,63 @@ fun ProductsRoute(
         suggestions = suggestions,
         onBack = onBack,
         onRenameList = viewModel::renameList,
-        onDeleteList = viewModel::deleteList,
+        onDeleteAllItems = viewModel::deleteAllItems,
         onClearBought = viewModel::clearBoughtItems,
-        onSortAlphabetically = viewModel::sortAlphabetically,
+        onSortTypeSelected = viewModel::selectSortType,
         onAddProduct = viewModel::addProduct,
         onUpdateProduct = viewModel::updateProduct,
         onDeleteProduct = viewModel::deleteProduct,
         onToggleProductBought = viewModel::toggleProductBought,
-        onMoveItem = viewModel::moveItem,
+        onReorderItem = viewModel::reorderItems,
+        onCommitOrder = viewModel::commitItemOrder,
         onUpdateSuggestionQuery = viewModel::updateSuggestionQuery,
         modifier = modifier
     )
 }
 
-@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod", "LongParameterList")
+@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod", "LongParameterList", "LongMethod")
 @Composable
 fun ProductsScreen(
     state: ProductsUiState,
     suggestions: List<String>,
     onBack: () -> Unit,
     onRenameList: (String) -> Unit,
-    onDeleteList: () -> Unit,
+    onDeleteAllItems: () -> Unit,
     onClearBought: () -> Unit,
-    onSortAlphabetically: () -> Unit,
+    onSortTypeSelected: (SortType) -> Unit,
     onAddProduct: (String, Double, String) -> Unit,
     onUpdateProduct: (ShoppingItem, String, Double, String) -> Unit,
     onDeleteProduct: (ShoppingItem) -> Unit,
     onToggleProductBought: (ShoppingItem) -> Unit,
-    onMoveItem: (Int, Int) -> Unit,
+    onReorderItem: (Int, Int) -> Unit,
+    onCommitOrder: () -> Unit,
     onUpdateSuggestionQuery: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val units = remember { context.resources.getStringArray(R.array.product_units).toList() }
 
-    var showAddDialog by remember { mutableStateOf(false) }
-    var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
-    var showCancelConfirmDialog by remember { mutableStateOf(false) }
+    var showAddDialog by rememberSaveable { mutableStateOf(false) }
+    var editingItemId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearBoughtConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var productPendingDeleteId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showCancelConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuSheet by rememberSaveable { mutableStateOf(false) }
+    val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
 
-    // Input States
-    var nameInput by remember { mutableStateOf("") }
-    var qtyInput by remember { mutableStateOf("") }
-    var unitInput by remember { mutableStateOf("") }
-
-    LaunchedEffect(editingItem) {
-        editingItem?.let { item ->
-            nameInput = item.name
-            qtyInput = item.quantity.let { qty ->
-                if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
-            }
-            unitInput = item.unit
-        } ?: run {
-            nameInput = ""
-            qtyInput = ""
-            unitInput = ""
-        }
+    fun closeMenuSheet() {
+        coroutineScope.launch { menuSheetState.hide() }.invokeOnCompletion { showMenuSheet = false }
     }
 
-    LaunchedEffect(showAddDialog) {
-        if (showAddDialog) {
-            nameInput = ""
-            qtyInput = ""
-            unitInput = ""
-        }
-    }
+    val editingItem = editingItemId?.let { id -> state.items.find { item -> item.id == id } }
+    val productPendingDelete = productPendingDeleteId?.let { id -> state.items.find { item -> item.id == id } }
+    var nameInput by rememberSaveable { mutableStateOf("") }
+    var qtyInput by rememberSaveable { mutableStateOf("") }
+    var unitInput by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(state.listDeleted) {
         if (state.listDeleted) onBack()
@@ -134,19 +132,19 @@ fun ProductsScreen(
                 ProductsTopBar(
                     title = state.list?.name ?: stringResource(R.string.products_default_title),
                     onBack = onBack,
-                    actions = TopBarActions(
-                        onRename = { showRenameDialog = true },
-                        onDelete = { showDeleteConfirmDialog = true },
-                        onClearBought = onClearBought,
-                        onSortAlphabetically = onSortAlphabetically
-                    ),
+                    onMenuClick = { showMenuSheet = true },
                     enabled = !isSheetOpen
                 )
             },
             floatingActionButton = {
                 if (!isSheetOpen) {
                     FloatingActionButton(
-                        onClick = { showAddDialog = true },
+                        onClick = {
+                            showAddDialog = true
+                            nameInput = ""
+                            qtyInput = ""
+                            unitInput = ""
+                        },
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         shape = RoundedCornerShape(16.dp),
@@ -167,9 +165,17 @@ fun ProductsScreen(
                 innerPadding = innerPadding,
                 state = state,
                 onToggleBought = onToggleProductBought,
-                onDelete = onDeleteProduct,
-                onEdit = { editingItem = it },
-                onMove = onMoveItem
+                onDelete = { item -> productPendingDeleteId = item.id },
+                onEdit = { item ->
+                    editingItemId = item.id
+                    nameInput = item.name
+                    qtyInput = item.quantity.let { qty ->
+                        if (qty % 1.0 == 0.0) qty.toInt().toString() else qty.toString()
+                    }
+                    unitInput = item.unit
+                },
+                onMove = onReorderItem,
+                onDragEnd = onCommitOrder
             )
         }
 
@@ -198,7 +204,7 @@ fun ProductsScreen(
                             showCancelConfirmDialog = true
                         } else {
                             showAddDialog = false
-                            editingItem = null
+                            editingItemId = null
                         }
                     }
             )
@@ -246,12 +252,33 @@ fun ProductsScreen(
                             onAddProduct(nameInput, quantityDouble, unitInput)
                         }
                         showAddDialog = false
-                        editingItem = null
+                        editingItemId = null
                     }
                 },
                 isSaveEnabled = isSaveEnabled
             )
         }
+    }
+
+    if (showMenuSheet) {
+        ShoppingListMenuBottomSheet(
+            sheetState = menuSheetState,
+            onDismissRequest = { showMenuSheet = false },
+            currentSortType = state.sortType,
+            onSortTypeSelected = onSortTypeSelected,
+            onDeleteAllClick = {
+                showDeleteConfirmDialog = true
+                closeMenuSheet()
+            },
+            onClearPurchasedClick = {
+                showClearBoughtConfirmDialog = true
+                closeMenuSheet()
+            },
+            onRenameClick = {
+                showRenameDialog = true
+                closeMenuSheet()
+            }
+        )
     }
 
     RenameDialogWrapper(
@@ -262,16 +289,27 @@ fun ProductsScreen(
     )
     DeleteConfirmDialogWrapper(
         visible = showDeleteConfirmDialog,
-        onDeleteConfirm = onDeleteList,
+        onDeleteConfirm = onDeleteAllItems,
         onDismiss = { showDeleteConfirmDialog = false }
+    )
+    ClearBoughtConfirmDialogWrapper(
+        visible = showClearBoughtConfirmDialog,
+        onClearConfirm = onClearBought,
+        onDismiss = { showClearBoughtConfirmDialog = false }
+    )
+    DeleteProductConfirmDialogWrapper(
+        product = productPendingDelete,
+        onDeleteConfirm = onDeleteProduct,
+        onDismiss = { productPendingDeleteId = null }
     )
     CancelConfirmDialogWrapper(
         visible = showCancelConfirmDialog,
         onDismiss = { showCancelConfirmDialog = false },
         onConfirm = {
             showAddDialog = false
-            editingItem = null
-        }
+            editingItemId = null
+        },
+        isEditing = editingItem != null
     )
 }
 

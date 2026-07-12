@@ -84,10 +84,26 @@ object Dimens {
         const val emptyStateIllustrationAspectRatio = 324f / 300f
         const val iconPickerSheetHeightFraction = 0.6f
         val swipeActionsWidth = 168.dp
+        val swipeActionsWidthTwoButtons = 136.dp
         val swipeActionContainerStartPadding = 16.dp
+        val swipeActionContainerEndPadding = 16.dp
         val swipeActionButtonSize = 48.dp
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp
+        val menuSheetCornerRadius = 28.dp
+        val menuSheetContentTopPadding = 8.dp
+        val menuSheetItemHeight = 56.dp
+        val menuSheetItemHorizontalPadding = 16.dp
+        val menuSheetItemIconSize = 24.dp
+        val menuSheetItemIconEndPadding = 16.dp
+        val menuSheetSortItemVerticalPadding = 12.dp
+        val menuSheetSortSubmenuWidth = 280.dp
+        val menuSheetBottomPadding = 16.dp
+        val sortSubmenuCornerRadius = 4.dp
+        val sortSubmenuElevation = 2.dp
+        val sortSubmenuVerticalPadding = 8.dp
+        val sortSubmenuItemHeight = 48.dp
+        val sortSubmenuItemHorizontalPadding = 12.dp
     }
 
     object Products {
@@ -126,6 +142,13 @@ object Dimens {
         val fabSize = 56.dp
         val fabEndPadding = 16.dp
         val fabBottomPadding = 16.dp
+
+        val swipeActionsWidthTwoButtons = 136.dp
+        val swipeActionContainerStartPadding = 16.dp
+        val swipeActionContainerEndPadding = 16.dp
+        val swipeActionButtonSize = 48.dp
+        val swipeActionIconSize = 24.dp
+        val swipeActionSpacing = 8.dp
     }
 
     object Auth {

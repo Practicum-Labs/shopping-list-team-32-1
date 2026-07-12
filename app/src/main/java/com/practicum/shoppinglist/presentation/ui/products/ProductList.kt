@@ -1,42 +1,49 @@
 package com.practicum.shoppinglist.presentation.ui.products
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.SwipeableListItem
 
 @Composable
 fun ProductsContent(
@@ -45,7 +52,8 @@ fun ProductsContent(
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit,
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -60,7 +68,8 @@ fun ProductsContent(
                 onToggleBought = onToggleBought,
                 onDelete = onDelete,
                 onEdit = onEdit,
-                onMove = onMove
+                onMove = onMove,
+                onDragEnd = onDragEnd
             )
         }
     }
@@ -72,85 +81,158 @@ fun ProductList(
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
     onEdit: (ShoppingItem) -> Unit,
-    onMove: (Int, Int) -> Unit
+    onMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit = {}
 ) {
     val state = rememberLazyListState()
-    val dragDropState = remember { DragDropState(state, onMove) }
-    LazyColumn(
-        state = state,
+    val dragDropState = remember { DragDropState(state, onMove, onDragEnd) }
+    val draggedIndex = dragDropState.draggedIndex
+    var openedItemKey by remember { mutableStateOf<Any?>(null) }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = Dimens.Products.listVerticalPadding)
-            .dragDropGesture(dragDropState)
     ) {
-        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-            val offset by animateDpAsState(
-                targetValue = dragDropState.getItemOffset(index).y.dp,
-                label = "offset"
-            )
+        LazyColumn(
+            state = state,
+            modifier = Modifier
+                .fillMaxSize()
+                .dragDropGesture(dragDropState)
+        ) {
+            itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(if (index == draggedIndex) 0f else 1f)
+                ) {
+                    SwipeableProductItem(
+                        item = item,
+                        onToggleBought = onToggleBought,
+                        onDelete = onDelete,
+                        onEdit = onEdit,
+                        isDragging = draggedIndex != null,
+                        openedItemKey = openedItemKey,
+                        onOpenedChange = { openedItemKey = it }
+                    )
+                }
+            }
+        }
+
+        if (draggedIndex != null && draggedIndex in items.indices) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .graphicsLayer { translationY = offset.toPx() }
+                    .zIndex(1f)
+                    .offset { dragDropState.overlayOffset() }
             ) {
                 SwipeableProductItem(
-                    item = item,
+                    item = items[draggedIndex],
                     onToggleBought = onToggleBought,
                     onDelete = onDelete,
-                    onEdit = onEdit
+                    onEdit = onEdit,
+                    openedItemKey = openedItemKey,
+                    onOpenedChange = { openedItemKey = it }
                 )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongParameterList")
 @Composable
 fun SwipeableProductItem(
     item: ShoppingItem,
     onToggleBought: (ShoppingItem) -> Unit,
     onDelete: (ShoppingItem) -> Unit,
-    onEdit: (ShoppingItem) -> Unit
+    onEdit: (ShoppingItem) -> Unit,
+    openedItemKey: Any?,
+    onOpenedChange: (Any?) -> Unit,
+    isDragging: Boolean = false
 ) {
-    val state = rememberSwipeToDismissBoxState()
-
-    LaunchedEffect(state.currentValue) {
-        when (state.currentValue) {
-            SwipeToDismissBoxValue.EndToStart -> {
-                onDelete(item)
-            }
-            SwipeToDismissBoxValue.StartToEnd -> {
-                onEdit(item)
-                state.snapTo(SwipeToDismissBoxValue.Settled)
-            }
-            SwipeToDismissBoxValue.Settled -> {}
-        }
-    }
-    SwipeToDismissBox(
-        state = state,
-        backgroundContent = { SwipeBackground(state.targetValue) },
-        content = { ProductItemRow(item = item, onToggleBought = onToggleBought) }
+    SwipeableListItem(
+        onDelete = { onDelete(item) },
+        actionsWidth = Dimens.Products.swipeActionsWidthTwoButtons,
+        itemKey = item.id,
+        openedItemKey = openedItemKey,
+        onOpenedChange = onOpenedChange,
+        backgroundContent = { isLongSwipe, closeItem ->
+            ProductSwipeBackground(
+                isLongSwipe = isLongSwipe,
+                onEditClick = { closeItem(); onEdit(item) },
+                onDeleteClick = { closeItem(); onDelete(item) }
+            )
+        },
+        content = { ProductItemRow(item = item, onToggleBought = onToggleBought, isDragging = isDragging) }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongMethod")
 @Composable
-fun SwipeBackground(target: SwipeToDismissBoxValue) {
-    val color = when (target) {
-        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colors.swipeActionBackground
-        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-        else -> Color.Transparent
-    }
-    val alignment = if (target == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart else Alignment.CenterEnd
-    val icon = if (target == SwipeToDismissBoxValue.StartToEnd) Icons.Default.Edit else Icons.Default.Delete
+fun ProductSwipeBackground(
+    isLongSwipe: Boolean,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color)
-            .padding(horizontal = Dimens.Products.sheetHorizontalPadding),
-        contentAlignment = alignment
+            .background(MaterialTheme.colorScheme.background)
+            .padding(start = Dimens.Products.swipeActionContainerStartPadding, end = 0.dp),
+        contentAlignment = Alignment.CenterEnd
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground)
+        if (isLongSwipe) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Surface(
+                    modifier = Modifier.size(Dimens.Products.swipeActionButtonSize),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(id = R.string.products_delete_content_description),
+                            modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
+                        )
+                    }
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = onEditClick,
+                    modifier = Modifier
+                        .size(Dimens.Products.swipeActionButtonSize)
+                        .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = stringResource(id = R.string.products_edit_content_description),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
+                    )
+                }
+                Spacer(modifier = Modifier.width(Dimens.Products.swipeActionSpacing))
+                IconButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier
+                        .size(Dimens.Products.swipeActionButtonSize)
+                        .background(MaterialTheme.colors.swipeActionBackground, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(id = R.string.products_delete_content_description),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(Dimens.Products.swipeActionIconSize)
+                    )
+                }
+                Spacer(modifier = Modifier.width(Dimens.Products.swipeActionContainerEndPadding))
+            }
+        }
     }
 }
 

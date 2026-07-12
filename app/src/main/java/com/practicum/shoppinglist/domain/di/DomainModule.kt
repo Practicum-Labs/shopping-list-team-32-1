@@ -18,14 +18,15 @@ import com.practicum.shoppinglist.domain.usecase.auth.RegisterUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddProductSuggestionUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
+import com.practicum.shoppinglist.domain.usecase.products.CommitShoppingItemOrderUseCase
+import com.practicum.shoppinglist.domain.usecase.products.DeleteAllShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
-import com.practicum.shoppinglist.domain.usecase.products.MoveShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
-import com.practicum.shoppinglist.domain.usecase.products.SortShoppingItemsAlphabeticallyUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingListSortTypeUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -84,10 +85,10 @@ val domainModule = module {
         ObserveShoppingItemsUseCase(shoppingItemRepository = get())
     }
     factory {
-        AddShoppingItemUseCase(shoppingItemRepository = get())
+        AddShoppingItemUseCase(shoppingItemRepository = get(), productSuggestionRepository = get())
     }
     factory {
-        UpdateShoppingItemUseCase(shoppingItemRepository = get())
+        UpdateShoppingItemUseCase(shoppingItemRepository = get(), productSuggestionRepository = get())
     }
     factory {
         DeleteShoppingItemUseCase(shoppingItemRepository = get())
@@ -99,15 +100,18 @@ val domainModule = module {
         ClearBoughtItemsUseCase(shoppingItemRepository = get())
     }
     factory {
-        SortShoppingItemsAlphabeticallyUseCase(shoppingItemRepository = get())
+        DeleteAllShoppingItemsUseCase(shoppingItemRepository = get())
     }
     factory {
-        MoveShoppingItemUseCase(shoppingItemRepository = get())
+        CommitShoppingItemOrderUseCase(shoppingItemRepository = get())
     }
     factory {
-        GetProductSuggestionsUseCase(shoppingItemRepository = get())
+        GetProductSuggestionsUseCase(productSuggestionRepository = get())
     }
     factory {
-        AddProductSuggestionUseCase(shoppingItemRepository = get())
+        AddProductSuggestionUseCase(productSuggestionRepository = get())
+    }
+    factory {
+        UpdateShoppingListSortTypeUseCase(shoppingListRepository = get())
     }
 }

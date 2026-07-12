@@ -5,4 +5,5 @@ data class ShoppingList(
     val name: String,
     val iconName: String,
     val items: List<ShoppingItem> = emptyList(),
+    val sortType: String = "CUSTOM",
 )

@@ -58,6 +58,13 @@
     <color name="shopping_dark_list_item_title">#FFFAF8</color>
     <color name="shopping_dark_confirm_dialog_delete">#FFBE77</color>
     <color name="shopping_dark_confirm_dialog_cancel">#A78C70</color>
+    <color name="shopping_menu_sheet_sort_label">#34C759</color>
+    <color name="shopping_light_sort_submenu_background">#FAEBE0</color>
+    <color name="shopping_dark_sort_submenu_background">#251E17</color>
+    <color name="shopping_light_menu_sheet_surface">#FFF1E7</color>
+    <color name="shopping_dark_menu_sheet_surface">#211A14</color>
+    <color name="shopping_light_menu_sheet_sort_active">#FEDDBD</color>
+    <color name="shopping_dark_menu_sheet_sort_active">#A78C70</color>
     <color name="shopping_dark_auth_button_loader">#FEDDBD</color>
 
     <!-- Products Screen Colors -->

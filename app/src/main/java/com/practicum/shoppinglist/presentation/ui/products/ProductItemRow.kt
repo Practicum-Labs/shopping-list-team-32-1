@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
@@ -25,7 +29,8 @@ import com.practicum.shoppinglist.presentation.theme.colors
 fun ProductItemRow(
     item: ShoppingItem,
     onToggleBought: (ShoppingItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDragging: Boolean = false
 ) {
     val textColor = if (item.isBought) {
         MaterialTheme.colorScheme.onSurfaceVariant
@@ -74,6 +79,13 @@ fun ProductItemRow(
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(Dimens.Products.itemSpacing / 2))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_trailingelement_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.alpha(if (isDragging) 1f else 0f)
+            )
         }
         HorizontalDivider(color = MaterialTheme.colors.productDivider)
     }

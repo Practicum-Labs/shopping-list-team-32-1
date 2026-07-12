@@ -39,7 +39,7 @@ val viewModelModule = module {
         ProductsViewModel(
             listId = listId,
             renameShoppingListUseCase = get(),
-            deleteShoppingListUseCase = get(),
+            deleteAllShoppingItemsUseCase = get(),
             getShoppingListUseCase = get(),
             observeShoppingItemsUseCase = get(),
             addShoppingItemUseCase = get(),
@@ -47,9 +47,9 @@ val viewModelModule = module {
             deleteShoppingItemUseCase = get(),
             toggleShoppingItemBoughtUseCase = get(),
             clearBoughtItemsUseCase = get(),
-            sortShoppingItemsAlphabeticallyUseCase = get(),
-            moveShoppingItemUseCase = get(),
+            commitShoppingItemOrderUseCase = get(),
             getProductSuggestionsUseCase = get(),
+            updateShoppingListSortTypeUseCase = get(),
         )
     }
 }

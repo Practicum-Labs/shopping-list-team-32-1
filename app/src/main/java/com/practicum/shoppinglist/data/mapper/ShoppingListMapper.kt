@@ -8,6 +8,7 @@ fun ShoppingListEntity.toDomain(): ShoppingList {
         id = id,
         name = name,
         iconName = iconName,
+        sortType = sortType,
     )
 }
 
@@ -17,5 +18,6 @@ fun ShoppingList.toEntity(ownerUserId: Long): ShoppingListEntity {
         name = name,
         iconName = iconName,
         ownerUserId = ownerUserId,
+        sortType = sortType,
     )
 }

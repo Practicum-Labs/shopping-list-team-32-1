@@ -14,6 +14,9 @@ interface ShoppingListDao {
     @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId AND owner_user_id = :ownerUserId LIMIT 1")
     suspend fun getShoppingListById(shoppingListId: Long, ownerUserId: Long): ShoppingListEntity?
 
+    @Query("SELECT * FROM shopping_lists WHERE id = :shoppingListId LIMIT 1")
+    suspend fun getShoppingListById(shoppingListId: Long): ShoppingListEntity?
+
     @Insert
     suspend fun insertShoppingList(shoppingList: ShoppingListEntity): Long
 
@@ -46,6 +49,19 @@ interface ShoppingListDao {
     suspend fun updateShoppingListName(
         shoppingListId: Long,
         name: String,
+        ownerUserId: Long,
+    )
+
+    @Query(
+        """
+        UPDATE shopping_lists
+        SET sort_type = :sortType
+        WHERE id = :shoppingListId AND owner_user_id = :ownerUserId
+        """,
+    )
+    suspend fun updateShoppingListSortType(
+        shoppingListId: Long,
+        sortType: String,
         ownerUserId: Long,
     )
 }

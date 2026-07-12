@@ -1,10 +1,12 @@
 package com.practicum.shoppinglist.domain.usecase.products
 
 import com.practicum.shoppinglist.domain.model.ShoppingItem
+import com.practicum.shoppinglist.domain.repository.ProductSuggestionRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 
 class AddShoppingItemUseCase(
-    private val shoppingItemRepository: ShoppingItemRepository
+    private val shoppingItemRepository: ShoppingItemRepository,
+    private val productSuggestionRepository: ProductSuggestionRepository
 ) {
     @Suppress("LongParameterList")
     suspend operator fun invoke(
@@ -15,7 +17,7 @@ class AddShoppingItemUseCase(
         currentItems: List<ShoppingItem>
     ) {
         val trimmedName = name.trim()
-        shoppingItemRepository.addSuggestion(trimmedName)
+        productSuggestionRepository.addSuggestion(trimmedName)
         val minOrder = currentItems.minOfOrNull { it.sortOrder } ?: 0
         val newItem = ShoppingItem(
             listId = listId,

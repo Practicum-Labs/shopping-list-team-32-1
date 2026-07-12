@@ -1,10 +1,7 @@
 package com.practicum.shoppinglist.presentation.ui.main.components
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,26 +32,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.SwipeableListItem
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
-import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun ShoppingListsContent(
@@ -71,6 +61,7 @@ fun ShoppingListsContent(
     isSearching: Boolean = false,
 ) {
     val listState = rememberLazyListState()
+    var openedItemKey by remember { mutableStateOf<Any?>(null) }
 
     LaunchedEffect(scrollToShoppingListId, shoppingLists) {
         scrollToShoppingListId?.let { targetListId ->
@@ -107,6 +98,9 @@ fun ShoppingListsContent(
             } else {
                 SwipeableListItem(
                     onDelete = { onDeleteListClick(shoppingList.id) },
+                    itemKey = shoppingList.id,
+                    openedItemKey = openedItemKey,
+                    onOpenedChange = { openedItemKey = it },
                     backgroundContent = { isLongSwipe, closeItem ->
                         Box(
                             modifier = Modifier
@@ -213,85 +207,6 @@ fun ShoppingListsContent(
                     }
                 )
             }
-        }
-    }
-}
-
-@Composable
-@Suppress("MagicNumber")
-fun SwipeableListItem(
-    onDelete: () -> Unit,
-    backgroundContent: @Composable (isLongSwipe: Boolean, closeItem: () -> Unit) -> Unit,
-    content: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val density = LocalDensity.current
-    val actionsWidth = Dimens.Main.swipeActionsWidth
-    val actionsWidthPx = with(density) { -actionsWidth.toPx() }
-
-    var offsetX by remember { mutableFloatStateOf(0f) }
-
-    val coroutineScope = rememberCoroutineScope()
-
-    val isLongSwipe = offsetX < actionsWidthPx * 1.5f
-
-    val closeItem: () -> Unit = {
-        coroutineScope.launch {
-            androidx.compose.animation.core.animate(
-                initialValue = offsetX,
-                targetValue = 0f,
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-            ) { value, _ ->
-                offsetX = value
-            }
-        }
-    }
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clip(RoundedCornerShape(Dimens.Main.listItemCornerRadius))
-        ) {
-            backgroundContent(isLongSwipe, closeItem)
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset { IntOffset(offsetX.roundToInt(), 0) }
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures(
-                        onDragEnd = {
-                            val targetOffset = if (offsetX < actionsWidthPx * 1.5f) {
-                                onDelete()
-                                0f
-                            } else if (offsetX < actionsWidthPx / 2f) {
-                                actionsWidthPx
-                            } else {
-                                0f
-                            }
-                            coroutineScope.launch {
-                                androidx.compose.animation.core.animate(
-                                    initialValue = offsetX,
-                                    targetValue = targetOffset,
-                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                                ) { value, _ ->
-                                    offsetX = value
-                                }
-                            }
-                        },
-                        onHorizontalDrag = { change, dragAmount ->
-                            change.consume()
-                            offsetX = (offsetX + dragAmount).coerceAtMost(0f)
-                        }
-                    )
-                }
-        ) {
-            content()
         }
     }
 }

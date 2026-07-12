@@ -2,7 +2,6 @@ package com.practicum.shoppinglist.data.repository
 
 import com.practicum.shoppinglist.data.local.dao.ShoppingItemDao
 import com.practicum.shoppinglist.data.local.dao.ShoppingListDao
-import com.practicum.shoppinglist.data.local.entity.ProductSuggestionEntity
 import com.practicum.shoppinglist.data.mapper.toDomain
 import com.practicum.shoppinglist.data.mapper.toEntity
 import com.practicum.shoppinglist.domain.model.ShoppingItem
@@ -72,6 +71,11 @@ class ShoppingItemRepositoryImpl(
         shoppingItemDao.deleteBoughtItemsForList(listId, ownerUserId)
     }
 
+    override suspend fun deleteAllItems(listId: Long) {
+        val ownerUserId = authRepository.requireCurrentUserId()
+        shoppingItemDao.deleteItemsForList(listId, ownerUserId)
+    }
+
     override suspend fun updateItems(items: List<ShoppingItem>) {
         if (items.isEmpty()) return
         val ownerUserId = authRepository.requireCurrentUserId()
@@ -79,18 +83,6 @@ class ShoppingItemRepositoryImpl(
             checkListOwnership(listId, ownerUserId)
         }
         shoppingItemDao.updateItems(items.map { it.toEntity() })
-    }
-
-    override fun getSuggestionsFlow(query: String): Flow<List<String>> {
-        return shoppingItemDao.getSuggestionsFlow(query).map { list ->
-            list.map { it.name }
-        }
-    }
-
-    override suspend fun addSuggestion(name: String) {
-        if (name.isNotBlank()) {
-            shoppingItemDao.insertSuggestion(ProductSuggestionEntity(name = name.trim()))
-        }
     }
 
     private suspend fun checkListOwnership(listId: Long, ownerUserId: Long) {

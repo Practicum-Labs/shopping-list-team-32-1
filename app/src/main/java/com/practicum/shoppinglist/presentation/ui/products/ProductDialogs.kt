@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.practicum.shoppinglist.R
+import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.common.ConfirmationDialog
 
 @Composable
 fun RenameDialogWrapper(
@@ -113,52 +115,84 @@ fun DeleteConfirmDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    val colors = MaterialTheme.colors
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.products_dialog_delete_title),
-                color = colors.addListDialogTitle
-            )
-        },
-        text = {
-            Text(
-                text = stringResource(R.string.products_dialog_delete_message),
-                color = colors.addListDialogPlaceholder
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = stringResource(R.string.products_dialog_delete_confirm),
-                    color = MaterialTheme.colors.confirmDialogDeleteText
-                )
+    ConfirmationDialog(
+        title = stringResource(R.string.products_dialog_delete_all_title),
+        confirmText = stringResource(R.string.products_dialog_delete_confirm),
+        cancelText = stringResource(R.string.products_dialog_cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+fun DeleteProductConfirmDialogWrapper(
+    product: ShoppingItem?,
+    onDeleteConfirm: (ShoppingItem) -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (product != null) {
+        ConfirmationDialog(
+            title = stringResource(R.string.products_dialog_delete_item_title, product.name),
+            confirmText = stringResource(R.string.products_dialog_delete_confirm),
+            cancelText = stringResource(R.string.products_dialog_cancel),
+            onConfirm = {
+                onDeleteConfirm(product)
+                onDismiss()
+            },
+            onDismiss = onDismiss,
+        )
+    }
+}
+
+@Composable
+fun ClearBoughtConfirmDialogWrapper(
+    visible: Boolean,
+    onClearConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (visible) {
+        ClearBoughtConfirmDialog(
+            onDismiss = onDismiss,
+            onConfirm = {
+                onClearConfirm()
+                onDismiss()
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.products_dialog_cancel),
-                    color = colors.addListDialogPlaceholder
-                )
-            }
-        },
-        containerColor = colors.addListDialogSurface
+        )
+    }
+}
+
+@Composable
+fun ClearBoughtConfirmDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(R.string.products_dialog_clear_bought_title),
+        confirmText = stringResource(R.string.products_dialog_clear_bought_confirm),
+        cancelText = stringResource(R.string.products_dialog_cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
     )
 }
 
 @Composable
 fun CancelConfirmDialog(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    isEditing: Boolean = false
 ) {
     val colors = MaterialTheme.colors
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.products_dialog_cancel_confirm_title),
+                text = stringResource(
+                    if (isEditing) {
+                        R.string.products_dialog_cancel_edit_confirm_title
+                    } else {
+                        R.string.products_dialog_cancel_confirm_title
+                    }
+                ),
                 color = colors.addListDialogTitle
             )
         },
@@ -192,7 +226,8 @@ fun CancelConfirmDialog(
 fun CancelConfirmDialogWrapper(
     visible: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    isEditing: Boolean = false
 ) {
     if (visible) {
         CancelConfirmDialog(
@@ -200,7 +235,8 @@ fun CancelConfirmDialogWrapper(
             onConfirm = {
                 onConfirm()
                 onDismiss()
-            }
+            },
+            isEditing = isEditing
         )
     }
 }
