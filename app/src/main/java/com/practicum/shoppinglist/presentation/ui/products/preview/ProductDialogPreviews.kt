@@ -82,15 +82,6 @@ private fun DeleteConfirmDialogDarkPreview() {
 }
 
 @Composable
-private fun ClearBoughtConfirmDialogPreviewContent(darkTheme: Boolean) {
-    Theme(darkTheme = darkTheme) {
-        ProductDialogPreviewContent {
-            ClearBoughtConfirmDialog(onDismiss = {}, onConfirm = {})
-        }
-    }
-}
-
-@Composable
 private fun CancelConfirmDialogPreviewContent(darkTheme: Boolean, isEditing: Boolean) {
     Theme(darkTheme = darkTheme) {
         ProductDialogPreviewContent {
