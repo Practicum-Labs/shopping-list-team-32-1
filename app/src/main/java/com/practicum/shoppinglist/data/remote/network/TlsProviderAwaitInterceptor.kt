@@ -1,4 +1,4 @@
-package com.practicum.shoppinglist.core.network
+package com.practicum.shoppinglist.data.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response

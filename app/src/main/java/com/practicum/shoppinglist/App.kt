@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import com.google.android.gms.security.ProviderInstaller
-import com.practicum.shoppinglist.core.network.TlsProviderGate
 import com.practicum.shoppinglist.data.di.dataModule
+import com.practicum.shoppinglist.data.remote.network.TlsProviderGate
 import com.practicum.shoppinglist.domain.di.domainModule
 import com.practicum.shoppinglist.presentation.di.themeModule
 import com.practicum.shoppinglist.presentation.di.viewModelModule
