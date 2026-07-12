@@ -26,6 +26,7 @@ import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingListSortTypeUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -109,5 +110,8 @@ val domainModule = module {
     }
     factory {
         AddProductSuggestionUseCase(shoppingItemRepository = get())
+    }
+    factory {
+        UpdateShoppingListSortTypeUseCase(shoppingListRepository = get())
     }
 }

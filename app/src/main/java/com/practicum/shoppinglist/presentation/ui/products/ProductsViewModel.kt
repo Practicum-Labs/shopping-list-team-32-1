@@ -15,6 +15,7 @@ import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ObserveShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ToggleShoppingItemBoughtUseCase
 import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingItemUseCase
+import com.practicum.shoppinglist.domain.usecase.products.UpdateShoppingListSortTypeUseCase
 import com.practicum.shoppinglist.presentation.ui.common.SortType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,7 +48,8 @@ class ProductsViewModel(
     private val toggleShoppingItemBoughtUseCase: ToggleShoppingItemBoughtUseCase,
     private val clearBoughtItemsUseCase: ClearBoughtItemsUseCase,
     private val commitShoppingItemOrderUseCase: CommitShoppingItemOrderUseCase,
-    private val getProductSuggestionsUseCase: GetProductSuggestionsUseCase
+    private val getProductSuggestionsUseCase: GetProductSuggestionsUseCase,
+    private val updateShoppingListSortTypeUseCase: UpdateShoppingListSortTypeUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductsUiState())
@@ -78,7 +80,9 @@ class ProductsViewModel(
             if (list == null) {
                 _uiState.value = _uiState.value.copy(listDeleted = true, isLoading = false)
             } else {
-                _uiState.value = _uiState.value.copy(list = list, isLoading = false)
+                val sortType = runCatching { SortType.valueOf(list.sortType) }
+                    .getOrDefault(SortType.Custom)
+                _uiState.value = _uiState.value.copy(list = list, sortType = sortType, isLoading = false)
                 observeShoppingItemsUseCase(listId).collect { items ->
                     persistedItems = items
                     _uiState.value = _uiState.value.copy(
@@ -156,6 +160,9 @@ class ProductsViewModel(
             items = sortForDisplay(persistedItems, sortType),
             sortType = sortType
         )
+        viewModelScope.launch {
+            updateShoppingListSortTypeUseCase(listId, sortType.name)
+        }
     }
 
     fun reorderItems(fromIndex: Int, toIndex: Int) {

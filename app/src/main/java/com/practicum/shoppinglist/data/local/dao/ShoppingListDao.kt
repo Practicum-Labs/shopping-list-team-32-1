@@ -51,4 +51,17 @@ interface ShoppingListDao {
         name: String,
         ownerUserId: Long,
     )
+
+    @Query(
+        """
+        UPDATE shopping_lists
+        SET sort_type = :sortType
+        WHERE id = :shoppingListId AND owner_user_id = :ownerUserId
+        """,
+    )
+    suspend fun updateShoppingListSortType(
+        shoppingListId: Long,
+        sortType: String,
+        ownerUserId: Long,
+    )
 }

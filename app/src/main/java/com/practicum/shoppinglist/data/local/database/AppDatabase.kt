@@ -16,7 +16,7 @@ import com.practicum.shoppinglist.data.local.entity.ShoppingListEntity
         ShoppingItemEntity::class,
         ProductSuggestionEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -74,6 +74,17 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(
+            DATABASE_VERSION_4,
+            DATABASE_VERSION_5,
+        ) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE shopping_lists ADD COLUMN sort_type TEXT NOT NULL DEFAULT 'CUSTOM'",
+                )
+            }
+        }
+
         fun seedProductSuggestions(db: SupportSQLiteDatabase) {
             val defaults = listOf(
                 "Кокосовое молоко",
@@ -101,3 +112,4 @@ private const val DATABASE_VERSION_1 = 1
 private const val DATABASE_VERSION_2 = 2
 private const val DATABASE_VERSION_3 = 3
 private const val DATABASE_VERSION_4 = 4
+private const val DATABASE_VERSION_5 = 5

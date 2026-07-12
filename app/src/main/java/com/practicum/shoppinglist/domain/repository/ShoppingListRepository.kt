@@ -26,4 +26,9 @@ interface ShoppingListRepository {
         shoppingListId: Long,
         name: String,
     )
+
+    suspend fun updateShoppingListSortType(
+        shoppingListId: Long,
+        sortType: String,
+    )
 }
