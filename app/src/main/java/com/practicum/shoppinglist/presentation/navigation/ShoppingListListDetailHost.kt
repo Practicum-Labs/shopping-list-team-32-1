@@ -1,6 +1,7 @@
 package com.practicum.shoppinglist.presentation.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,7 @@ fun ShoppingListListDetailHost(
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
-        modifier = modifier,
+        modifier = modifier.background(MaterialTheme.colorScheme.background),
         listPane = {
             AnimatedPane {
                 Box(modifier = Modifier.fillMaxSize()) {
