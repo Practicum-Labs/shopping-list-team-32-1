@@ -179,6 +179,7 @@ class ProductsViewModel(
     fun commitItemOrder() {
         viewModelScope.launch {
             commitShoppingItemOrderUseCase(_uiState.value.items)
+            updateShoppingListSortTypeUseCase(listId, SortType.Custom.name)
         }
     }
 
