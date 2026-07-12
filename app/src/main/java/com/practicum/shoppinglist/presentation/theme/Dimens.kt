@@ -84,8 +84,9 @@ object Dimens {
         const val emptyStateIllustrationAspectRatio = 324f / 300f
         const val iconPickerSheetHeightFraction = 0.6f
         val swipeActionsWidth = 168.dp
-        val swipeActionsWidthTwoButtons = 112.dp
+        val swipeActionsWidthTwoButtons = 136.dp
         val swipeActionContainerStartPadding = 16.dp
+        val swipeActionContainerEndPadding = 16.dp
         val swipeActionButtonSize = 48.dp
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp

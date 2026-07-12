@@ -230,6 +230,7 @@ fun ProductSwipeBackground(
                         modifier = Modifier.size(Dimens.Main.swipeActionIconSize)
                     )
                 }
+                Spacer(modifier = Modifier.width(Dimens.Main.swipeActionContainerEndPadding))
             }
         }
     }
