@@ -26,7 +26,7 @@ private fun ProductsScreenPreviewContent(
             suggestions = emptyList(),
             onBack = {},
             onRenameList = {},
-            onDeleteList = {},
+            onDeleteAllItems = {},
             onClearBought = {},
             onSortTypeSelected = {},
             onAddProduct = { _, _, _ -> },

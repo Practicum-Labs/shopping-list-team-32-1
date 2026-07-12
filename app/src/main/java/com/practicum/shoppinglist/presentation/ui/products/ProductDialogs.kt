@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.colors
+import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialog
 
 @Composable
 fun RenameDialogWrapper(
@@ -113,38 +114,12 @@ fun DeleteConfirmDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    val colors = MaterialTheme.colors
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.products_dialog_delete_title),
-                color = colors.addListDialogTitle
-            )
-        },
-        text = {
-            Text(
-                text = stringResource(R.string.products_dialog_delete_message),
-                color = colors.addListDialogPlaceholder
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = stringResource(R.string.products_dialog_delete_confirm),
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.products_dialog_cancel),
-                    color = colors.addListDialogPlaceholder
-                )
-            }
-        },
-        containerColor = colors.addListDialogSurface
+    ConfirmationDialog(
+        title = stringResource(R.string.products_dialog_delete_all_title),
+        confirmText = stringResource(R.string.products_dialog_delete_confirm),
+        cancelText = stringResource(R.string.products_dialog_cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
     )
 }
 
@@ -170,38 +145,12 @@ fun ClearBoughtConfirmDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    val colors = MaterialTheme.colors
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.products_dialog_clear_bought_title),
-                color = colors.addListDialogTitle
-            )
-        },
-        text = {
-            Text(
-                text = stringResource(R.string.products_dialog_clear_bought_message),
-                color = colors.addListDialogPlaceholder
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = stringResource(R.string.products_dialog_clear_bought_confirm),
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.products_dialog_cancel),
-                    color = colors.addListDialogPlaceholder
-                )
-            }
-        },
-        containerColor = colors.addListDialogSurface
+    ConfirmationDialog(
+        title = stringResource(R.string.products_dialog_clear_bought_title),
+        confirmText = stringResource(R.string.products_dialog_clear_bought_confirm),
+        cancelText = stringResource(R.string.products_dialog_cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
     )
 }
 

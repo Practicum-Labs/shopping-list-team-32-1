@@ -19,6 +19,7 @@ import com.practicum.shoppinglist.domain.usecase.products.AddProductSuggestionUs
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.CommitShoppingItemOrderUseCase
+import com.practicum.shoppinglist.domain.usecase.products.DeleteAllShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
@@ -96,6 +97,9 @@ val domainModule = module {
     }
     factory {
         ClearBoughtItemsUseCase(shoppingItemRepository = get())
+    }
+    factory {
+        DeleteAllShoppingItemsUseCase(shoppingItemRepository = get())
     }
     factory {
         CommitShoppingItemOrderUseCase(shoppingItemRepository = get())

@@ -62,7 +62,7 @@ fun ProductsRoute(
         suggestions = suggestions,
         onBack = onBack,
         onRenameList = viewModel::renameList,
-        onDeleteList = viewModel::deleteList,
+        onDeleteAllItems = viewModel::deleteAllItems,
         onClearBought = viewModel::clearBoughtItems,
         onSortTypeSelected = viewModel::selectSortType,
         onAddProduct = viewModel::addProduct,
@@ -84,7 +84,7 @@ fun ProductsScreen(
     suggestions: List<String>,
     onBack: () -> Unit,
     onRenameList: (String) -> Unit,
-    onDeleteList: () -> Unit,
+    onDeleteAllItems: () -> Unit,
     onClearBought: () -> Unit,
     onSortTypeSelected: (SortType) -> Unit,
     onAddProduct: (String, Double, String) -> Unit,
@@ -287,7 +287,7 @@ fun ProductsScreen(
     )
     DeleteConfirmDialogWrapper(
         visible = showDeleteConfirmDialog,
-        onDeleteConfirm = onDeleteList,
+        onDeleteConfirm = onDeleteAllItems,
         onDismiss = { showDeleteConfirmDialog = false }
     )
     ClearBoughtConfirmDialogWrapper(

@@ -72,6 +72,11 @@ class ShoppingItemRepositoryImpl(
         shoppingItemDao.deleteBoughtItemsForList(listId, ownerUserId)
     }
 
+    override suspend fun deleteAllItems(listId: Long) {
+        val ownerUserId = authRepository.requireCurrentUserId()
+        shoppingItemDao.deleteItemsForList(listId, ownerUserId)
+    }
+
     override suspend fun updateItems(items: List<ShoppingItem>) {
         if (items.isEmpty()) return
         val ownerUserId = authRepository.requireCurrentUserId()

@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
-import com.practicum.shoppinglist.domain.usecase.DeleteShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.RenameShoppingListUseCase
 import com.practicum.shoppinglist.domain.usecase.products.AddShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.ClearBoughtItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.CommitShoppingItemOrderUseCase
+import com.practicum.shoppinglist.domain.usecase.products.DeleteAllShoppingItemsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.DeleteShoppingItemUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetProductSuggestionsUseCase
 import com.practicum.shoppinglist.domain.usecase.products.GetShoppingListUseCase
@@ -38,7 +38,7 @@ data class ProductsUiState(
 class ProductsViewModel(
     private val listId: Long,
     private val renameShoppingListUseCase: RenameShoppingListUseCase,
-    private val deleteShoppingListUseCase: DeleteShoppingListUseCase,
+    private val deleteAllShoppingItemsUseCase: DeleteAllShoppingItemsUseCase,
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val observeShoppingItemsUseCase: ObserveShoppingItemsUseCase,
     private val addShoppingItemUseCase: AddShoppingItemUseCase,
@@ -139,10 +139,9 @@ class ProductsViewModel(
         }
     }
 
-    fun deleteList() {
+    fun deleteAllItems() {
         viewModelScope.launch {
-            deleteShoppingListUseCase(listId)
-            _uiState.value = _uiState.value.copy(listDeleted = true)
+            deleteAllShoppingItemsUseCase(listId)
         }
     }
 
