@@ -36,16 +36,19 @@ class App : Application(), KoinComponent {
     }
 
     private fun updateSecurityProvider() {
-        ProviderInstaller.installIfNeededAsync(this, object : ProviderInstaller.ProviderInstallListener {
-            override fun onProviderInstalled() {
-                tlsProviderGate.signalReady()
-            }
+        ProviderInstaller.installIfNeededAsync(
+            this,
+            object : ProviderInstaller.ProviderInstallListener {
+                override fun onProviderInstalled() {
+                    tlsProviderGate.signalReady()
+                }
 
-            override fun onProviderInstallFailed(errorCode: Int, recoveryIntent: Intent?) {
-                Log.w(TAG, "TLS-провайдер не обновлён (errorCode=$errorCode)")
-                tlsProviderGate.signalReady()
-            }
-        })
+                override fun onProviderInstallFailed(errorCode: Int, recoveryIntent: Intent?) {
+                    Log.w(TAG, "TLS-провайдер не обновлён (errorCode=$errorCode)")
+                    tlsProviderGate.signalReady()
+                }
+            },
+        )
     }
 
     private companion object {

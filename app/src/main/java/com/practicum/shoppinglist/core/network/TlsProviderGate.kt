@@ -17,7 +17,11 @@ class TlsProviderGate(initiallyReady: Boolean = false) {
     fun awaitReady() {
         val becameReady = latch.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         if (!becameReady) {
-            Log.w(TAG, "TLS-провайдер не подтвердил готовность за ${AWAIT_TIMEOUT_MS}мс, запрос выполняется без подтверждения")
+            Log.w(
+                TAG,
+                "TLS-провайдер не подтвердил готовность за ${AWAIT_TIMEOUT_MS}мс, " +
+                    "запрос выполняется без подтверждения",
+            )
         }
     }
 
