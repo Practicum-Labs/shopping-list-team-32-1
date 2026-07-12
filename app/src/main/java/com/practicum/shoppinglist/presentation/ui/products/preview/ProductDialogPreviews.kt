@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.practicum.shoppinglist.presentation.theme.Theme
 import com.practicum.shoppinglist.presentation.ui.products.CancelConfirmDialog
-import com.practicum.shoppinglist.presentation.ui.products.ClearBoughtConfirmDialog
 import com.practicum.shoppinglist.presentation.ui.products.DeleteConfirmDialog
 import com.practicum.shoppinglist.presentation.ui.products.RenameListDialog
 

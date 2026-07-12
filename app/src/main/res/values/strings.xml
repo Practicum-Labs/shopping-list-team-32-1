@@ -43,8 +43,6 @@
     <string name="main_menu_sheet_sort_custom">Пользовательская</string>
     <string name="main_menu_sheet_delete_all">Удалить все</string>
     <string name="main_menu_sheet_clear_purchased">Очистить купленные</string>
-    <string name="shopping_list_delete_all_confirm_title">Удалить все товары?</string>
-    <string name="shopping_list_clear_purchased_confirm_title">Удалить все купленные товары?</string>
     <string-array name="product_units">
         <item>л</item>
         <item>мл</item>
@@ -89,8 +87,6 @@
     <string name="products_back_content_description">Назад</string>
     <string name="products_menu_content_description">Меню</string>
     <string name="products_menu_rename">Переименовать список</string>
-    <string name="products_menu_clear_bought">Очистить список (удалить купленные)</string>
-    <string name="products_menu_delete">Удалить список</string>
     <string name="products_empty_state_title">В списке покупок пока пусто</string>
     <string name="products_empty_state_subtitle">Нажмите на кнопку + ниже,\nчтобы добавить товары</string>
     <string name="products_add_item_content_description">Добавить товар</string>
