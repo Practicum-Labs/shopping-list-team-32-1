@@ -8,10 +8,12 @@ import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
 import com.practicum.shoppinglist.data.remote.auth.AuthApi
 import com.practicum.shoppinglist.data.repository.AuthRepositoryImpl
+import com.practicum.shoppinglist.data.repository.ProductSuggestionRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ShoppingItemRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ShoppingListRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ThemeRepositoryImpl
 import com.practicum.shoppinglist.domain.repository.AuthRepository
+import com.practicum.shoppinglist.domain.repository.ProductSuggestionRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingItemRepository
 import com.practicum.shoppinglist.domain.repository.ShoppingListRepository
 import com.practicum.shoppinglist.domain.repository.ThemeRepository
@@ -87,6 +89,9 @@ val dataModule = module {
             shoppingListDao = get(),
             authRepository = get()
         )
+    }
+    single<ProductSuggestionRepository> {
+        ProductSuggestionRepositoryImpl(shoppingItemDao = get())
     }
     single {
         ThemePreferencesDataSource(context = androidContext())

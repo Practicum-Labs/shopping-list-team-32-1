@@ -13,7 +13,4 @@ interface ShoppingItemRepository {
     suspend fun clearBoughtItems(listId: Long)
     suspend fun deleteAllItems(listId: Long)
     suspend fun updateItems(items: List<ShoppingItem>)
-
-    fun getSuggestionsFlow(query: String): Flow<List<String>>
-    suspend fun addSuggestion(name: String)
 }

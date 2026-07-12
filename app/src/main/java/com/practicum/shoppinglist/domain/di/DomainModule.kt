@@ -85,10 +85,10 @@ val domainModule = module {
         ObserveShoppingItemsUseCase(shoppingItemRepository = get())
     }
     factory {
-        AddShoppingItemUseCase(shoppingItemRepository = get())
+        AddShoppingItemUseCase(shoppingItemRepository = get(), productSuggestionRepository = get())
     }
     factory {
-        UpdateShoppingItemUseCase(shoppingItemRepository = get())
+        UpdateShoppingItemUseCase(shoppingItemRepository = get(), productSuggestionRepository = get())
     }
     factory {
         DeleteShoppingItemUseCase(shoppingItemRepository = get())
@@ -106,10 +106,10 @@ val domainModule = module {
         CommitShoppingItemOrderUseCase(shoppingItemRepository = get())
     }
     factory {
-        GetProductSuggestionsUseCase(shoppingItemRepository = get())
+        GetProductSuggestionsUseCase(productSuggestionRepository = get())
     }
     factory {
-        AddProductSuggestionUseCase(shoppingItemRepository = get())
+        AddProductSuggestionUseCase(productSuggestionRepository = get())
     }
     factory {
         UpdateShoppingListSortTypeUseCase(shoppingListRepository = get())
