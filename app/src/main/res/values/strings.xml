@@ -106,6 +106,7 @@
     <string name="products_dialog_rename_save">Сохранить</string>
     <string name="products_dialog_cancel">Отмена</string>
     <string name="products_dialog_delete_all_title">Удалить все товары?</string>
+    <string name="products_dialog_delete_item_title">Удалить «%1$s»?</string>
     <string name="products_dialog_delete_confirm">Удалить</string>
     <string name="products_dialog_clear_bought_title">Удалить все купленные товары?</string>
     <string name="products_dialog_clear_bought_confirm">Удалить</string>

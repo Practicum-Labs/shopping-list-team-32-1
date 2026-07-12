@@ -104,6 +104,7 @@ fun ProductsScreen(
     var showRenameDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
     var showClearBoughtConfirmDialog by rememberSaveable { mutableStateOf(false) }
+    var productPendingDeleteId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCancelConfirmDialog by rememberSaveable { mutableStateOf(false) }
     var showMenuSheet by rememberSaveable { mutableStateOf(false) }
     val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -114,6 +115,7 @@ fun ProductsScreen(
     }
 
     val editingItem = editingItemId?.let { id -> state.items.find { item -> item.id == id } }
+    val productPendingDelete = productPendingDeleteId?.let { id -> state.items.find { item -> item.id == id } }
     var nameInput by rememberSaveable { mutableStateOf("") }
     var qtyInput by rememberSaveable { mutableStateOf("") }
     var unitInput by rememberSaveable { mutableStateOf("") }
@@ -163,7 +165,7 @@ fun ProductsScreen(
                 innerPadding = innerPadding,
                 state = state,
                 onToggleBought = onToggleProductBought,
-                onDelete = onDeleteProduct,
+                onDelete = { item -> productPendingDeleteId = item.id },
                 onEdit = { item ->
                     editingItemId = item.id
                     nameInput = item.name
@@ -294,6 +296,11 @@ fun ProductsScreen(
         visible = showClearBoughtConfirmDialog,
         onClearConfirm = onClearBought,
         onDismiss = { showClearBoughtConfirmDialog = false }
+    )
+    DeleteProductConfirmDialogWrapper(
+        product = productPendingDelete,
+        onDeleteConfirm = onDeleteProduct,
+        onDismiss = { productPendingDeleteId = null }
     )
     CancelConfirmDialogWrapper(
         visible = showCancelConfirmDialog,

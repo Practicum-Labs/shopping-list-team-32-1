@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.practicum.shoppinglist.R
+import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.ui.main.components.ConfirmationDialog
 
@@ -121,6 +122,26 @@ fun DeleteConfirmDialog(
         onConfirm = onConfirm,
         onDismiss = onDismiss,
     )
+}
+
+@Composable
+fun DeleteProductConfirmDialogWrapper(
+    product: ShoppingItem?,
+    onDeleteConfirm: (ShoppingItem) -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (product != null) {
+        ConfirmationDialog(
+            title = stringResource(R.string.products_dialog_delete_item_title, product.name),
+            confirmText = stringResource(R.string.products_dialog_delete_confirm),
+            cancelText = stringResource(R.string.products_dialog_cancel),
+            onConfirm = {
+                onDeleteConfirm(product)
+                onDismiss()
+            },
+            onDismiss = onDismiss,
+        )
+    }
 }
 
 @Composable
