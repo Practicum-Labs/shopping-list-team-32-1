@@ -12,10 +12,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.practicum.shoppinglist.domain.model.ShoppingItem
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Theme
+import com.practicum.shoppinglist.presentation.ui.common.SortType
 import com.practicum.shoppinglist.presentation.ui.main.MainContentState
 import com.practicum.shoppinglist.presentation.ui.main.MainScreen
 import com.practicum.shoppinglist.presentation.ui.main.MainUiState
-import com.practicum.shoppinglist.presentation.ui.common.SortType
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingScreen
 import com.practicum.shoppinglist.presentation.ui.products.ProductsScreen
 import com.practicum.shoppinglist.presentation.ui.products.ProductsUiState
@@ -43,7 +43,7 @@ private fun TabletTwoPaneContent() {
             )
         }
         VerticalDivider(modifier = Modifier.fillMaxHeight())
-        Box(modifier = Modifier.weight(1.4f)) {
+        Box(modifier = Modifier.weight(DETAIL_PANE_WEIGHT)) {
             ProductsScreen(
                 state = ProductsUiState(
                     list = tabletShoppingLists.first(),
@@ -122,3 +122,5 @@ private fun TabletOnboardingDarkPreview() {
         OnboardingScreen(isDarkTheme = true)
     }
 }
+
+private const val DETAIL_PANE_WEIGHT = 1.4f
