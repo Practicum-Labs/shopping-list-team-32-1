@@ -3,12 +3,12 @@ package com.practicum.shoppinglist.data.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.practicum.shoppinglist.core.network.TlsProviderAwaitInterceptor
-import com.practicum.shoppinglist.core.network.TlsProviderGate
 import com.practicum.shoppinglist.data.local.database.AppDatabase
 import com.practicum.shoppinglist.data.local.datasource.AuthTokenDataSource
 import com.practicum.shoppinglist.data.local.datasource.ThemePreferencesDataSource
 import com.practicum.shoppinglist.data.remote.auth.AuthApi
+import com.practicum.shoppinglist.data.remote.network.TlsProviderAwaitInterceptor
+import com.practicum.shoppinglist.data.remote.network.TlsProviderGate
 import com.practicum.shoppinglist.data.repository.AuthRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ProductSuggestionRepositoryImpl
 import com.practicum.shoppinglist.data.repository.ShoppingItemRepositoryImpl

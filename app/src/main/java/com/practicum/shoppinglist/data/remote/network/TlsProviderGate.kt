@@ -1,4 +1,4 @@
-package com.practicum.shoppinglist.core.network
+package com.practicum.shoppinglist.data.remote.network
 
 import android.util.Log
 import java.util.concurrent.CountDownLatch
