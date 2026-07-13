@@ -154,6 +154,13 @@ Koin-модули (`dataModule`, `domainModule`, `viewModelModule`, `themeModule
 
 ---
 
+## Релизная сборка
+
+- [Pre-release v1.0.0-rc1](https://github.com/Practicum-Labs/shopping-list-team-32-1/releases/tag/v1.0.0-rc1) подписанная сборка для проверки перед финальным релизом.
+- Финальный релиз `v1.0.0` создается автоматически через GitHub Actions при публикации тега `v1.0.0` на финальный merge-коммит в `main`.
+
+---
+
 ## Требования к сборке
 
 - **minSdk:** 24 (Android 7.0 Nougat)
