@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,17 +61,28 @@ fun ProductsContent(
             .fillMaxSize()
             .padding(innerPadding)
     ) {
-        if (state.items.isEmpty()) {
-            EmptyState()
-        } else {
-            ProductList(
-                items = state.items,
-                onToggleBought = onToggleBought,
-                onDelete = onDelete,
-                onEdit = onEdit,
-                onMove = onMove,
-                onDragEnd = onDragEnd
-            )
+        when {
+            state.isLoading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            state.items.isEmpty() -> {
+                EmptyState()
+            }
+
+            else -> {
+                ProductList(
+                    items = state.items,
+                    onToggleBought = onToggleBought,
+                    onDelete = onDelete,
+                    onEdit = onEdit,
+                    onMove = onMove,
+                    onDragEnd = onDragEnd
+                )
+            }
         }
     }
 }

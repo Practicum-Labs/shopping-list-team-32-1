@@ -82,11 +82,12 @@ class ProductsViewModel(
             } else {
                 val sortType = runCatching { SortType.valueOf(list.sortType) }
                     .getOrDefault(SortType.Custom)
-                _uiState.value = _uiState.value.copy(list = list, sortType = sortType, isLoading = false)
+                _uiState.value = _uiState.value.copy(list = list, sortType = sortType)
                 observeShoppingItemsUseCase(listId).collect { items ->
                     persistedItems = items
                     _uiState.value = _uiState.value.copy(
-                        items = sortForDisplay(items, _uiState.value.sortType)
+                        items = sortForDisplay(items, _uiState.value.sortType),
+                        isLoading = false,
                     )
                 }
             }
