@@ -63,6 +63,7 @@ fun MainRoute(
     onLogoutClick: () -> Unit,
     onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    selectedListId: Long? = null,
     viewModel: MainViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -102,6 +103,7 @@ fun MainRoute(
             onRenameListDismiss = viewModel::onRenameListDismiss,
             onListClick = onListClick,
         ),
+        selectedListId = selectedListId,
         modifier = modifier,
     )
 }
@@ -113,6 +115,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     isDarkTheme: Boolean = false,
     actions: MainScreenActions = MainScreenActions(),
+    selectedListId: Long? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -229,6 +232,7 @@ fun MainScreen(
             isDarkTheme = isDarkTheme,
             isSearching = uiState.isSearching,
             scrollToShoppingListId = uiState.scrollToShoppingListId,
+            selectedListId = selectedListId,
             actions = actions,
         )
         if (uiState.isSearching && uiState.searchQuery.isEmpty()) {
@@ -319,6 +323,7 @@ private fun BoxScope.MainContent(
     isDarkTheme: Boolean,
     isSearching: Boolean,
     scrollToShoppingListId: Long?,
+    selectedListId: Long?,
     actions: MainScreenActions,
 ) {
     when (contentState) {
@@ -361,6 +366,7 @@ private fun BoxScope.MainContent(
                     onRenameListClick = actions.onRenameListClick,
                     onListClick = actions.onListClick,
                     isSearching = isSearching,
+                    selectedListId = selectedListId,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(

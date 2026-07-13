@@ -1,6 +1,10 @@
 package com.practicum.shoppinglist.presentation.theme
 
 object Motion {
+    object Main {
+        const val listItemSelectionDurationMillis = 150
+    }
+
     object Navigation {
         const val loadingScreenDelayMillis = 2_000L
         const val mainEnterDurationMillis = 500

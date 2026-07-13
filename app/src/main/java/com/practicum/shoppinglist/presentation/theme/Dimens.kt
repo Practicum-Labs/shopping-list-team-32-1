@@ -15,6 +15,7 @@ object Dimens {
         val loaderBottomPadding = 96.dp
         val loaderSize = 36.dp
         val loaderStrokeWidth = 3.dp
+        val contentMaxWidth = 420.dp
         const val logoAspectRatio = 338f / 74f
         const val illustrationAspectRatio = 324f / 300f
     }
@@ -149,6 +150,13 @@ object Dimens {
         val swipeActionButtonSize = 48.dp
         val swipeActionIconSize = 24.dp
         val swipeActionSpacing = 8.dp
+    }
+
+    object ListDetail {
+        val emptyStateIconSize = 96.dp
+        val emptyStateHorizontalPadding = 44.dp
+        val emptyStateTitleTopPadding = 24.dp
+        val emptyStateSubtitleTopPadding = 8.dp
     }
 
     object Auth {

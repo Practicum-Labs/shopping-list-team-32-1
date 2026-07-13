@@ -41,19 +41,40 @@ class MainViewModel(
     private val screenState = MutableStateFlow(MainUiState())
     private val retryRequests = MutableStateFlow(0)
 
-    val uiState: StateFlow<MainUiState> = combine(
-        retryRequests.flatMapLatest {
-            observeShoppingListsUseCase()
-                .map<List<ShoppingList>, MainContentState> { shoppingLists ->
-                    if (shoppingLists.isEmpty()) {
-                        MainContentState.Empty
-                    } else {
-                        MainContentState.Content(shoppingLists = shoppingLists)
-                    }
+    private val shoppingListsState: StateFlow<MainContentState> = retryRequests.flatMapLatest {
+        observeShoppingListsUseCase()
+            .map<List<ShoppingList>, MainContentState> { shoppingLists ->
+                if (shoppingLists.isEmpty()) {
+                    MainContentState.Empty
+                } else {
+                    MainContentState.Content(shoppingLists = shoppingLists)
                 }
-                .onStart { emit(MainContentState.Loading) }
-                .catch { emit(MainContentState.Error) }
-        },
+            }
+            .onStart { emit(MainContentState.Loading) }
+            .catch { emit(MainContentState.Error) }
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_TIMEOUT_MILLIS),
+            initialValue = MainContentState.Loading,
+        )
+
+    val existingListIds: StateFlow<Set<Long>?> = shoppingListsState
+        .map { contentState ->
+            when (contentState) {
+                is MainContentState.Content -> contentState.shoppingLists.mapTo(mutableSetOf()) { it.id }
+                MainContentState.Empty -> emptySet()
+                MainContentState.Loading, MainContentState.Error -> null
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_TIMEOUT_MILLIS),
+            initialValue = null,
+        )
+
+    val uiState: StateFlow<MainUiState> = combine(
+        shoppingListsState,
         screenState,
     ) { contentState, currentState ->
         val filteredContentState = if (contentState is MainContentState.Content) {
@@ -72,7 +93,7 @@ class MainViewModel(
     }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_TIMEOUT_MILLIS),
             initialValue = MainUiState(),
         )
 
@@ -381,6 +402,7 @@ class MainViewModel(
     private companion object {
         const val MAX_LIST_NAME_LENGTH = 64
         const val DEFAULT_LIST_ICON_NAME = "list_alt"
+        const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
     }
 }
 
