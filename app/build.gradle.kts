@@ -1,11 +1,21 @@
 @file:Suppress("MagicNumber")
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kover)
     alias(libs.plugins.ksp)
 }
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use(::load)
+    }
+}
+val hasReleaseSigningConfig = keystorePropertiesFile.exists()
 
 android {
     namespace = "com.practicum.shoppinglist"
@@ -25,9 +35,24 @@ android {
         compose = true
     }
 
+    signingConfigs {
+        if (hasReleaseSigningConfig) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            if (hasReleaseSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -38,6 +63,18 @@ android {
         val javaVersion = JavaVersion.toVersion(libs.versions.jvmTarget.get())
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val hasReleaseTask = allTasks.any { task ->
+        task.path.contains("Release", ignoreCase = false)
+    }
+    if (hasReleaseTask && !hasReleaseSigningConfig) {
+        error(
+            "Release signing is not configured. Create keystore.properties in the project root " +
+                "with storeFile, storePassword, keyAlias and keyPassword."
+        )
     }
 }
 
