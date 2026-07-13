@@ -14,7 +14,6 @@ coroutines = "1.11.0"
 kover = "0.9.8"
 ksp = "2.3.9"
 material = "1.14.0"
-mockk = "1.14.11"
 navigation = "2.9.8"
 okhttp = "5.3.2"
 playServicesBase = "18.10.0"
@@ -62,7 +61,6 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 koin-androidx-compose-navigation = { group = "io.insert-koin", name = "koin-androidx-compose-navigation" }
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koinBom" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
