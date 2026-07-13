@@ -123,7 +123,7 @@ Koin-модули (`dataModule`, `domainModule`, `viewModelModule`, `themeModule
 
 ### Разделение задач
 
-Каждый разработчик реализует свой блок «насквозь» — от Room entity до Compose UI.
+Каждый разработчик реализует свой блок «насквозь» - от Room entity до Compose UI.
 
 ---
 
@@ -150,9 +150,7 @@ Koin-модули (`dataModule`, `domainModule`, `viewModelModule`, `themeModule
 
 ## Видеодемонстрация
 
-> Ссылка на видео-демо будет добавлена после завершения разработки MVP.
->
-> _Разместите видео в Google Drive / Яндекс Диске с открытым доступом и вставьте ссылку сюда._
+[Видеодемонстрация работы приложения](https://drive.google.com/file/d/12mANG6ux7yXWlmHgxxqQdvS79eHZ03TP/view?usp=sharing)
 
 ---
 
