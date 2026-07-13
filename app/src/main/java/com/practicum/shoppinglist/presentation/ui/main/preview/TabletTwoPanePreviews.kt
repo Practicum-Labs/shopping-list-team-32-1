@@ -33,13 +33,15 @@ private val tabletProductItems = listOf(
 )
 
 @Composable
-private fun TabletTwoPaneContent() {
+private fun TabletTwoPaneContent(selectedListId: Long = tabletShoppingLists.first().id) {
     Row(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             MainScreen(
                 uiState = MainUiState(
                     contentState = MainContentState.Content(shoppingLists = tabletShoppingLists),
                 ),
+                // The detail pane below shows this list's products, so it is the selected one.
+                selectedListId = selectedListId,
             )
         }
         VerticalDivider(modifier = Modifier.fillMaxHeight())
@@ -93,6 +95,45 @@ private fun TabletTwoPaneLightPreview() {
 private fun TabletTwoPaneDarkPreview() {
     Theme(darkTheme = true) {
         TabletTwoPaneContent()
+    }
+}
+
+@Composable
+private fun TabletSearchListPaneContent() {
+    MainScreen(
+        uiState = MainUiState(
+            contentState = MainContentState.Content(shoppingLists = tabletShoppingLists),
+            isSearching = true,
+            searchQuery = "н",
+        ),
+        selectedListId = tabletShoppingLists.first().id,
+    )
+}
+
+@Preview(
+    name = "Tablet List Pane, Search (Light)",
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 640,
+)
+@Composable
+private fun TabletSearchListPaneLightPreview() {
+    Theme {
+        TabletSearchListPaneContent()
+    }
+}
+
+@Preview(
+    name = "Tablet List Pane, Search (Dark)",
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 640,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun TabletSearchListPaneDarkPreview() {
+    Theme(darkTheme = true) {
+        TabletSearchListPaneContent()
     }
 }
 

@@ -19,13 +19,18 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,8 +40,10 @@ import androidx.navigation.navArgument
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Dimens
 import com.practicum.shoppinglist.presentation.ui.main.MainRoute
+import com.practicum.shoppinglist.presentation.ui.main.MainViewModel
 import com.practicum.shoppinglist.presentation.ui.products.ProductsRoute
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -51,9 +58,14 @@ fun ShoppingListListDetailHost(
     val isTwoPane = navigator.scaffoldDirective.maxHorizontalPartitions > 1
     val detailNavController = rememberNavController()
 
+    val mainViewModel: MainViewModel = koinViewModel()
+    val existingListIds by mainViewModel.existingListIds.collectAsStateWithLifecycle()
+
     BackHandler(enabled = navigator.canNavigateBack()) {
         coroutineScope.launch { navigator.navigateBack() }
     }
+
+    DiscardDeletedSelection(navigator = navigator, existingListIds = existingListIds)
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
@@ -64,6 +76,7 @@ fun ShoppingListListDetailHost(
                 ListDetailListPane(
                     isDarkTheme = isDarkTheme,
                     isTwoPane = isTwoPane,
+                    selectedListId = navigator.currentDestination?.contentKey?.takeIf { isTwoPane },
                     onThemeClick = onThemeClick,
                     onLogoutClick = onLogoutClick,
                     onListClick = { listId ->
@@ -79,6 +92,7 @@ fun ShoppingListListDetailHost(
                 ListDetailDetailPane(
                     navController = detailNavController,
                     contentKey = navigator.currentDestination?.contentKey,
+                    isTwoPane = isTwoPane,
                     onBack = { coroutineScope.launch { navigator.navigateBack() } },
                 )
             }
@@ -86,10 +100,28 @@ fun ShoppingListListDetailHost(
     )
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun DiscardDeletedSelection(
+    navigator: ThreePaneScaffoldNavigator<Long>,
+    existingListIds: Set<Long>?,
+) {
+    LaunchedEffect(existingListIds, navigator.currentDestination?.contentKey) {
+        if (existingListIds != null) {
+            while (true) {
+                val selectedListId = navigator.currentDestination?.contentKey
+                if (selectedListId == null || selectedListId in existingListIds) {
+                    break
+                }
+                navigator.navigateBack(BackNavigationBehavior.PopLatest)
+            }
+        }
+    }
+}
+
 private fun syncDetailDestination(navController: NavHostController, targetContentKey: Long?) {
     val targetRoute = if (targetContentKey != null) productsRoutePath(targetContentKey) else DETAIL_EMPTY_ROUTE
-    val currentRoute = navController.currentDestination?.route
-    if (currentRoute == targetRoute) {
+    if (navController.currentDetailRoute() == targetRoute) {
         return
     }
     val popUpToId = navController.currentDestination?.id ?: navController.graph.startDestinationId
@@ -98,10 +130,22 @@ private fun syncDetailDestination(navController: NavHostController, targetConten
     }
 }
 
+private fun NavHostController.currentDetailRoute(): String? {
+    val entry = currentBackStackEntry ?: return null
+    return when (entry.destination.route) {
+        PRODUCTS_ROUTE -> entry.arguments
+            ?.getLong(PRODUCTS_ROUTE_ARG_LIST_ID)
+            ?.let(::productsRoutePath)
+
+        else -> entry.destination.route
+    }
+}
+
 @Composable
 private fun ListDetailListPane(
     isDarkTheme: Boolean,
     isTwoPane: Boolean,
+    selectedListId: Long?,
     onThemeClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onListClick: (Long) -> Unit,
@@ -110,6 +154,7 @@ private fun ListDetailListPane(
     Box(modifier = modifier.fillMaxSize()) {
         MainRoute(
             isDarkTheme = isDarkTheme,
+            selectedListId = selectedListId,
             onThemeClick = onThemeClick,
             onLogoutClick = onLogoutClick,
             onListClick = onListClick,
@@ -129,12 +174,20 @@ private fun ListDetailListPane(
 private fun ListDetailDetailPane(
     navController: NavHostController,
     contentKey: Long?,
+    isTwoPane: Boolean,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Deliberately unkeyed: this is the destination the pane opens on. In single-pane mode the pane
+    // is composed only while a list is selected, so the NavHost lands straight on that list instead
+    // of rendering the placeholder and then animating away from it.
+    val startDestination = remember {
+        if (contentKey != null) productsRoutePath(contentKey) else DETAIL_EMPTY_ROUTE
+    }
+
     NavHost(
         navController = navController,
-        startDestination = DETAIL_EMPTY_ROUTE,
+        startDestination = startDestination,
         modifier = modifier,
     ) {
         composable(DETAIL_EMPTY_ROUTE) {
@@ -154,8 +207,13 @@ private fun ListDetailDetailPane(
     // Must stay inside the detail pane: in single-pane mode AnimatedPane composes this content
     // only once the detail pane is shown, and NavHost sets the graph while composing. An effect
     // hoisted to the scaffold would run before the graph exists and never retry.
-    LaunchedEffect(contentKey) {
-        syncDetailDestination(navController, contentKey)
+    LaunchedEffect(contentKey, isTwoPane) {
+        // Single-pane deselection means the pane itself is animating out; swapping in the
+        // placeholder would show it during that exit.
+        val isPaneClosing = contentKey == null && !isTwoPane
+        if (!isPaneClosing) {
+            syncDetailDestination(navController, contentKey)
+        }
     }
 }
 

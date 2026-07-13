@@ -1,5 +1,7 @@
 package com.practicum.shoppinglist.presentation.ui.main.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,12 +40,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.domain.model.ShoppingList
 import com.practicum.shoppinglist.presentation.theme.Dimens
+import com.practicum.shoppinglist.presentation.theme.Motion
 import com.practicum.shoppinglist.presentation.theme.colors
 import com.practicum.shoppinglist.presentation.ui.common.SwipeableListItem
 import com.practicum.shoppinglist.presentation.ui.main.shoppingListIconByName
@@ -59,6 +67,7 @@ fun ShoppingListsContent(
     onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isSearching: Boolean = false,
+    selectedListId: Long? = null,
 ) {
     val listState = rememberLazyListState()
     var openedItemKey by remember { mutableStateOf<Any?>(null) }
@@ -89,9 +98,11 @@ fun ShoppingListsContent(
             items = shoppingLists,
             key = { shoppingList -> shoppingList.id },
         ) { shoppingList ->
+            val isSelected = shoppingList.id == selectedListId
             if (isSearching) {
                 SearchShoppingListItem(
                     shoppingList = shoppingList,
+                    isSelected = isSelected,
                     onIconClick = onShoppingListIconClick,
                     onListClick = onListClick,
                 )
@@ -201,6 +212,7 @@ fun ShoppingListsContent(
                     content = {
                         ShoppingListItem(
                             shoppingList = shoppingList,
+                            isSelected = isSelected,
                             onIconClick = onShoppingListIconClick,
                             onListClick = onListClick,
                         )
@@ -214,11 +226,16 @@ fun ShoppingListsContent(
 @Composable
 private fun ShoppingListItem(
     shoppingList: ShoppingList,
+    isSelected: Boolean,
     onIconClick: (Long) -> Unit,
     onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(Dimens.Main.listItemCornerRadius)
+    val itemColors = shoppingListItemColors(
+        isSelected = isSelected,
+        unselectedContainer = MaterialTheme.colors.listItemSurface,
+    )
 
     Card(
         onClick = { onListClick(shoppingList.id) },
@@ -229,11 +246,12 @@ private fun ShoppingListItem(
                 elevation = Dimens.Main.listItemElevation,
                 shape = shape,
                 clip = false,
-            ),
+            )
+            .semantics { selected = isSelected },
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colors.listItemSurface,
-            contentColor = MaterialTheme.colors.listItemTitle,
+            containerColor = itemColors.container,
+            contentColor = itemColors.title,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
@@ -247,31 +265,14 @@ private fun ShoppingListItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.Main.listItemContentSpacing),
         ) {
-            Surface(
-                onClick = { onIconClick(shoppingList.id) },
-                modifier = Modifier
-                    .size(Dimens.Main.listItemIconContainerSize),
-                shape = CircleShape,
-                color = MaterialTheme.colors.iconPickerItemContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Icon(
-                        imageVector = shoppingListIconByName(shoppingList.iconName),
-                        contentDescription = stringResource(
-                            id = R.string.main_shopping_list_icon_content_description,
-                        ),
-                        modifier = Modifier.size(Dimens.Main.listItemIconSize),
-                    )
-                }
-            }
+            ShoppingListItemIcon(
+                shoppingList = shoppingList,
+                itemColors = itemColors,
+                onIconClick = onIconClick,
+            )
             Text(
                 text = shoppingList.name,
-                color = MaterialTheme.colors.listItemTitle,
+                color = itemColors.title,
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -281,44 +282,124 @@ private fun ShoppingListItem(
 @Composable
 private fun SearchShoppingListItem(
     shoppingList: ShoppingList,
+    isSelected: Boolean,
     onIconClick: (Long) -> Unit,
     onListClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val shape = RoundedCornerShape(Dimens.Main.listItemCornerRadius)
+    val itemColors = shoppingListItemColors(
+        isSelected = isSelected,
+        unselectedContainer = Color.Transparent,
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
+            .clip(shape)
+            .background(itemColors.container)
             .clickable { onListClick(shoppingList.id) }
-            .padding(vertical = 8.dp),
+            .semantics { selected = isSelected }
+            .padding(
+                horizontal = Dimens.Main.listItemHorizontalPadding,
+                vertical = 8.dp,
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.Main.listItemContentSpacing),
     ) {
-        Surface(
-            onClick = { onIconClick(shoppingList.id) },
-            modifier = Modifier
-                .size(Dimens.Main.listItemIconContainerSize),
-            shape = CircleShape,
-            color = MaterialTheme.colors.iconPickerItemContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Icon(
-                    imageVector = shoppingListIconByName(shoppingList.iconName),
-                    contentDescription = stringResource(
-                        id = R.string.main_shopping_list_icon_content_description,
-                    ),
-                    modifier = Modifier.size(Dimens.Main.listItemIconSize),
-                )
-            }
-        }
+        ShoppingListItemIcon(
+            shoppingList = shoppingList,
+            itemColors = itemColors,
+            onIconClick = onIconClick,
+        )
         Text(
             text = shoppingList.name,
-            color = MaterialTheme.colors.listItemTitle,
+            color = itemColors.title,
             style = MaterialTheme.typography.bodyLarge,
         )
     }
+}
+
+@Composable
+private fun ShoppingListItemIcon(
+    shoppingList: ShoppingList,
+    itemColors: ShoppingListItemColors,
+    onIconClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = { onIconClick(shoppingList.id) },
+        modifier = modifier.size(Dimens.Main.listItemIconContainerSize),
+        shape = CircleShape,
+        color = itemColors.iconContainer,
+        contentColor = itemColors.icon,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Icon(
+                imageVector = shoppingListIconByName(shoppingList.iconName),
+                contentDescription = stringResource(
+                    id = R.string.main_shopping_list_icon_content_description,
+                ),
+                modifier = Modifier.size(Dimens.Main.listItemIconSize),
+            )
+        }
+    }
+}
+
+@Immutable
+private data class ShoppingListItemColors(
+    val container: Color,
+    val title: Color,
+    val iconContainer: Color,
+    val icon: Color,
+)
+
+@Composable
+private fun shoppingListItemColors(
+    isSelected: Boolean,
+    unselectedContainer: Color,
+): ShoppingListItemColors {
+    val spec = tween<Color>(durationMillis = Motion.Main.listItemSelectionDurationMillis)
+    val container by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else unselectedContainer,
+        animationSpec = spec,
+        label = "shoppingListItemContainer",
+    )
+    val title by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colors.listItemTitle
+        },
+        animationSpec = spec,
+        label = "shoppingListItemTitle",
+    )
+    val iconContainer by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            MaterialTheme.colors.iconPickerItemContainer
+        },
+        animationSpec = spec,
+        label = "shoppingListItemIconContainer",
+    )
+    val icon by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.onSurface
+        } else {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        },
+        animationSpec = spec,
+        label = "shoppingListItemIcon",
+    )
+    return ShoppingListItemColors(
+        container = container,
+        title = title,
+        iconContainer = iconContainer,
+        icon = icon,
+    )
 }
