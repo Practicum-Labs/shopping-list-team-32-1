@@ -10,11 +10,12 @@
 |---|---|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Язык** | Kotlin | Основной язык Android-разработки: хорошо работает с корутинами, Flow, Compose и современными Jetpack-библиотеками                                                          |
 | **UI** | [Jetpack Compose](https://developer.android.com/develop/ui/compose) + Material 3 | Декларативный UI упрощает разработку экранов, состояний и превью. Material 3 дает готовые компоненты и единый визуальный стиль                                             |
+| **Адаптивный UI** | [Material 3 Adaptive](https://developer.android.com/develop/ui/compose/layouts/adaptive) (`adaptive`, `adaptive-navigation`) | `ListDetailPaneScaffold` используется для планшетного режима: на телефоне отображается одна панель с переходом «список → товары», на планшете список и товары одновременно |
 | **Архитектура** | MVVM + Clean Architecture | MVVM выбран как понятный команде паттерн для UI-слоя. Clean Architecture разделяет presentation, domain и data, поэтому бизнес-логика не зависит от UI и источников данных |
 | **Асинхронность** | Kotlin Coroutines + Flow | Используются для работы с БД, сетью и реактивными состояниями экранов                                                                                                      |
 | **БД** | [Room](https://developer.android.com/training/data-storage/room) | Официальная обертка над SQLite: проверяет SQL на этапе компиляции, удобно работает с Flow и миграциями                                                                     |
 | **Локальные настройки** | DataStore Preferences | Используется для хранения небольших пользовательских настроек и auth-сессии, где не нужна таблица Room                                                                     |
-| **DI** | [Koin](https://insert-koin.io) | Легкий DI-фреймворк с Kotlin DSL. Не требует аннотационной кодогенерации                                                |
+| **DI** | [Koin](https://insert-koin.io) | Легкий DI-фреймворк с Kotlin DSL. Не требует аннотационной кодогенерации                                                                                                   |
 | **Network** | [Retrofit](https://square.github.io/retrofit/) + Gson + OkHttp | Retrofit выбран для типобезопасного описания API, Gson для JSON, OkHttp для сетевого клиента и interceptors                                                                |
 | **Навигация** | [Navigation Compose](https://developer.android.com/develop/ui/compose/navigation) | Официальное решение для навигации между Compose-экранами                                                                                                                   |
 | **Статический анализ** | Detekt + Reviewdog | Detekt контролирует стиль и сложность Kotlin-кода, Reviewdog показывает замечания прямо в Pull Request                                                                     |
@@ -130,12 +131,20 @@ Koin-модули (`dataModule`, `domainModule`, `viewModelModule`, `themeModule
 #### Команда №1
 | Участник | Реализованные задачи |
 |---|---|
-| **Pavel Michka** | Инициализация проекта, подключение библиотек, настройка Clean Architecture пакетов, RootActivity, .gitignore |
-| **Sergey Ivanov** | _в процессе_ |
-| **Sergey Gnedovsky** | _в процессе_ |
-| **Daniil Kvasnikov** | _в процессе_ |
+| **Pavel Michka** | Инициализация проекта, подключение библиотек, структура пакетов Clean Architecture, RootActivity, `.gitignore`. CI: workflow `pr_checks.yml` (detekt + assembleDebug на PR и push). Создание списка покупок. Авторизация, регистрация и восстановление пароля, онбординг и переходы между экранами. Unit-тесты (ViewModel, мапперы, use case) и настройка покрытия Kover |
+| **Sergey Ivanov** | Действия со списками: переименование, копирование, удаление, удаление всех. Поиск по спискам. Свайп-действия и их оптимизация, диалоги подтверждения и их стилизация, Compose-превью, поддержка minSdk 24 |
+| **Sergey Gnedovsky** | Экран товаров и управление позициями: добавление, редактирование, отметка «куплено». Миграции Room и сидинг подсказок продуктов, вёрстка по Figma, светлая и тёмная темы |
+| **Daniil Kvasnikov** | Планшетный режим: two-pane list-detail на Material 3 Adaptive, подсветка выбранного списка, обработка удаления открытого списка. Drag & drop и сортировка товаров. Bottom-sheet меню списка и сортировки |
 
-> Раздел будет дополняться по мере завершения задач.
+---
+
+## Задачи на исследование
+
+- **Поддержка TLS на старых версиях Android.** При minSdk 24 разбирались с доверием к сертификатам Let's Encrypt: в проект добавлены `network_security_config.xml` и корневой сертификат ISRG Root X1, а также ожидание инициализации TLS-провайдера перед сетевыми запросами.
+- **Миграции Room и предзаполнение данных.** Исследовали, как безопасно менять схему БД и засеивать таблицу подсказок продуктов без потери пользовательских данных.
+- **Release-сборка и подпись.** Разбирались с R8/ProGuard, `shrinkResources`, upload key и ручной signed-сборкой через GitHub Actions.
+- **Статический анализ и покрытие.** Настройка Detekt (правила сложности, formatting) с выводом замечаний в PR через Reviewdog и отчётов покрытия через Kover.
+- **Unit-тестирование.** Изучали подходы к тестированию Kotlin-логики в Android-проекте: тестирование ViewModel с корутинами и Flow, проверку use case, мапперов и ошибок валидации без запуска UI.
 
 ---
 
