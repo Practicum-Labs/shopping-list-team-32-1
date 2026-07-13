@@ -9,17 +9,23 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.booleanResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.practicum.shoppinglist.R
 import com.practicum.shoppinglist.presentation.theme.Motion
 import com.practicum.shoppinglist.presentation.ui.auth.login.LoginRoute
 import com.practicum.shoppinglist.presentation.ui.auth.recovery.RecoveryRoute
 import com.practicum.shoppinglist.presentation.ui.auth.register.RegisterRoute
+import com.practicum.shoppinglist.presentation.ui.main.MainRoute
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingDestination
 import com.practicum.shoppinglist.presentation.ui.onboarding.OnboardingRoute
+import com.practicum.shoppinglist.presentation.ui.products.ProductsRoute
 
 @Composable
 fun ShoppingListNavHost(
@@ -28,6 +34,7 @@ fun ShoppingListNavHost(
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
+    val isTablet = booleanResource(R.bool.is_tablet)
 
     NavHost(
         navController = navController,
@@ -38,7 +45,8 @@ fun ShoppingListNavHost(
         loginRoute(navController)
         registerRoute(navController)
         recoveryRoute(navController)
-        mainRoute(navController, isDarkTheme, onThemeClick)
+        mainRoute(navController, isDarkTheme, isTablet, onThemeClick)
+        productsRoute(navController)
     }
 }
 
@@ -172,6 +180,7 @@ private fun NavGraphBuilder.recoveryRoute(navController: NavHostController) {
 private fun NavGraphBuilder.mainRoute(
     navController: NavHostController,
     isDarkTheme: Boolean,
+    isTablet: Boolean,
     onThemeClick: () -> Unit,
 ) {
     composable(
@@ -187,11 +196,37 @@ private fun NavGraphBuilder.mainRoute(
             }
         },
     ) {
-        ShoppingListListDetailHost(
-            isDarkTheme = isDarkTheme,
-            onThemeClick = onThemeClick,
-            onLogoutClick = { navController.navigateToLoginFromMain() },
-        )
+        if (isTablet) {
+            ShoppingListListDetailHost(
+                isDarkTheme = isDarkTheme,
+                onThemeClick = onThemeClick,
+                onLogoutClick = { navController.navigateToLoginFromMain() },
+            )
+        } else {
+            MainRoute(
+                isDarkTheme = isDarkTheme,
+                onThemeClick = onThemeClick,
+                onLogoutClick = { navController.navigateToLoginFromMain() },
+                onListClick = { listId -> navController.navigate(productsRoutePath(listId)) },
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.productsRoute(navController: NavHostController) {
+    composable(
+        route = PRODUCTS_ROUTE,
+        arguments = listOf(
+            navArgument(PRODUCTS_ROUTE_ARG_LIST_ID) { type = NavType.LongType },
+        ),
+    ) { backStackEntry ->
+        val listId = backStackEntry.arguments?.getLong(PRODUCTS_ROUTE_ARG_LIST_ID)
+        if (listId != null) {
+            ProductsRoute(
+                listId = listId,
+                onBack = { navController.popBackStack() },
+            )
+        }
     }
 }
 

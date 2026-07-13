@@ -249,6 +249,3 @@ private fun ListDetailEmptyState(modifier: Modifier = Modifier) {
 }
 
 private const val DETAIL_EMPTY_ROUTE = "products_empty"
-private const val PRODUCTS_ROUTE_ARG_LIST_ID = "listId"
-private const val PRODUCTS_ROUTE = "products/{$PRODUCTS_ROUTE_ARG_LIST_ID}"
-private fun productsRoutePath(listId: Long) = "products/$listId"
