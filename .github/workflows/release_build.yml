@@ -86,6 +86,7 @@ jobs:
                 if: startsWith(github.ref, 'refs/tags/') && hashFiles(format('docs/release/{0}.md', github.ref_name)) != ''
                 uses: softprops/action-gh-release@v2
                 with:
+                    name: Release ${{ github.ref_name }}
                     body_path: docs/release/${{ github.ref_name }}.md
                     prerelease: ${{ contains(github.ref_name, '-rc') }}
                     files: |
@@ -96,6 +97,7 @@ jobs:
                 if: startsWith(github.ref, 'refs/tags/') && hashFiles(format('docs/release/{0}.md', github.ref_name)) == ''
                 uses: softprops/action-gh-release@v2
                 with:
+                    name: Release ${{ github.ref_name }}
                     generate_release_notes: true
                     prerelease: ${{ contains(github.ref_name, '-rc') }}
                     files: |
