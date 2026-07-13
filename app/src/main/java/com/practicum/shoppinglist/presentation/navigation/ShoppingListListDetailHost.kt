@@ -55,10 +55,6 @@ fun ShoppingListListDetailHost(
         coroutineScope.launch { navigator.navigateBack() }
     }
 
-    LaunchedEffect(navigator.currentDestination?.contentKey) {
-        syncDetailDestination(detailNavController, navigator.currentDestination?.contentKey)
-    }
-
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
@@ -82,6 +78,7 @@ fun ShoppingListListDetailHost(
             AnimatedPane {
                 ListDetailDetailPane(
                     navController = detailNavController,
+                    contentKey = navigator.currentDestination?.contentKey,
                     onBack = { coroutineScope.launch { navigator.navigateBack() } },
                 )
             }
@@ -90,13 +87,12 @@ fun ShoppingListListDetailHost(
 }
 
 private fun syncDetailDestination(navController: NavHostController, targetContentKey: Long?) {
-    val startDestinationId = runCatching { navController.graph.startDestinationId }.getOrNull() ?: return
     val targetRoute = if (targetContentKey != null) productsRoutePath(targetContentKey) else DETAIL_EMPTY_ROUTE
     val currentRoute = navController.currentDestination?.route
     if (currentRoute == targetRoute) {
         return
     }
-    val popUpToId = navController.currentDestination?.id ?: startDestinationId
+    val popUpToId = navController.currentDestination?.id ?: navController.graph.startDestinationId
     navController.navigate(targetRoute) {
         popUpTo(popUpToId) { inclusive = true }
     }
@@ -132,6 +128,7 @@ private fun ListDetailListPane(
 @Composable
 private fun ListDetailDetailPane(
     navController: NavHostController,
+    contentKey: Long?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -152,6 +149,13 @@ private fun ListDetailDetailPane(
                 ProductsRoute(listId = listId, onBack = onBack)
             }
         }
+    }
+
+    // Must stay inside the detail pane: in single-pane mode AnimatedPane composes this content
+    // only once the detail pane is shown, and NavHost sets the graph while composing. An effect
+    // hoisted to the scaffold would run before the graph exists and never retry.
+    LaunchedEffect(contentKey) {
+        syncDetailDestination(navController, contentKey)
     }
 }
 
