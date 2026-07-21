@@ -1,9 +1,100 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
     <style name="Base.Theme.Shoppinglist" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
     </style>
 
-    <style name="Theme.Shoppinglist" parent="Base.Theme.Shoppinglist" />
+    <style name="Theme.Shoppinglist.Light" parent="Base.Theme.Shoppinglist">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/shopping_light_background</item>
+
+        <item name="shoppingColorPrimary">@color/shopping_light_primary</item>
+        <item name="shoppingColorOnPrimary">@color/shopping_light_on_primary</item>
+        <item name="shoppingColorPrimaryContainer">@color/shopping_light_primary_container</item>
+        <item name="shoppingColorOnPrimaryContainer">@color/shopping_light_on_primary_container</item>
+        <item name="shoppingColorSecondary">@color/shopping_light_secondary</item>
+        <item name="shoppingColorOnSecondary">@color/shopping_light_on_secondary</item>
+        <item name="shoppingColorBackground">@color/shopping_light_background</item>
+        <item name="shoppingColorOnBackground">@color/shopping_light_on_background</item>
+        <item name="shoppingColorSurface">@color/shopping_light_surface</item>
+        <item name="shoppingColorOnSurface">@color/shopping_light_on_surface</item>
+        <item name="shoppingColorSurfaceVariant">@color/shopping_light_surface_variant</item>
+        <item name="shoppingColorOnSurfaceVariant">@color/shopping_light_on_surface_variant</item>
+        <item name="shoppingColorOutline">@color/shopping_light_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_light_outline_variant</item>
+        <item name="shoppingColorError">@color/shopping_light_error</item>
+        <item name="shoppingColorOnError">@color/shopping_light_on_error</item>
+        <item name="shoppingColorAddListDialogSurface">@color/shopping_light_add_list_dialog_surface</item>
+        <item name="shoppingColorAddListDialogLabelContainer">@color/shopping_light_add_list_dialog_label_container</item>
+        <item name="shoppingColorAddListDialogAccent">@color/shopping_light_add_list_dialog_accent</item>
+        <item name="shoppingColorAddListDialogIcon">@color/shopping_light_add_list_dialog_icon</item>
+        <item name="shoppingColorAddListDialogTitle">@color/shopping_light_add_list_dialog_title</item>
+        <item name="shoppingColorAddListDialogPlaceholder">@color/shopping_light_add_list_dialog_placeholder</item>
+        <item name="shoppingColorIconPickerSheetSurface">@color/shopping_light_icon_picker_sheet_surface</item>
+        <item name="shoppingColorIconPickerItemContainer">@color/shopping_light_icon_picker_item_container</item>
+        <item name="shoppingColorListItemSurface">@color/shopping_light_list_item_surface</item>
+        <item name="shoppingColorListItemTitle">@color/shopping_light_list_item_title</item>
+        <item name="shoppingColorSwipeActionBackground">@color/shopping_light_swipe_action_background</item>
+        <item name="shoppingColorConfirmDialogCancelBackground">@color/shopping_light_primary_container</item>
+        <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_light_primary</item>
+        <item name="shoppingColorConfirmDialogCancelText">@color/shopping_light_on_primary_container</item>
+        <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_light_on_primary</item>
+        <item name="shoppingColorMenuSheetSortLabel">@color/shopping_menu_sheet_sort_label</item>
+        <item name="shoppingColorSortSubmenuBackground">@color/shopping_light_sort_submenu_background</item>
+        <item name="shoppingColorMenuSheetSurface">@color/shopping_light_menu_sheet_surface</item>
+        <item name="shoppingColorMenuSheetSortActive">@color/shopping_light_menu_sheet_sort_active</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_light_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_light_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_light_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_light_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_light_product_divider</item>
+    </style>
+
+    <style name="Theme.Shoppinglist.Dark" parent="Base.Theme.Shoppinglist">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/shopping_dark_background</item>
+
+        <item name="shoppingColorPrimary">@color/shopping_dark_primary</item>
+        <item name="shoppingColorOnPrimary">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorPrimaryContainer">@color/shopping_dark_primary_container</item>
+        <item name="shoppingColorOnPrimaryContainer">@color/shopping_dark_on_primary_container</item>
+        <item name="shoppingColorSecondary">@color/shopping_dark_secondary</item>
+        <item name="shoppingColorOnSecondary">@color/shopping_dark_on_secondary</item>
+        <item name="shoppingColorBackground">@color/shopping_dark_background</item>
+        <item name="shoppingColorOnBackground">@color/shopping_dark_on_background</item>
+        <item name="shoppingColorSurface">@color/shopping_dark_surface</item>
+        <item name="shoppingColorOnSurface">@color/shopping_dark_on_surface</item>
+        <item name="shoppingColorSurfaceVariant">@color/shopping_dark_surface_variant</item>
+        <item name="shoppingColorOnSurfaceVariant">@color/shopping_dark_on_surface_variant</item>
+        <item name="shoppingColorOutline">@color/shopping_dark_outline</item>
+        <item name="shoppingColorOutlineVariant">@color/shopping_dark_outline_variant</item>
+        <item name="shoppingColorError">@color/shopping_dark_error</item>
+        <item name="shoppingColorOnError">@color/shopping_dark_on_error</item>
+        <item name="shoppingColorAddListDialogSurface">@color/shopping_dark_add_list_dialog_surface</item>
+        <item name="shoppingColorAddListDialogLabelContainer">@color/shopping_dark_add_list_dialog_label_container</item>
+        <item name="shoppingColorAddListDialogAccent">@color/shopping_dark_add_list_dialog_accent</item>
+        <item name="shoppingColorAddListDialogIcon">@color/shopping_dark_add_list_dialog_icon</item>
+        <item name="shoppingColorAddListDialogTitle">@color/shopping_dark_add_list_dialog_title</item>
+        <item name="shoppingColorAddListDialogPlaceholder">@color/shopping_dark_add_list_dialog_placeholder</item>
+        <item name="shoppingColorIconPickerSheetSurface">@color/shopping_dark_icon_picker_sheet_surface</item>
+        <item name="shoppingColorIconPickerItemContainer">@color/shopping_dark_icon_picker_item_container</item>
+        <item name="shoppingColorListItemSurface">@color/shopping_dark_list_item_surface</item>
+        <item name="shoppingColorListItemTitle">@color/shopping_dark_list_item_title</item>
+        <item name="shoppingColorSwipeActionBackground">@color/shopping_dark_swipe_action_background</item>
+        <item name="shoppingColorConfirmDialogCancelBackground">@color/shopping_dark_confirm_dialog_cancel</item>
+        <item name="shoppingColorConfirmDialogDeleteBackground">@color/shopping_dark_confirm_dialog_delete</item>
+        <item name="shoppingColorConfirmDialogCancelText">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorConfirmDialogDeleteText">@color/shopping_dark_on_primary</item>
+        <item name="shoppingColorMenuSheetSortLabel">@color/shopping_menu_sheet_sort_label</item>
+        <item name="shoppingColorSortSubmenuBackground">@color/shopping_dark_sort_submenu_background</item>
+        <item name="shoppingColorMenuSheetSurface">@color/shopping_dark_menu_sheet_surface</item>
+        <item name="shoppingColorMenuSheetSortActive">@color/shopping_dark_menu_sheet_sort_active</item>
+        <item name="shoppingColorAuthButtonLoader">@color/shopping_dark_auth_button_loader</item>
+        <item name="shoppingColorProductCheckedBackground">@color/shopping_dark_product_checked_bg</item>
+        <item name="shoppingColorProductTick">@color/shopping_dark_product_tick</item>
+        <item name="shoppingColorProductMoreVert">@color/shopping_dark_product_more_vert</item>
+        <item name="shoppingColorProductDivider">@color/shopping_dark_product_divider</item>
+    </style>
+
+    <style name="Theme.Shoppinglist" parent="Theme.Shoppinglist.Light" />
 </resources>

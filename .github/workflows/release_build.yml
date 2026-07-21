@@ -1,0 +1,105 @@
+name: Release build
+
+on:
+    workflow_dispatch:
+    push:
+        tags:
+            - 'v*.*.*'
+
+permissions:
+    contents: write
+
+env:
+    commonGradleFlags: --parallel --stacktrace --no-configuration-cache --no-daemon
+
+jobs:
+    release-build:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Setup JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
+                    cache: gradle
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Restore release signing files
+                env:
+                    RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+                    RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+                    RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+                    RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+                run: |
+                    set -euo pipefail
+                    if [ -z "$RELEASE_KEYSTORE_BASE64" ] || [ -z "$RELEASE_KEYSTORE_PASSWORD" ] || [ -z "$RELEASE_KEY_ALIAS" ] || [ -z "$RELEASE_KEY_PASSWORD" ]; then
+                        echo "Release signing secrets are not configured."
+                        exit 1
+                    fi
+                    mkdir -p keystore
+                    echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > keystore/release.jks
+                    cat > keystore.properties <<EOF
+                    storeFile=keystore/release.jks
+                    storePassword=$RELEASE_KEYSTORE_PASSWORD
+                    keyAlias=$RELEASE_KEY_ALIAS
+                    keyPassword=$RELEASE_KEY_PASSWORD
+                    EOF
+
+            -   name: Build signed release APK and AAB
+                run: ./gradlew :app:assembleRelease :app:bundleRelease $commonGradleFlags
+
+            -   name: Verify release APK signature
+                run: |
+                    APKSIGNER="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)/apksigner"
+                    "$APKSIGNER" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
+
+            -   name: Upload release APK
+                uses: actions/upload-artifact@v4
+                with:
+                    name: shopping-list-release-apk
+                    path: app/build/outputs/apk/release/app-release.apk
+                    if-no-files-found: error
+                    retention-days: 30
+
+            -   name: Upload release AAB
+                uses: actions/upload-artifact@v4
+                with:
+                    name: shopping-list-release-aab
+                    path: app/build/outputs/bundle/release/app-release.aab
+                    if-no-files-found: error
+                    retention-days: 30
+
+            -   name: Prepare release files
+                if: startsWith(github.ref, 'refs/tags/')
+                run: |
+                    set -euo pipefail
+                    mkdir -p release-artifacts
+                    cp app/build/outputs/apk/release/app-release.apk "release-artifacts/shopping-list-${GITHUB_REF_NAME}.apk"
+                    cp app/build/outputs/bundle/release/app-release.aab "release-artifacts/shopping-list-${GITHUB_REF_NAME}.aab"
+
+            -   name: Create GitHub Release from notes
+                if: startsWith(github.ref, 'refs/tags/') && hashFiles(format('docs/release/{0}.md', github.ref_name)) != ''
+                uses: softprops/action-gh-release@v2
+                with:
+                    name: Release ${{ github.ref_name }}
+                    body_path: docs/release/${{ github.ref_name }}.md
+                    prerelease: ${{ contains(github.ref_name, '-rc') }}
+                    files: |
+                        release-artifacts/*.apk
+                        release-artifacts/*.aab
+
+            -   name: Create GitHub Release with generated notes
+                if: startsWith(github.ref, 'refs/tags/') && hashFiles(format('docs/release/{0}.md', github.ref_name)) == ''
+                uses: softprops/action-gh-release@v2
+                with:
+                    name: Release ${{ github.ref_name }}
+                    generate_release_notes: true
+                    prerelease: ${{ contains(github.ref_name, '-rc') }}
+                    files: |
+                        release-artifacts/*.apk
+                        release-artifacts/*.aab
